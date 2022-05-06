@@ -3,11 +3,9 @@ package gr.uom.java.xmi;
 import gr.uom.java.xmi.diff.UMLClassDiff;
 import gr.uom.java.xmi.diff.UMLModelDiff;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Set;
+import java.util.*;
 
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
 
 public class UMLModel {
@@ -15,7 +13,18 @@ public class UMLModel {
     private List<UMLClass> classList;
     private List<UMLGeneralization> generalizationList;
     private List<UMLRealization> realizationList;
-    private boolean partial;
+
+
+	private Map<String, CompilationUnit> compilationUnitMap = new LinkedHashMap<>();
+
+	public Map<String, CompilationUnit> getCompilationUnitMap() {
+		return compilationUnitMap;
+	}
+	public void addCompilationUnit(String fname, CompilationUnit cu){
+		compilationUnitMap.put(fname,cu);
+	}
+
+	private boolean partial;
 
     public UMLModel(Set<String> repositoryDirectories) {
     	this.repositoryDirectories = repositoryDirectories;

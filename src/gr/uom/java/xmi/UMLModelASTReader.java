@@ -82,6 +82,7 @@ public class UMLModelASTReader {
 			parser.setResolveBindings(false);
 			parser.setKind(ASTParser.K_COMPILATION_UNIT);
 			parser.setStatementsRecovery(true);
+
 			String javaFileContent = javaFileContents.get(filePath);
 			parser.setSource(javaFileContent.toCharArray());
 			if((javaFileContent.contains(FREE_MARKER_GENERATED) || javaFileContent.contains(FREE_MARKER_GENERATED_2)) &&
@@ -90,6 +91,7 @@ public class UMLModelASTReader {
 			}
 			try {
 				CompilationUnit compilationUnit = (CompilationUnit)parser.createAST(null);
+				this.getUmlModel().addCompilationUnit(filePath,compilationUnit); //TODO:  Use fullpath to avoid errors while two files have the same name
 				processCompilationUnit(filePath, compilationUnit, javaFileContent);
 			}
 			catch(Exception e) {
