@@ -19,6 +19,12 @@
  */
 
 package tree;
+
+import io.TreeIoUtils;
+import io.TreeIoUtils.MetadataSerializer;
+import io.TreeIoUtils.MetadataUnserializer;
+import io.TreeIoUtils.TreeFormatter;
+
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -30,6 +36,8 @@ import java.util.regex.Pattern;
  */
 public class TreeContext {
     private final Map<String, Object> metadata = new HashMap<>();
+
+    private final MetadataSerializers serializers = new MetadataSerializers();
 
     private Tree root;
 
@@ -102,4 +110,76 @@ public class TreeContext {
         return metadata.entrySet().iterator();
     }
 
+    /**
+     * Get the metadata serializers for this tree context.
+     */
+    public MetadataSerializers getSerializers() {
+        return serializers;
+    }
+
+    public TreeContext export(MetadataSerializers s) {
+        serializers.addAll(s);
+        return this;
+    }
+
+    public TreeContext export(String key, MetadataSerializer s) {
+        serializers.add(key, s);
+        return this;
+    }
+
+    public TreeContext export(String... name) {
+        for (String n : name)
+            serializers.add(n, x -> x.toString());
+        return this;
+    }
+
+    public static class Marshallers<E> {
+        Map<String, E> serializers = new HashMap<>();
+
+        public static final Pattern valid_id = Pattern.compile("[a-zA-Z0-9_]*");
+
+        public void addAll(Marshallers<E> other) {
+            addAll(other.serializers);
+        }
+
+        public void addAll(Map<String, E> serializers) {
+            serializers.forEach((k, s) -> add(k, s));
+        }
+
+        public void add(String name, E serializer) {
+            if (!valid_id.matcher(name).matches()) // TODO I definitely don't like this rule, we should think twice
+                throw new RuntimeException("Invalid key for serialization");
+            serializers.put(name, serializer);
+        }
+
+        public void remove(String key) {
+            serializers.remove(key);
+        }
+
+        public Set<String> exports() {
+            return serializers.keySet();
+        }
+    }
+
+    public static class MetadataSerializers extends Marshallers<MetadataSerializer> {
+        public void serialize(TreeFormatter formatter, String key, Object value) throws Exception {
+            MetadataSerializer s = serializers.get(key);
+            if (s != null)
+                formatter.serializeAttribute(key, s.toString(value));
+        }
+    }
+
+    public static class MetadataUnserializers extends Marshallers<MetadataUnserializer> {
+        public void load(Tree tree, String key, String value) throws Exception {
+            MetadataUnserializer s = serializers.get(key);
+            if (s != null) {
+                if (key.equals("pos"))
+                    tree.setPos(Integer.parseInt(value));
+                else if (key.equals("length"))
+                    tree.setLength(Integer.parseInt(value));
+                else
+                    tree.setMetadata(key, s.fromString(value));
+            }
+        }
+    }
 }

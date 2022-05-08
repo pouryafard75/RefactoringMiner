@@ -17,9 +17,15 @@
  * Copyright 2015-2017 Floréal Morandat <florealm@gmail.com>
  */
 package tree;
+
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class dedicated to construct AST types.
+ *
+ * @see Type
+ */
 public class TypeSet {
     private static final TypeFactoryImplementation implementation = new TypeFactoryImplementation();
 

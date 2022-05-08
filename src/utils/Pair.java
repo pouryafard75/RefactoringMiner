@@ -1,5 +1,10 @@
-package tree;
+package utils;
 
+/**
+ * A class to store immutable pairs of objects.
+ * @param <T1> the type of the first object.
+ * @param <T2> the type of the second object.
+ */
 public class Pair<T1, T2> {
     /**
      * The first object.

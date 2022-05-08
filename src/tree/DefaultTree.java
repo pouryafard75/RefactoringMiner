@@ -32,6 +32,8 @@ public class DefaultTree extends AbstractTree implements Tree {
     private int pos;
     private int length;
 
+    private AssociationMap metadata;
+
     /**
      * Constructs a new node with an empty label.
      * @param type the type of the node
@@ -116,4 +118,30 @@ public class DefaultTree extends AbstractTree implements Tree {
         this.type = type;
     }
 
+    @Override
+    public Object getMetadata(String key) {
+        if (metadata == null)
+            return null;
+        return metadata.get(key);
+    }
+
+    @Override
+    public Object setMetadata(String key, Object value) {
+        if (value == null) {
+            if (metadata == null)
+                return null;
+            else
+                return metadata.remove(key);
+        }
+        if (metadata == null)
+            metadata = new AssociationMap();
+        return metadata.set(key, value);
+    }
+
+    @Override
+    public Iterator<Entry<String, Object>> getMetadata() {
+        if (metadata == null)
+            return new EmptyEntryIterator();
+        return metadata.iterator();
+    }
 }

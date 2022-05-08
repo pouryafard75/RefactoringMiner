@@ -1,11 +1,8 @@
-package Mappings;
+package ASTDiff;
 
 import org.eclipse.jdt.core.dom.*;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
 
 public class BaseTree{
     private Type type;

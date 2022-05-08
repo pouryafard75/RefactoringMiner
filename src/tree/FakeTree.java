@@ -90,4 +90,27 @@ public class FakeTree extends AbstractTree {
         return "FakeTree";
     }
 
+    /**
+     * fake nodes have no metadata
+     */
+    @Override
+    public Object getMetadata(String key) {
+        return null;
+    }
+
+    /**
+     * fake node store no metadata
+     */
+    @Override
+    public Object setMetadata(String key, Object value) {
+        throw unsupportedOperation();
+    }
+
+    /**
+     * Since they have no metadata they do not iterate on nothing
+     */
+    @Override
+    public Iterator<Map.Entry<String, Object>> getMetadata() {
+        return new EmptyEntryIterator();
+    }
 }

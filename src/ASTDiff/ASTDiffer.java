@@ -1,14 +1,9 @@
-package Mappings;
+package ASTDiff;
 
-import gr.uom.java.xmi.LocationInfo;
-import gr.uom.java.xmi.decomposition.UMLOperationBodyMapper;
 import gr.uom.java.xmi.diff.UMLClassDiff;
 import gr.uom.java.xmi.diff.UMLModelDiff;
-import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.NodeFinder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ASTDiffer

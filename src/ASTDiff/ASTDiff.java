@@ -1,7 +1,7 @@
-package Mappings;
+package ASTDiff;
 
 import org.eclipse.jdt.core.dom.ASTNode;
-import java.util.ArrayList;
+
 import java.util.List;
 
 public class ASTDiff

@@ -341,4 +341,18 @@ public interface Tree {
      */
     void setMetrics(TreeMetrics metrics);
 
+    /**
+     * Returns the metadata with the given key for this node.
+     */
+    Object getMetadata(String key);
+
+    /**
+     * Set the metadata with the given key and value for this node.
+     */
+    Object setMetadata(String key, Object value);
+
+    /**
+     * Returns an iterator for all metadata of this node.
+     */
+    Iterator<Entry<String, Object>> getMetadata();
 }

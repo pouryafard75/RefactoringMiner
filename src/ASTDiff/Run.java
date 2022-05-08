@@ -1,4 +1,4 @@
-package Mappings;
+package ASTDiff;
 import gr.uom.java.xmi.UMLModel;
 import gr.uom.java.xmi.UMLModelASTReader;
 import gr.uom.java.xmi.diff.UMLModelDiff;
