@@ -9,7 +9,7 @@ public class BaseTree{
     private BaseTree parent;
     private int pos;
     private int length;
-    private TreeMetrics treeMetrics;
+//    private TreeMetrics treeMetrics;
     private ArrayList<BaseTree> children = new ArrayList<>();
     ASTVisitor astVisitor = new ASTVisitor() {
 

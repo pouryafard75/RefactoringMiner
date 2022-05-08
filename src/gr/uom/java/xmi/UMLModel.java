@@ -7,6 +7,7 @@ import java.util.*;
 
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
+import tree.TreeContext;
 
 public class UMLModel {
 	private Set<String> repositoryDirectories;
@@ -15,13 +16,13 @@ public class UMLModel {
     private List<UMLRealization> realizationList;
 
 
-	private Map<String, CompilationUnit> compilationUnitMap = new LinkedHashMap<>();
+	private Map<String, TreeContext> treeContextMap = new LinkedHashMap<>();
 
-	public Map<String, CompilationUnit> getCompilationUnitMap() {
-		return compilationUnitMap;
+	public Map<String, TreeContext> getCompilationUnitMap() {
+		return treeContextMap;
 	}
-	public void addCompilationUnit(String fname, CompilationUnit cu){
-		compilationUnitMap.put(fname,cu);
+	public void addCompilationUnit(String fname, TreeContext treeContext){
+		treeContextMap.put(fname,treeContext);
 	}
 
 	private boolean partial;

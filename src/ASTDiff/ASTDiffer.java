@@ -1,8 +1,13 @@
 package ASTDiff;
 
+import gr.uom.java.xmi.LocationInfo;
+import gr.uom.java.xmi.decomposition.UMLOperationBodyMapper;
 import gr.uom.java.xmi.diff.UMLClassDiff;
 import gr.uom.java.xmi.diff.UMLModelDiff;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import tree.Tree;
+import tree.TreeContext;
+import utils.Pair;
 
 import java.util.List;
 
@@ -24,34 +29,38 @@ public class ASTDiffer
     private void commonClasses() {
         List<UMLClassDiff> commons = this.umlModelDiff.getCommonClassDiffList();
         for (UMLClassDiff classdiff : commons) {
-            process(classdiff,findComps(classdiff));
+            process(classdiff,findTreeContexts(classdiff));
 
         }
     }
 
-    private void process(UMLClassDiff classdiff, Pair<CompilationUnit, CompilationUnit> comps) {
-        CompilationUnit firstcomp = comps.getFirst();
-        CompilationUnit secondcomp = comps.getSecond();
-//        List<UMLOperationBodyMapper> umlOperationBodyMapperList = classdiff.getOperationBodyMapperList();
-//        UMLOperationBodyMapper temp = umlOperationBodyMapperList.get(1);
-//        LocationInfo locationInChild =  temp.getContainer1().getLocationInfo();
-//        LocationInfo locationInParent  =  temp.getContainer2().getLocationInfo();
+    private void process(UMLClassDiff classdiff, Pair<TreeContext, TreeContext> tcs) {
+        TreeContext parentTreeCTX = tcs.first;
+        TreeContext childTreeCTX = tcs.second;
+        List<UMLOperationBodyMapper> umlOperationBodyMapperList = classdiff.getOperationBodyMapperList();
+        UMLOperationBodyMapper temp = umlOperationBodyMapperList.get(0);
+        LocationInfo locationInParent =  temp.getContainer1().getLocationInfo();
+        LocationInfo locationInChild  =  temp.getContainer2().getLocationInfo();
+        Tree childNode = childTreeCTX.getRoot().getTreeBetweenPositions(locationInChild.getStartOffset(), locationInChild.getEndOffset());
+        Tree parentNode = parentTreeCTX.getRoot().getTreeBetweenPositions(locationInParent.getStartOffset(), locationInParent.getEndOffset());
+
+
+
+        System.out.println("Here");
 //        ASTNode firstAST = NodeFinder.perform(firstcomp,locationInParent.getStartOffset(),locationInParent.getLength());
 //        ASTNode secondAST = NodeFinder.perform(secondcomp,locationInChild.getStartOffset(),locationInChild.getLength());
-        BaseTree myBase = new BaseTree(firstcomp);
 
 
 
     }
 
-    private Pair<CompilationUnit, CompilationUnit> findComps(UMLClassDiff classDiff) {
+    private Pair<TreeContext, TreeContext> findTreeContexts(UMLClassDiff classDiff) {
         //TODO: find corresponding comps
-        Pair<CompilationUnit, CompilationUnit> p = new Pair<>();
-        p.setPair(this.umlModelDiff.getChildModel().getCompilationUnitMap().values().iterator().next(),
-                this.umlModelDiff.getParentModel().getCompilationUnitMap().values().iterator().next());
-        Type a  = new Type("a");
-        new BaseTree(a);
-        return p;
+        String filename = "example.java";
+        return new Pair<TreeContext,TreeContext>
+                (this.umlModelDiff.getParentModel().getCompilationUnitMap().get(filename),
+                 this.umlModelDiff.getChildModel().getCompilationUnitMap().get(filename));
+
     }
 }
 

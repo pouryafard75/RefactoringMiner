@@ -22,8 +22,14 @@ import java.util.stream.Stream;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
+import gen.SyntaxException;
+import jdt.AbstractJdtVisitor;
+import jdt.JdtTreeGenerator;
+import jdt.JdtVisitor;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.ToolFactory;
+import org.eclipse.jdt.core.compiler.IScanner;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -59,6 +65,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import gr.uom.java.xmi.LocationInfo.CodeElementType;
 import gr.uom.java.xmi.decomposition.OperationBody;
 import gr.uom.java.xmi.decomposition.VariableDeclaration;
+import tree.TreeContext;
 
 public class UMLModelASTReader {
 	private static final String FREE_MARKER_GENERATED = "generated using freemarker";
@@ -91,7 +98,14 @@ public class UMLModelASTReader {
 			}
 			try {
 				CompilationUnit compilationUnit = (CompilationUnit)parser.createAST(null);
-				this.getUmlModel().addCompilationUnit(filePath,compilationUnit); //TODO:  Use fullpath to avoid errors while two files have the same name
+
+
+				IScanner scanner = ToolFactory.createScanner(false, false, false, false);
+				scanner.setSource(javaFileContent.toCharArray());
+				JdtVisitor visitor = new JdtVisitor(scanner);
+				compilationUnit.accept(visitor);
+				TreeContext treeContext = visitor.getTreeContext();
+				this.getUmlModel().addCompilationUnit(filePath,treeContext); //TODO:  Use fullpath to avoid errors while two files have the same name
 				processCompilationUnit(filePath, compilationUnit, javaFileContent);
 			}
 			catch(Exception e) {

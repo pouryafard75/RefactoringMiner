@@ -11,8 +11,10 @@ import java.util.List;
 
 public class Run {
     public static void main(String[] args) throws RefactoringMinerTimedOutException, IOException {
-        UMLModel model1 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v1")).getUmlModel();
-        UMLModel model2 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v2")).getUmlModel();
+//        UMLModel model1 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v1")).getUmlModel();
+//        UMLModel model2 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v2")).getUmlModel();UMLModel model1 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v1")).getUmlModel();
+        UMLModel model1 = new UMLModelASTReader(new File("D:\\TestCases\\v1")).getUmlModel();
+        UMLModel model2 = new UMLModelASTReader(new File("D:\\TestCases\\v2")).getUmlModel();
         UMLModelDiff modelDiff = model1.diff(model2);
         List<Refactoring> refactorings = modelDiff.getRefactorings();
 
