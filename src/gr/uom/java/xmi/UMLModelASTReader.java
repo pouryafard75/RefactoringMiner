@@ -128,7 +128,7 @@ public class UMLModelASTReader {
 				repositoryDirectories.add(directory);
 			}
 		}
-		this.umlModel = new UMLModel(repositoryDirectories);
+		this.umlModel = new UMLModel(rootFolder,repositoryDirectories);
 		processJavaFileContents(javaFileContents);
 	}
 

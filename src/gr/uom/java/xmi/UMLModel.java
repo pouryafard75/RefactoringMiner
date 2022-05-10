@@ -3,6 +3,7 @@ package gr.uom.java.xmi;
 import gr.uom.java.xmi.diff.UMLClassDiff;
 import gr.uom.java.xmi.diff.UMLModelDiff;
 
+import java.io.File;
 import java.util.*;
 
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -10,6 +11,7 @@ import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import tree.TreeContext;
 
 public class UMLModel {
+	public File rootFolder;
 	private Set<String> repositoryDirectories;
     private List<UMLClass> classList;
     private List<UMLGeneralization> generalizationList;
@@ -27,12 +29,19 @@ public class UMLModel {
 
 	private boolean partial;
 
-    public UMLModel(Set<String> repositoryDirectories) {
+    public UMLModel(File rootFolder, Set<String> repositoryDirectories) {
+		this.rootFolder = rootFolder;
     	this.repositoryDirectories = repositoryDirectories;
         classList = new ArrayList<UMLClass>();
         generalizationList = new ArrayList<UMLGeneralization>();
         realizationList = new ArrayList<UMLRealization>();
     }
+	public UMLModel(Set<String> repositoryDirectories) {
+		this.repositoryDirectories = repositoryDirectories;
+		classList = new ArrayList<UMLClass>();
+		generalizationList = new ArrayList<UMLGeneralization>();
+		realizationList = new ArrayList<UMLRealization>();
+	}
 
 	public boolean isPartial() {
 		return partial;

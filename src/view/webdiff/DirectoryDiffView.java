@@ -18,11 +18,11 @@
  * Copyright 2011-2015 Floréal Morandat <florealm@gmail.com>
  */
 
-package com.github.gumtreediff.client.diff.webdiff;
+package view.webdiff;
 
-import com.github.gumtreediff.gen.TreeGenerators;
-import com.github.gumtreediff.utils.Pair;
-import com.github.gumtreediff.io.DirectoryComparator;
+
+import utils.Pair;
+import io.DirectoryComparator;
 import org.rendersnake.DocType;
 import org.rendersnake.HtmlCanvas;
 import org.rendersnake.Renderable;
@@ -121,13 +121,13 @@ public class DirectoryDiffView implements Renderable {
                         .div(class_("btn-toolbar justify-content-end"))
                             .div(class_("btn-group"))
                                 //TODO: integrate this with the -g option
-                                .if_(TreeGenerators.getInstance().hasGeneratorForFile(file.first.getAbsolutePath()))
+//                                .if_(TreeGenerators.getInstance().hasGeneratorForFile(file.first.getAbsolutePath()))
                                     .a(class_("btn btn-primary btn-sm").href("/monaco-diff/" + id)).content("monaco")
                                     .a(class_("btn btn-primary btn-sm").href("/vanilla-diff/" + id)).content("classic")
-                                ._if()
-                                .a(class_("btn btn-primary btn-sm").href("/monaco-native-diff/" + id)).content("monaco-native")
-                                .a(class_("btn btn-primary btn-sm").href("/mergely-diff/" + id)).content("mergely")
-                                .a(class_("btn btn-primary btn-sm").href("/raw-diff/" + id)).content("raw")
+//                                ._if()
+//                                .a(class_("btn btn-primary btn-sm").href("/monaco-native-diff/" + id)).content("monaco-native")
+//                                .a(class_("btn btn-primary btn-sm").href("/mergely-diff/" + id)).content("mergely")
+//                                .a(class_("btn btn-primary btn-sm").href("/raw-diff/" + id)).content("raw")
                             ._div()
                         ._div()
                     ._td()

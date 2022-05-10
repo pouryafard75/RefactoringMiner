@@ -18,9 +18,9 @@
  * Copyright 2011-2015 Floréal Morandat <florealm@gmail.com>
  */
 
-package com.github.gumtreediff.client.diff.webdiff;
+package view.webdiff;
 
-import com.github.gumtreediff.actions.Diff;
+import actions.ASTDiff;
 import org.rendersnake.DocType;
 import org.rendersnake.HtmlCanvas;
 import org.rendersnake.Renderable;
@@ -40,11 +40,11 @@ public class VanillaDiffView implements Renderable {
     private File srcFile;
     private File dstFile;
 
-    private Diff diff;
+    private ASTDiff diff;
 
     private boolean dump;
 
-    public VanillaDiffView(File srcFile, File dstFile, Diff diff, boolean dump) throws IOException {
+    public VanillaDiffView(File srcFile, File dstFile, ASTDiff diff, boolean dump) throws IOException {
         this.srcFile = srcFile;
         this.dstFile = dstFile;
         this.diff = diff;

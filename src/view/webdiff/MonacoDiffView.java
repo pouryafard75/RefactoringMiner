@@ -17,11 +17,10 @@
  * Copyright 2020 Jean-Rémy Falleri <jr.falleri@gmail.com>
  */
 
-package com.github.gumtreediff.client.diff.webdiff;
-
-import com.github.gumtreediff.actions.Diff;
-import com.github.gumtreediff.actions.TreeClassifier;
-import com.github.gumtreediff.tree.Tree;
+package view.webdiff;
+import actions.ASTDiff;
+import actions.TreeClassifier;
+import tree.Tree;
 import org.rendersnake.DocType;
 import org.rendersnake.HtmlCanvas;
 import org.rendersnake.Renderable;
@@ -35,11 +34,11 @@ public class MonacoDiffView implements Renderable {
     private File srcFile;
     private File dstFile;
 
-    private Diff diff;
+    private ASTDiff diff;
 
     private int id;
 
-    public MonacoDiffView(File fSrc, File fDst, Diff diff, int id) {
+    public MonacoDiffView(File fSrc, File fDst, ASTDiff diff, int id) {
         this.srcFile = fSrc;
         this.dstFile = fDst;
         this.diff = diff;
@@ -84,7 +83,7 @@ public class MonacoDiffView implements Renderable {
         b.append("{");
         b.append("url:").append("\"/left/" + id + "\"").append(",");
         b.append("ranges: [");
-        for (Tree t: diff.src.getRoot().preOrder()) {
+        for (Tree t: diff.srcTC.getRoot().preOrder()) {
             if (c.getMovedSrcs().contains(t))
                 appendRange(b, t, "moved");
             if (c.getUpdatedSrcs().contains(t))
@@ -103,7 +102,7 @@ public class MonacoDiffView implements Renderable {
         b.append("{");
         b.append("url:").append("\"/right/" + id + "\"").append(",");
         b.append("ranges: [");
-        for (Tree t: diff.dst.getRoot().preOrder()) {
+        for (Tree t: diff.dstTC.getRoot().preOrder()) {
             if (c.getMovedDsts().contains(t))
                 appendRange(b, t, "moved");
             if (c.getUpdatedDsts().contains(t))
@@ -120,7 +119,7 @@ public class MonacoDiffView implements Renderable {
         TreeClassifier c = diff.createRootNodesClassifier();
         StringBuilder b = new StringBuilder();
         b.append("[");
-        for (Tree t: diff.src.getRoot().preOrder()) {
+        for (Tree t: diff.srcTC.getRoot().preOrder()) {
             if (c.getMovedSrcs().contains(t) || c.getUpdatedSrcs().contains(t)) {
                 Tree d = diff.mappings.getDstForSrc(t);
                 b.append(String.format("[%s, %s, %s, %s], ", t.getPos(), t.getEndPos(), d.getPos(), d.getEndPos()));

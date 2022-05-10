@@ -18,13 +18,13 @@
  * Copyright 2011-2015 Floréal Morandat <florealm@gmail.com>
  */
 
-package com.github.gumtreediff.client.diff.webdiff;
+package view.webdiff;
 
-import com.github.gumtreediff.actions.Diff;
-import com.github.gumtreediff.actions.TreeClassifier;
-import com.github.gumtreediff.utils.SequenceAlgorithms;
-import com.github.gumtreediff.tree.Tree;
-import com.github.gumtreediff.tree.TreeContext;
+import actions.ASTDiff;
+import actions.TreeClassifier;
+import utils.SequenceAlgorithms;
+import tree.Tree;
+import tree.TreeContext;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
@@ -53,9 +53,9 @@ public final class VanillaDiffHtmlBuilder {
 
     private File fDst;
 
-    private Diff diff;
+    private ASTDiff diff;
 
-    public VanillaDiffHtmlBuilder(File fSrc, File fDst, Diff diff) {
+    public VanillaDiffHtmlBuilder(File fSrc, File fDst, ASTDiff diff) {
         this.fSrc = fSrc;
         this.fDst = fDst;
         this.diff = diff;
@@ -69,18 +69,18 @@ public final class VanillaDiffHtmlBuilder {
         int mId = 1;
 
         TagIndex ltags = new TagIndex();
-        for (Tree t: diff.src.getRoot().preOrder()) {
+        for (Tree t: diff.srcTC.getRoot().preOrder()) {
             if (c.getMovedSrcs().contains(t)) {
                 mappingIds.put(diff.mappings.getDstForSrc(t), mId);
                 ltags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
                 ltags.addTags(t.getPos(), String.format(
-                                SRC_MV_SPAN, "token mv", mId++, tooltip(diff.src, t)), t.getEndPos(), END_SPAN);
+                                SRC_MV_SPAN, "token mv", mId++, tooltip(diff.srcTC, t)), t.getEndPos(), END_SPAN);
             }
             if (c.getUpdatedSrcs().contains(t)) {
                 mappingIds.put(diff.mappings.getDstForSrc(t), mId);
                 ltags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
                 ltags.addTags(t.getPos(), String.format(
-                                SRC_MV_SPAN, "token upd", mId++, tooltip(diff.src, t)), t.getEndPos(), END_SPAN);
+                                SRC_MV_SPAN, "token upd", mId++, tooltip(diff.srcTC, t)), t.getEndPos(), END_SPAN);
                 List<int[]> hunks = SequenceAlgorithms.hunks(t.getLabel(), diff.mappings.getDstForSrc(t).getLabel());
                 for (int[] hunk: hunks)
                     ltags.addTags(t.getPos() + hunk[0], UPD_SPAN, t.getPos() + hunk[1], END_SPAN);
@@ -89,23 +89,23 @@ public final class VanillaDiffHtmlBuilder {
             if (c.getDeletedSrcs().contains(t)) {
                 ltags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
                 ltags.addTags(t.getPos(), String.format(
-                                ADD_DEL_SPAN, "token del", tooltip(diff.src, t)), t.getEndPos(), END_SPAN);
+                                ADD_DEL_SPAN, "token del", tooltip(diff.srcTC, t)), t.getEndPos(), END_SPAN);
             }
         }
 
         TagIndex rtags = new TagIndex();
-        for (Tree t: diff.dst.getRoot().preOrder()) {
+        for (Tree t: diff.dstTC.getRoot().preOrder()) {
             if (c.getMovedDsts().contains(t)) {
                 int dId = mappingIds.getInt(t);
                 rtags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
                 rtags.addTags(t.getPos(), String.format(
-                                DST_MV_SPAN, "token mv", dId, tooltip(diff.dst, t)), t.getEndPos(), END_SPAN);
+                                DST_MV_SPAN, "token mv", dId, tooltip(diff.dstTC, t)), t.getEndPos(), END_SPAN);
             }
             if (c.getUpdatedDsts().contains(t)) {
                 int dId = mappingIds.getInt(t);
                 rtags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
                 rtags.addTags(t.getPos(), String.format(
-                                DST_MV_SPAN, "token upd", dId, tooltip(diff.dst, t)), t.getEndPos(), END_SPAN);
+                                DST_MV_SPAN, "token upd", dId, tooltip(diff.dstTC, t)), t.getEndPos(), END_SPAN);
                 List<int[]> hunks = SequenceAlgorithms.hunks(diff.mappings.getSrcForDst(t).getLabel(), t.getLabel());
                 for (int[] hunk: hunks)
                     rtags.addTags(t.getPos() + hunk[2], UPD_SPAN, t.getPos() + hunk[3], END_SPAN);
@@ -113,7 +113,7 @@ public final class VanillaDiffHtmlBuilder {
             if (c.getInsertedDsts().contains(t)) {
                 rtags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
                 rtags.addTags(t.getPos(), String.format(
-                                ADD_DEL_SPAN, "token add", tooltip(diff.dst, t)), t.getEndPos(), END_SPAN);
+                                ADD_DEL_SPAN, "token add", tooltip(diff.dstTC, t)), t.getEndPos(), END_SPAN);
             }
         }
 

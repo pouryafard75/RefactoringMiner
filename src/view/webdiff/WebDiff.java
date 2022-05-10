@@ -18,15 +18,11 @@
  * Copyright 2011-2015 Floréal Morandat <florealm@gmail.com>
  */
 
-package com.github.gumtreediff.client.diff.webdiff;
+package view.webdiff;
 
-import com.github.gumtreediff.actions.Diff;
-import com.github.gumtreediff.client.Option;
-import com.github.gumtreediff.client.Register;
-import com.github.gumtreediff.client.diff.AbstractDiffClient;
-import com.github.gumtreediff.utils.Registry;
-import com.github.gumtreediff.io.DirectoryComparator;
-import com.github.gumtreediff.utils.Pair;
+import actions.ASTDiff;
+import io.DirectoryComparator;
+import utils.Pair;
 import org.rendersnake.HtmlCanvas;
 import org.rendersnake.Renderable;
 import spark.Spark;
@@ -39,49 +35,26 @@ import java.nio.file.Paths;
 
 import static spark.Spark.*;
 
-@Register(description = "Web diff client", options = WebDiff.WebDiffOptions.class, priority = Registry.Priority.HIGH)
-public class WebDiff extends AbstractDiffClient<WebDiff.WebDiffOptions> {
+public class WebDiff  {
     public static final String JQUERY_JS_URL = "https://code.jquery.com/jquery-3.4.1.min.js";
     public static final String BOOTSTRAP_CSS_URL = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css";
     public static final String BOOTSTRAP_JS_URL = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js";
+    public static final int port = 4567;
+    public String srcPath;
+    public String dstPath;
 
-    public WebDiff(String[] args) {
-        super(args);
+
+    public WebDiff(String srcPath, String dstPath) {
+        this.srcPath = srcPath;
+        this.dstPath = dstPath;
     }
 
-    public static class WebDiffOptions extends AbstractDiffClient.DiffOptions {
-        public static final int DEFAULT_PORT = 4567;
-        public int port = DEFAULT_PORT;
-
-        @Override
-        public Option[] values() {
-            return Option.Context.addValue(super.values(),
-                    new Option("--port", String.format("Set server port (default to %d).", DEFAULT_PORT), 1) {
-                        @Override
-                        protected void process(String name, String[] args) {
-                            int p = Integer.parseInt(args[0]);
-                            if (p > 0)
-                                port = p;
-                            else
-                                System.err.printf("Invalid port number (%s), using %d.\n", args[0], port);
-                        }
-                    }
-            );
-        }
-    }
-
-    @Override
-    protected WebDiffOptions newOptions() {
-        return new WebDiffOptions();
-    }
-
-    @Override
     public void run() {
-        DirectoryComparator comparator = new DirectoryComparator(opts.srcPath, opts.dstPath);
+        DirectoryComparator comparator = new DirectoryComparator(this.srcPath, this.dstPath);
         comparator.compare();
-        configureSpark(comparator, opts.port);
+        configureSpark(comparator, this.port);
         Spark.awaitInitialization();
-        System.out.println(String.format("Starting server: %s:%d.", "http://127.0.0.1", opts.port));
+        System.out.println(String.format("Starting server: %s:%d.", "http://127.0.0.1", this.port));
     }
 
     public void configureSpark(final DirectoryComparator comparator, int port) {
@@ -101,14 +74,14 @@ public class WebDiff extends AbstractDiffClient<WebDiff.WebDiffOptions> {
         get("/vanilla-diff/:id", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
             Pair<File, File> pair = comparator.getModifiedFiles().get(id);
-            Diff diff = getDiff(pair.first.getAbsolutePath(), pair.second.getAbsolutePath());
+            ASTDiff diff = getDiff(pair.first.getAbsolutePath(), pair.second.getAbsolutePath());
             Renderable view = new VanillaDiffView(pair.first, pair.second, diff, false);
             return render(view);
         });
         get("/monaco-diff/:id", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
             Pair<File, File> pair = comparator.getModifiedFiles().get(id);
-            Diff diff = getDiff(pair.first.getAbsolutePath(), pair.second.getAbsolutePath());
+            ASTDiff diff = getDiff(pair.first.getAbsolutePath(), pair.second.getAbsolutePath());
             Renderable view = new MonacoDiffView(pair.first, pair.second, diff, id);
             return render(view);
         });
@@ -123,13 +96,13 @@ public class WebDiff extends AbstractDiffClient<WebDiff.WebDiffOptions> {
             Renderable view = new MergelyDiffView(id);
             return render(view);
         });
-        get("/raw-diff/:id", (request, response) -> {
-            int id = Integer.parseInt(request.params(":id"));
-            Pair<File, File> pair = comparator.getModifiedFiles().get(id);
-            Diff diff = getDiff(pair.first.getAbsolutePath(), pair.second.getAbsolutePath());
-            Renderable view = new TextDiffView(pair.first, pair.second, diff);
-            return render(view);
-        });
+//        get("/raw-diff/:id", (request, response) -> {
+//            int id = Integer.parseInt(request.params(":id"));
+//            Pair<File, File> pair = comparator.getModifiedFiles().get(id);
+//            Diff diff = getDiff(pair.first.getAbsolutePath(), pair.second.getAbsolutePath());
+//            Renderable view = new TextDiffView(pair.first, pair.second, diff);
+//            return render(view);
+//        });
         get("/left/:id", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
             Pair<File, File> pair = comparator.getModifiedFiles().get(id);
