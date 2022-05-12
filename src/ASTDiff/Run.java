@@ -27,10 +27,10 @@ public class Run {
 //        UMLModel model2 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v2")).getUmlModel();UMLModel model1 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v1")).getUmlModel();
 //        UMLModel model1 = new UMLModelASTReader(new File("D:\\TestCases\\v1")).getUmlModel();
 //        UMLModel model2 = new UMLModelASTReader(new File("D:\\TestCases\\v2")).getUmlModel();
-        UMLModel model1 = new UMLModelASTReader(new File("D:\\DebugCases\\RenameMethod\\v1")).getUmlModel();
-        UMLModel model2 = new UMLModelASTReader(new File("D:\\DebugCases\\RenameMethod\\v2")).getUmlModel();
-//        UMLModel model1 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/RenameMethod/v1/")).getUmlModel();
-//        UMLModel model2 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/RenameMethod/v2/")).getUmlModel();
+//        UMLModel model1 = new UMLModelASTReader(new File("D:\\DebugCases\\RenameMethod\\v1")).getUmlModel();
+//        UMLModel model2 = new UMLModelASTReader(new File("D:\\DebugCases\\RenameMethod\\v2")).getUmlModel();
+        UMLModel model1 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/SimpleCase/v1/")).getUmlModel();
+        UMLModel model2 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/SimpleCase/v2/")).getUmlModel();
         UMLModelDiff modelDiff = model1.diff(model2);
         ProjectASTDiffer projectASTDiffer = new ProjectASTDiffer(modelDiff);
         projectASTDiffer.diff();

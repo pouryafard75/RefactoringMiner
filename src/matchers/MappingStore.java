@@ -88,6 +88,7 @@ public class MappingStore implements Iterable<Mapping> {
     }
     public void addListOfMapping(List<Pair<Tree,Tree>> pairList)
     {
+        if (pairList == null) return;
         for (Pair<Tree,Tree> pair : pairList) {
             addMapping(pair.first,pair.second);
         }

@@ -229,4 +229,15 @@ public final class TreeUtils {
             }
         };
     }
+
+    public static Tree findChildByType(Tree tree, String type) {
+        if (!tree.getChildren().isEmpty())
+        {
+            for (Tree child: tree.getChildren()) {
+                if (child.getType().name.equals(type))
+                    return child;
+            }
+        }
+        return null;
+    }
 }

@@ -5,8 +5,11 @@ import actions.EditScript;
 import actions.SimplifiedChawatheScriptGenerator;
 import gr.uom.java.xmi.LocationInfo;
 import gr.uom.java.xmi.UMLOperation;
+import gr.uom.java.xmi.UMLType;
+import gr.uom.java.xmi.VariableDeclarationContainer;
 import gr.uom.java.xmi.decomposition.AbstractCodeMapping;
 import gr.uom.java.xmi.decomposition.UMLOperationBodyMapper;
+import gr.uom.java.xmi.decomposition.replacement.Replacement;
 import gr.uom.java.xmi.diff.UMLClassDiff;
 import gr.uom.java.xmi.diff.UMLModelDiff;
 import matchers.Mapping;
@@ -59,15 +62,15 @@ public class ProjectASTDiffer
         List<UMLClassDiff> commons = this.umlModelDiff.getCommonClassDiffList();
 
         for (UMLClassDiff classdiff : commons) {
-            this.astDiffMap.put(getSrcPath() + File.separator +  classdiff.getOriginalClass().getSourceFile(), process(classdiff,findTreeContexts(classdiff)));
+            ASTDiff classASTDiff = process(classdiff, findTreeContexts(classdiff));
+            String fullPath = getSrcPath() + File.separator + classdiff.getOriginalClass().getSourceFile();
+            this.astDiffMap.put(fullPath, classASTDiff);
         }
 
     }
 
     private ASTDiff process(UMLClassDiff classdiff, Pair<TreeContext, TreeContext> treeContextPair)
     {
-
-
         Tree srcTree = treeContextPair.first.getRoot();
         Tree dstTree = treeContextPair.second.getRoot();
 
@@ -82,18 +85,22 @@ public class ProjectASTDiffer
 
         mappingStore.addListOfMapping(classDecMapping);
 
-        for(UMLOperation umlOperation : classdiff.getAddedOperations())
-        {
-            Tree addedOperationNode = dstTree.getTreeBetweenPositions(umlOperation.getLocationInfo().getStartOffset(),umlOperation.getLocationInfo().getEndOffset());
-            System.out.println("ol");
-        }
         for(UMLOperationBodyMapper umlOperationBodyMapper : classdiff.getOperationBodyMapperList())
         {
+            VariableDeclarationContainer container1 = umlOperationBodyMapper.getContainer1();
+            VariableDeclarationContainer container2 = umlOperationBodyMapper.getContainer2();
+            List<UMLType> commonParamsTypes = container1.commonParameterTypes(container2);
+            List<UMLType> commonParamsTypes2 = container2.commonParameterTypes(container1);
 
+//            for (UMLType umlType : commonParamsTypes) {
+//                umlType.get
+//
+//            }
             Tree srcOperationNode = srcTree.getTreeBetweenPositions(umlOperationBodyMapper.getOperation1().getLocationInfo().getStartOffset(),umlOperationBodyMapper.getOperation1().getLocationInfo().getEndOffset());
             Tree dstOperationNode = dstTree.getTreeBetweenPositions(umlOperationBodyMapper.getOperation2().getLocationInfo().getStartOffset(),umlOperationBodyMapper.getOperation2().getLocationInfo().getEndOffset());
             mappingStore.addMapping(srcOperationNode,dstOperationNode);
-            mappingStore.addListOfMapping(firstlevelChildren(srcOperationNode,dstOperationNode));
+            mappingStore.addListOfMapping(processMethodSignature(srcOperationNode,dstOperationNode));
+//            mappingStore.addListOfMapping(firstlevelChildren(srcOperationNode,dstOperationNode));
             Set<AbstractCodeMapping> mappings = umlOperationBodyMapper.getMappings();
             for (AbstractCodeMapping abstractCodeMapping : mappings)
             {
@@ -101,7 +108,6 @@ public class ProjectASTDiffer
                 {
                     int srcStartOffset = abstractCodeMapping.getFragment1().getLocationInfo().getStartOffset();
                     int srcEndOffset = abstractCodeMapping.getFragment1().getLocationInfo().getEndOffset();
-
                     int dstStartOffset = abstractCodeMapping.getFragment2().getLocationInfo().getStartOffset();
                     int dstEndOffset = abstractCodeMapping.getFragment2().getLocationInfo().getEndOffset();
 
@@ -109,19 +115,73 @@ public class ProjectASTDiffer
                     Tree dstStatementNode = dstTree.getTreeBetweenPositions(dstStartOffset,dstEndOffset);
                     mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
                 }
+                else
+                {
+                    Set<Replacement> replacements = abstractCodeMapping.getReplacements();
+                    if (replacements.size() == 1)
+                    {
+                        Replacement replacement = replacements.iterator().next();
+                        if (replacement.getType() == Replacement.ReplacementType.NUMBER_LITERAL)
+                        {
+                            int srcStartOffset = abstractCodeMapping.getFragment1().getLocationInfo().getStartOffset();
+                            int srcEndOffset = abstractCodeMapping.getFragment1().getLocationInfo().getEndOffset();
+                            int dstStartOffset = abstractCodeMapping.getFragment2().getLocationInfo().getStartOffset();
+                            int dstEndOffset = abstractCodeMapping.getFragment2().getLocationInfo().getEndOffset();
+
+                            Tree srcStatementNode = srcTree.getTreeBetweenPositions(srcStartOffset,srcEndOffset);
+                            Tree dstStatementNode = dstTree.getTreeBetweenPositions(dstStartOffset,dstEndOffset);
+                            mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
+                        }
+
+                    }
+                }
             }
 
         }
         return new ASTDiff(treeContextPair.first, treeContextPair.second,mappingStore,new SimplifiedChawatheScriptGenerator().computeActions(mappingStore));
     }
 
-    private List<Pair<Tree, Tree>> classDeclarationMapping(Tree srcTypeDeclartion, Tree dstTypeDeclartion) {
-        System.out.println("ol");
-        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
-        pairlist.add(new Pair<>(srcTypeDeclartion,dstTypeDeclartion));
-        for (int i = 0; i < 3; i++) {
-            pairlist.add(new Pair<>(srcTypeDeclartion.getChildren().get(i),dstTypeDeclartion.getChildren().get(i)));
+    private List<Pair<Tree, Tree>> processMethodSignature(Tree srcOperationNode, Tree dstOperationNode) {
+        List<Pair<Tree,Tree>> pairList = new ArrayList<>();
+        List<String> searchingTypes = new ArrayList<>();
+        searchingTypes.add("Modifier");
+        searchingTypes.add("SimpleName");
+        searchingTypes.add("PrimitiveType");
+        searchingTypes.add("Block");
+        for (String type : searchingTypes) {
+            Pair<Tree,Tree> matched = matchBasedOnType(srcOperationNode,dstOperationNode,type);
+            if (matched != null)
+                pairList.add(matched);
         }
+        return pairList;
+    }
+
+    private List<Pair<Tree, Tree>> processClassDesc(Tree srcOperationNode, Tree dstOperationNode) {
+        List<Pair<Tree,Tree>> pairList = new ArrayList<>();
+        List<String> searchingTypes = new ArrayList<>();
+        searchingTypes.add("Modifier");
+        searchingTypes.add("SimpleName");
+        searchingTypes.add("TYPE_DECLARATION_KIND");
+        for (String type : searchingTypes) {
+            Pair<Tree,Tree> matched = matchBasedOnType(srcOperationNode,dstOperationNode,type);
+            if (matched != null)
+                pairList.add(matched);
+        }
+        return pairList;
+    }
+
+
+    private Pair<Tree, Tree> matchBasedOnType(Tree srcOperationNode, Tree dstOperationNode, String searchingType) {
+        Tree srcModifier = TreeUtils.findChildByType(srcOperationNode,searchingType);
+        Tree dstModifier = TreeUtils.findChildByType(dstOperationNode,searchingType);
+        if (srcModifier != null && dstModifier != null)
+            return new Pair<>(srcModifier, dstModifier);
+        return null;
+    }
+
+    private List<Pair<Tree, Tree>> classDeclarationMapping(Tree srcTypeDeclartion, Tree dstTypeDeclartion) {
+        List<Pair<Tree, Tree>> pairlist = processClassDesc(srcTypeDeclartion, dstTypeDeclartion);
+        pairlist.add(new Pair<>(srcTypeDeclartion,dstTypeDeclartion));
         return pairlist;
     }
 
