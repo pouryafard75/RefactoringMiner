@@ -121,7 +121,8 @@ public class ProjectASTDiffer
                     if (replacements.size() == 1)
                     {
                         Replacement replacement = replacements.iterator().next();
-                        if (replacement.getType() == Replacement.ReplacementType.NUMBER_LITERAL)
+                        if (replacement.getType() == Replacement.ReplacementType.NUMBER_LITERAL ||
+                            replacement.getType() == Replacement.ReplacementType.STRING_LITERAL)
                         {
                             int srcStartOffset = abstractCodeMapping.getFragment1().getLocationInfo().getStartOffset();
                             int srcEndOffset = abstractCodeMapping.getFragment1().getLocationInfo().getEndOffset();
