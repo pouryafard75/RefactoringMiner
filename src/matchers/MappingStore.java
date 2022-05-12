@@ -3,6 +3,7 @@ package matchers;
 import java.util.*;
 
 import tree.Tree;
+import utils.Pair;
 
 public class MappingStore implements Iterable<Mapping> {
     /**
@@ -84,6 +85,12 @@ public class MappingStore implements Iterable<Mapping> {
     public void addMapping(Tree src, Tree dst) {
         srcToDst.put(src, dst);
         dstToSrc.put(dst, src);
+    }
+    public void addListOfMapping(List<Pair<Tree,Tree>> pairList)
+    {
+        for (Pair<Tree,Tree> pair : pairList) {
+            addMapping(pair.first,pair.second);
+        }
     }
 
     /**
