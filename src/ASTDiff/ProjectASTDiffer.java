@@ -9,11 +9,13 @@ import gr.uom.java.xmi.UMLType;
 import gr.uom.java.xmi.VariableDeclarationContainer;
 import gr.uom.java.xmi.decomposition.AbstractCodeMapping;
 import gr.uom.java.xmi.decomposition.UMLOperationBodyMapper;
+import gr.uom.java.xmi.decomposition.VariableDeclaration;
 import gr.uom.java.xmi.decomposition.replacement.Replacement;
 import gr.uom.java.xmi.diff.UMLClassDiff;
 import gr.uom.java.xmi.diff.UMLModelDiff;
 import matchers.Mapping;
 import matchers.MappingStore;
+import org.refactoringminer.api.Refactoring;
 import tree.Tree;
 import tree.TreeContext;
 import tree.TreeUtils;
@@ -87,15 +89,19 @@ public class ProjectASTDiffer
 
         for(UMLOperationBodyMapper umlOperationBodyMapper : classdiff.getOperationBodyMapperList())
         {
+            Set<Refactoring> refactorings = umlOperationBodyMapper.getRefactorings();
+            for (org.apache.commons.lang3.tuple.Pair<VariableDeclaration, VariableDeclaration> matchedPair: umlOperationBodyMapper.getMatchedVariables()) {
+                VariableDeclaration leftPair = matchedPair.getLeft();
+                VariableDeclaration rightPair = matchedPair.getRight();
+                Tree leftTree = findByLocationInfo(srcTree,leftPair.getLocationInfo());
+                Tree rightTree = findByLocationInfo(dstTree,rightPair.getLocationInfo());
+                mappingStore.addMappingRecursively(leftTree,rightTree);
+            }
             VariableDeclarationContainer container1 = umlOperationBodyMapper.getContainer1();
             VariableDeclarationContainer container2 = umlOperationBodyMapper.getContainer2();
             List<UMLType> commonParamsTypes = container1.commonParameterTypes(container2);
             List<UMLType> commonParamsTypes2 = container2.commonParameterTypes(container1);
 
-//            for (UMLType umlType : commonParamsTypes) {
-//                umlType.get
-//
-//            }
             Tree srcOperationNode = srcTree.getTreeBetweenPositions(umlOperationBodyMapper.getOperation1().getLocationInfo().getStartOffset(),umlOperationBodyMapper.getOperation1().getLocationInfo().getEndOffset());
             Tree dstOperationNode = dstTree.getTreeBetweenPositions(umlOperationBodyMapper.getOperation2().getLocationInfo().getStartOffset(),umlOperationBodyMapper.getOperation2().getLocationInfo().getEndOffset());
             mappingStore.addMapping(srcOperationNode,dstOperationNode);
@@ -142,6 +148,12 @@ public class ProjectASTDiffer
         return new ASTDiff(treeContextPair.first, treeContextPair.second,mappingStore,new SimplifiedChawatheScriptGenerator().computeActions(mappingStore));
     }
 
+    private Tree findByLocationInfo(Tree tree, LocationInfo locationInfo){
+        int startoffset = locationInfo.getStartOffset();
+        int endoffset = locationInfo.getEndOffset();
+        Tree result = tree.getTreeBetweenPositions(startoffset, endoffset);
+        return result;
+    }
     private List<Pair<Tree, Tree>> processMethodSignature(Tree srcOperationNode, Tree dstOperationNode) {
         List<Pair<Tree,Tree>> pairList = new ArrayList<>();
         List<String> searchingTypes = new ArrayList<>();
