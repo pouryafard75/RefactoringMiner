@@ -111,9 +111,12 @@ public class MappingStore implements Iterable<Mapping> {
     public void addListOfMappingRecursively(List<Pair<Tree,Tree>> pairList) {
         if (pairList == null) return;
         for(Pair<Tree,Tree> pair : pairList)
-            addMappingRecursively(pair.first,pair.second);
+            addPairRecursively(pair);
     }
-
+    public void addPairRecursively(Pair<Tree,Tree> pair)
+    {
+        addMappingRecursively(pair.first,pair.second);
+    }
 
     /**
      * Remove the mapping between the provided source and destination nodes.

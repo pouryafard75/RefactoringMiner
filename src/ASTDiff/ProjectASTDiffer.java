@@ -76,9 +76,11 @@ public class ProjectASTDiffer
         Tree srcTree = treeContextPair.first.getRoot();
         Tree dstTree = treeContextPair.second.getRoot();
 
+
         MappingStore mappingStore = new MappingStore(srcTree,dstTree);
         mappingStore.addMapping(srcTree,dstTree);
 
+        mappingStore.addPairRecursively(processPackageDeclaration(srcTree,dstTree,classdiff));
         mappingStore.addListOfMappingRecursively(processImports(srcTree,dstTree,classdiff.getImportDiffList().getCommonImports()));
 
         List<Pair<Tree, Tree>> classDecMapping = classDeclarationMapping(
@@ -144,6 +146,30 @@ public class ProjectASTDiffer
 
         }
         return new ASTDiff(treeContextPair.first, treeContextPair.second,mappingStore,new SimplifiedChawatheScriptGenerator().computeActions(mappingStore));
+    }
+
+    private Pair<Tree, Tree> processPackageDeclaration(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
+        //TODO: In current implementation, I assumed that these two package-statements are matched since they both belong to the same class
+        //TODO : Question: Can single file have multiple package declaration? if yes, I have to use list of pairs
+        Tree srcPackageDeclaration = findPackageDeclaration(srcTree);
+        Tree dstPackageDeclaration = findPackageDeclaration(dstTree);
+        if (srcPackageDeclaration != null && dstPackageDeclaration != null)
+            return new Pair<Tree,Tree>(srcPackageDeclaration,dstPackageDeclaration);
+        return null;
+    }
+
+    private Tree findPackageDeclaration(Tree inputTree) {
+        String searchingType = "PackageDeclaration";
+        if (!inputTree.getChildren().isEmpty())
+        {
+            List<Tree> children = inputTree.getChildren();
+            for(Tree child: children)
+            {
+                if (child.getType().name.equals(searchingType))
+                    return child;
+            }
+        }
+        return null;
     }
 
     private List<Pair<Tree, Tree>> processImports(Tree srcTree, Tree dstTree, Set<String> commonImports) {
