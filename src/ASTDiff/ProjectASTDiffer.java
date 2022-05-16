@@ -79,6 +79,8 @@ public class ProjectASTDiffer
         MappingStore mappingStore = new MappingStore(srcTree,dstTree);
         mappingStore.addMapping(srcTree,dstTree);
 
+        mappingStore.addListOfMappingRecursively(processImports(srcTree,dstTree,classdiff.getImportDiffList().getCommonImports()));
+
         List<Pair<Tree, Tree>> classDecMapping = classDeclarationMapping(
                 srcTree.getTreeBetweenPositions
                         (classdiff.getOriginalClass().getLocationInfo().getStartOffset(), classdiff.getOriginalClass().getLocationInfo().getEndOffset()),
@@ -87,7 +89,9 @@ public class ProjectASTDiffer
 
         mappingStore.addListOfMapping(classDecMapping);
 
-        for(UMLOperationBodyMapper umlOperationBodyMapper : classdiff.getOperationBodyMapperList())
+        List<UMLOperationBodyMapper> operationBodyMapperList = classdiff.getOperationBodyMapperList();
+
+        for(UMLOperationBodyMapper umlOperationBodyMapper : operationBodyMapperList)
         {
             Set<Refactoring> refactorings = umlOperationBodyMapper.getRefactorings();
             for (org.apache.commons.lang3.tuple.Pair<VariableDeclaration, VariableDeclaration> matchedPair: umlOperationBodyMapper.getMatchedVariables()) {
@@ -97,16 +101,10 @@ public class ProjectASTDiffer
                 Tree rightTree = findByLocationInfo(dstTree,rightPair.getLocationInfo());
                 mappingStore.addMappingRecursively(leftTree,rightTree);
             }
-            VariableDeclarationContainer container1 = umlOperationBodyMapper.getContainer1();
-            VariableDeclarationContainer container2 = umlOperationBodyMapper.getContainer2();
-            List<UMLType> commonParamsTypes = container1.commonParameterTypes(container2);
-            List<UMLType> commonParamsTypes2 = container2.commonParameterTypes(container1);
-
             Tree srcOperationNode = srcTree.getTreeBetweenPositions(umlOperationBodyMapper.getOperation1().getLocationInfo().getStartOffset(),umlOperationBodyMapper.getOperation1().getLocationInfo().getEndOffset());
             Tree dstOperationNode = dstTree.getTreeBetweenPositions(umlOperationBodyMapper.getOperation2().getLocationInfo().getStartOffset(),umlOperationBodyMapper.getOperation2().getLocationInfo().getEndOffset());
             mappingStore.addMapping(srcOperationNode,dstOperationNode);
             mappingStore.addListOfMapping(processMethodSignature(srcOperationNode,dstOperationNode));
-//            mappingStore.addListOfMapping(firstlevelChildren(srcOperationNode,dstOperationNode));
             Set<AbstractCodeMapping> mappings = umlOperationBodyMapper.getMappings();
             for (AbstractCodeMapping abstractCodeMapping : mappings)
             {
@@ -146,6 +144,32 @@ public class ProjectASTDiffer
 
         }
         return new ASTDiff(treeContextPair.first, treeContextPair.second,mappingStore,new SimplifiedChawatheScriptGenerator().computeActions(mappingStore));
+    }
+
+    private List<Pair<Tree, Tree>> processImports(Tree srcTree, Tree dstTree, Set<String> commonImports) {
+        if (commonImports.isEmpty())
+             return null;
+        String searchingType = "ImportDeclaration";
+        List<Tree> srcChildren = srcTree.getChildren();
+        List<Tree> dstChildren = dstTree.getChildren();
+        List<Pair<Tree,Tree>> matchedTrees = new ArrayList<>();
+        for(String label : commonImports){
+            Tree srcImportStatement = findImportByTypeAndLabel(srcChildren,searchingType,label);
+            Tree dstImportStatement = findImportByTypeAndLabel(dstChildren,searchingType,label);
+            if (srcImportStatement != null && dstImportStatement != null)
+                matchedTrees.add(new Pair<>(srcImportStatement,dstImportStatement));
+        }
+        return matchedTrees;
+    }
+
+    private Tree findImportByTypeAndLabel(List<Tree> inputTree, String searchingType, String label) {
+        for (Tree srcStatement: inputTree) {
+            if (srcStatement.getType().name.equals(searchingType)) {
+                if (srcStatement.getChild(0).getLabel().equals(label)) //TODO getChild 0 will cause a lot of problem
+                    return srcStatement;
+            }
+        }
+        return null;
     }
 
     private Tree findByLocationInfo(Tree tree, LocationInfo locationInfo){
