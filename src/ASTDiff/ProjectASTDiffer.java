@@ -16,6 +16,7 @@ import gr.uom.java.xmi.diff.UMLModelDiff;
 import matchers.Mapping;
 import matchers.MappingStore;
 import org.refactoringminer.api.Refactoring;
+import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import tree.Tree;
 import tree.TreeContext;
 import tree.TreeUtils;
@@ -43,9 +44,9 @@ public class ProjectASTDiffer
         return umlModelDiff;
     }
 
-    public ProjectASTDiffer(UMLModelDiff umlModelDiff)
-    {
+    public ProjectASTDiffer(UMLModelDiff umlModelDiff) throws RefactoringMinerTimedOutException {
         this.umlModelDiff = umlModelDiff;
+        umlModelDiff.getRefactorings();
         this.srcPath = this.umlModelDiff.getParentModel().rootFolder.getAbsolutePath();
         this.dstPath = this.umlModelDiff.getChildModel().rootFolder.getAbsolutePath();
 
@@ -106,7 +107,7 @@ public class ProjectASTDiffer
             Tree srcOperationNode = srcTree.getTreeBetweenPositions(umlOperationBodyMapper.getOperation1().getLocationInfo().getStartOffset(),umlOperationBodyMapper.getOperation1().getLocationInfo().getEndOffset());
             Tree dstOperationNode = dstTree.getTreeBetweenPositions(umlOperationBodyMapper.getOperation2().getLocationInfo().getStartOffset(),umlOperationBodyMapper.getOperation2().getLocationInfo().getEndOffset());
             mappingStore.addMapping(srcOperationNode,dstOperationNode);
-            mappingStore.addListOfMapping(processMethodSignature(srcOperationNode,dstOperationNode));
+            mappingStore.addListOfMappingRecursively(processMethodSignature(srcOperationNode,dstOperationNode));
             Set<AbstractCodeMapping> mappings = umlOperationBodyMapper.getMappings();
             for (AbstractCodeMapping abstractCodeMapping : mappings)
             {
@@ -205,10 +206,15 @@ public class ProjectASTDiffer
         return result;
     }
     private List<Pair<Tree, Tree>> processMethodSignature(Tree srcOperationNode, Tree dstOperationNode) {
+        //TODO: static and ... are also considered as Modifier for method declration
+        //TODO: (cont.) probably, I have to change ASTVisitor to modify those types.
         List<Pair<Tree,Tree>> pairList = new ArrayList<>();
         List<String> searchingTypes = new ArrayList<>();
+        searchingTypes.add("AccessModifier");
         searchingTypes.add("Modifier");
         searchingTypes.add("SimpleName");
+        searchingTypes.add("SimpleType");
+        // TODO: Above line was added to check the Exceptions, probably not the right way to handle this.
         searchingTypes.add("PrimitiveType");
         searchingTypes.add("Block");
         for (String type : searchingTypes) {
@@ -222,7 +228,7 @@ public class ProjectASTDiffer
     private List<Pair<Tree, Tree>> processClassDesc(Tree srcOperationNode, Tree dstOperationNode) {
         List<Pair<Tree,Tree>> pairList = new ArrayList<>();
         List<String> searchingTypes = new ArrayList<>();
-        searchingTypes.add("Modifier");
+        searchingTypes.add("AccessModifier");
         searchingTypes.add("SimpleName");
         searchingTypes.add("TYPE_DECLARATION_KIND");
         for (String type : searchingTypes) {

@@ -5,10 +5,14 @@ package jdt;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
+
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import tree.Type;
 import org.eclipse.jdt.core.dom.*;
 import tree.Tree;
 import tree.TreeContext;
+import tree.TypeSet;
+
 import static tree.TypeSet.type;
 
 public abstract class AbstractJdtVisitor extends ASTVisitor {
@@ -39,6 +43,11 @@ public abstract class AbstractJdtVisitor extends ASTVisitor {
     }
 
     protected void push(ASTNode n, Type type, String label, int startPosition, int length) {
+        if (type.name.equals("Modifier"))
+        {
+            if (label.equals("public") || label.equals("private") || label.equals("protected") || label.equals("default"))
+                type = TypeSet.type("AccessModifier");
+        }
         Tree t = context.createTree(type, label);
         t.setPos(startPosition);
         t.setLength(length);
