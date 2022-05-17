@@ -84,13 +84,14 @@ public class ProjectASTDiffer
         mappingStore.addPairRecursively(processPackageDeclaration(srcTree,dstTree,classdiff));
         mappingStore.addListOfMappingRecursively(processImports(srcTree,dstTree,classdiff.getImportDiffList().getCommonImports()));
 
-        List<Pair<Tree, Tree>> classDecMapping = classDeclarationMapping(
-                srcTree.getTreeBetweenPositions
-                        (classdiff.getOriginalClass().getLocationInfo().getStartOffset(), classdiff.getOriginalClass().getLocationInfo().getEndOffset()),
-                dstTree.getTreeBetweenPositions
-                        (classdiff.getNextClass().getLocationInfo().getStartOffset(), classdiff.getNextClass().getLocationInfo().getEndOffset()));
 
-        mappingStore.addListOfMapping(classDecMapping);
+        Tree srcClassTree = findByLocationInfo(srcTree,classdiff.getOriginalClass().getLocationInfo());
+        Tree dstClassTree = findByLocationInfo(dstTree,classdiff.getNextClass().getLocationInfo());
+        mappingStore.addListOfMapping(classDeclarationMapping(srcClassTree,dstClassTree));
+        mappingStore.addPairRecursively(processSuperClass(srcTree,dstTree,classdiff));
+        mappingStore.addListOfMappingRecursively(processClassImplemetedInterfaces(srcTree,dstTree,classdiff));
+
+
 
         List<UMLOperationBodyMapper> operationBodyMapperList = classdiff.getOperationBodyMapperList();
 
@@ -147,6 +148,23 @@ public class ProjectASTDiffer
 
         }
         return new ASTDiff(treeContextPair.first, treeContextPair.second,mappingStore,new SimplifiedChawatheScriptGenerator().computeActions(mappingStore));
+    }
+
+    private List<Pair<Tree, Tree>> processClassImplemetedInterfaces(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
+
+        return null;
+    }
+
+
+    private Pair<Tree, Tree> processSuperClass(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
+        UMLType srcParentUML = classdiff.getOriginalClass().getSuperclass();
+        UMLType dstParentUML = classdiff.getNextClass().getSuperclass();
+        if (srcParentUML != null && dstParentUML != null) {
+            Tree srcParentClassTree = findByLocationInfo(srcTree, srcParentUML.getLocationInfo());
+            Tree dstParentClassTree = findByLocationInfo(dstTree, dstParentUML.getLocationInfo());
+            return new Pair<>(srcParentClassTree,dstParentClassTree);
+        }
+        return null;
     }
 
     private Pair<Tree, Tree> processPackageDeclaration(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {

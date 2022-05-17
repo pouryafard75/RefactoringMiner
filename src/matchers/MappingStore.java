@@ -115,6 +115,7 @@ public class MappingStore implements Iterable<Mapping> {
     }
     public void addPairRecursively(Pair<Tree,Tree> pair)
     {
+        if (pair == null) return;
         addMappingRecursively(pair.first,pair.second);
     }
 
