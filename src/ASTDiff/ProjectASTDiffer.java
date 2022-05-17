@@ -88,11 +88,13 @@ public class ProjectASTDiffer
         mappingStore.addPairRecursively(processSuperClass(srcTree,dstTree,classdiff));
         mappingStore.addListOfMappingRecursively(processClassImplemetedInterfaces(srcTree,dstTree,classdiff));
 
+
         for (org.apache.commons.lang3.tuple.Pair<UMLAnnotation, UMLAnnotation> umlAnnotationUMLAnnotationPair : classdiff.getAnnotationListDiff().getCommonAnnotations()) {
             Tree srcClassAnnotationTree = findByLocationInfo(srcTree , umlAnnotationUMLAnnotationPair.getLeft().getLocationInfo());
             Tree dstClassAnnotationTree = findByLocationInfo(dstTree, umlAnnotationUMLAnnotationPair.getRight().getLocationInfo());
             mappingStore.addMappingRecursively(srcClassAnnotationTree,dstClassAnnotationTree);
         }
+
 
 
         List<UMLOperationBodyMapper> operationBodyMapperList = classdiff.getOperationBodyMapperList();
@@ -153,8 +155,29 @@ public class ProjectASTDiffer
     }
 
     private List<Pair<Tree, Tree>> processClassImplemetedInterfaces(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
+        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
 
-        return null;
+        List<UMLType> srcImplementedInterfaces = classdiff.getOriginalClass().getImplementedInterfaces();
+        List<UMLType> dstImplementedInterfaces = classdiff.getNextClass().getImplementedInterfaces();
+
+        List<UMLType> removedOnes = classdiff.getRemovedImplementedInterfaces();
+        for (UMLType srcUmltype : srcImplementedInterfaces) {
+            if (!removedOnes.contains(srcUmltype))
+            {
+                Tree srcInterfaceTree = findByLocationInfo(srcTree,srcUmltype.getLocationInfo());
+                for (UMLType dstUmlType : dstImplementedInterfaces) {
+                    if (dstUmlType.getClassType().equals(srcUmltype.getClassType()))
+                    {
+                        Tree dstInterfaceTree = findByLocationInfo(dstTree,dstUmlType.getLocationInfo());
+                        pairlist.add(new Pair<>(srcInterfaceTree, dstInterfaceTree));
+                        break;
+                    }
+                }
+
+            }
+
+        }
+        return pairlist;
     }
 
 
