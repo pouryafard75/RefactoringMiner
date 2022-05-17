@@ -3,14 +3,12 @@ package ASTDiff;
 import actions.ASTDiff;
 import actions.EditScript;
 import actions.SimplifiedChawatheScriptGenerator;
-import gr.uom.java.xmi.LocationInfo;
-import gr.uom.java.xmi.UMLOperation;
-import gr.uom.java.xmi.UMLType;
-import gr.uom.java.xmi.VariableDeclarationContainer;
+import gr.uom.java.xmi.*;
 import gr.uom.java.xmi.decomposition.AbstractCodeMapping;
 import gr.uom.java.xmi.decomposition.UMLOperationBodyMapper;
 import gr.uom.java.xmi.decomposition.VariableDeclaration;
 import gr.uom.java.xmi.decomposition.replacement.Replacement;
+import gr.uom.java.xmi.diff.UMLAnnotationListDiff;
 import gr.uom.java.xmi.diff.UMLClassDiff;
 import gr.uom.java.xmi.diff.UMLModelDiff;
 import matchers.Mapping;
@@ -84,13 +82,17 @@ public class ProjectASTDiffer
         mappingStore.addPairRecursively(processPackageDeclaration(srcTree,dstTree,classdiff));
         mappingStore.addListOfMappingRecursively(processImports(srcTree,dstTree,classdiff.getImportDiffList().getCommonImports()));
 
-
         Tree srcClassTree = findByLocationInfo(srcTree,classdiff.getOriginalClass().getLocationInfo());
         Tree dstClassTree = findByLocationInfo(dstTree,classdiff.getNextClass().getLocationInfo());
         mappingStore.addListOfMapping(classDeclarationMapping(srcClassTree,dstClassTree));
         mappingStore.addPairRecursively(processSuperClass(srcTree,dstTree,classdiff));
         mappingStore.addListOfMappingRecursively(processClassImplemetedInterfaces(srcTree,dstTree,classdiff));
 
+        for (org.apache.commons.lang3.tuple.Pair<UMLAnnotation, UMLAnnotation> umlAnnotationUMLAnnotationPair : classdiff.getAnnotationListDiff().getCommonAnnotations()) {
+            Tree srcClassAnnotationTree = findByLocationInfo(srcTree , umlAnnotationUMLAnnotationPair.getLeft().getLocationInfo());
+            Tree dstClassAnnotationTree = findByLocationInfo(dstTree, umlAnnotationUMLAnnotationPair.getRight().getLocationInfo());
+            mappingStore.addMappingRecursively(srcClassAnnotationTree,dstClassAnnotationTree);
+        }
 
 
         List<UMLOperationBodyMapper> operationBodyMapperList = classdiff.getOperationBodyMapperList();
