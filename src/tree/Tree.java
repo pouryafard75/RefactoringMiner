@@ -91,6 +91,14 @@ public interface Tree {
         }
         return null;
     }
+    default Tree getTreeBetweenPositions(int position, int endPosition,String type) {
+        for (Tree t: this.preOrder()) {
+            if (t.getPos() >= position && t.getEndPos() <= endPosition)
+                if (t.getType().name.equals(type))
+                    return t;
+        }
+        return null;
+    }
 
     /**
      * Returns the child node at the given URL.

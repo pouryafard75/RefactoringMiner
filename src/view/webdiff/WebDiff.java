@@ -78,13 +78,13 @@ public class WebDiff  {
             Renderable view = new MergelyDiffView(id);
             return render(view);
         });
-//        get("/raw-diff/:id", (request, response) -> {
-//            int id = Integer.parseInt(request.params(":id"));
-//            Pair<File, File> pair = comparator.getModifiedFiles().get(id);
-//            Diff diff = getDiff(pair.first.getAbsolutePath(), pair.second.getAbsolutePath());
-//            Renderable view = new TextDiffView(pair.first, pair.second, diff);
-//            return render(view);
-//        });
+        get("/raw-diff/:id", (request, response) -> {
+            int id = Integer.parseInt(request.params(":id"));
+            Pair<File, File> pair = comparator.getModifiedFiles().get(id);
+            ASTDiff diff = projectASTDiffer.getASTDiffbyFileName(pair.first.getAbsolutePath());
+            Renderable view = new TextDiffView(pair.first, pair.second, diff,  id);
+            return render(view);
+        });
         get("/left/:id", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
             Pair<File, File> pair = comparator.getModifiedFiles().get(id);

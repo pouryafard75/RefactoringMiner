@@ -34,7 +34,6 @@ public class Run {
         UMLModelDiff modelDiff = model1.diff(model2);
         ProjectASTDiffer projectASTDiffer = new ProjectASTDiffer(modelDiff);
         projectASTDiffer.diff();
-        System.out.println("hi");
 
 
         WebDiff webDiff = new WebDiff(projectASTDiffer);

@@ -104,8 +104,9 @@ public class MappingStore implements Iterable<Mapping> {
      */
     public void addMappingRecursively(Tree src, Tree dst) {
         addMapping(src, dst);
-        for (int i = 0; i < src.getChildren().size(); i++)
-            addMappingRecursively(src.getChild(i), dst.getChild(i));
+        if (src.getChildren() != null)
+            for (int i = 0; i < src.getChildren().size(); i++)
+                addMappingRecursively(src.getChild(i), dst.getChild(i));
     }
 
     public void addListOfMappingRecursively(List<Pair<Tree,Tree>> pairList) {

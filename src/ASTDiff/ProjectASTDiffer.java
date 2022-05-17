@@ -82,11 +82,12 @@ public class ProjectASTDiffer
         mappingStore.addPairRecursively(processPackageDeclaration(srcTree,dstTree,classdiff));
         mappingStore.addListOfMappingRecursively(processImports(srcTree,dstTree,classdiff.getImportDiffList().getCommonImports()));
 
-        Tree srcClassTree = findByLocationInfo(srcTree,classdiff.getOriginalClass().getLocationInfo());
-        Tree dstClassTree = findByLocationInfo(dstTree,classdiff.getNextClass().getLocationInfo());
+        Tree srcClassTree = findByLocationInfo(srcTree,classdiff.getOriginalClass().getLocationInfo(),"TypeDeclaration");
+        Tree dstClassTree = findByLocationInfo(dstTree,classdiff.getNextClass().getLocationInfo(),"TypeDeclaration");
         mappingStore.addListOfMapping(classDeclarationMapping(srcClassTree,dstClassTree));
         mappingStore.addPairRecursively(processSuperClass(srcTree,dstTree,classdiff));
         mappingStore.addListOfMappingRecursively(processClassImplemetedInterfaces(srcTree,dstTree,classdiff));
+        mappingStore.addListOfMapping(processClassAttributes(srcTree,dstTree,classdiff));
 
 
         for (org.apache.commons.lang3.tuple.Pair<UMLAnnotation, UMLAnnotation> umlAnnotationUMLAnnotationPair : classdiff.getAnnotationListDiff().getCommonAnnotations()) {
@@ -112,10 +113,15 @@ public class ProjectASTDiffer
             Tree srcOperationNode = srcTree.getTreeBetweenPositions(umlOperationBodyMapper.getOperation1().getLocationInfo().getStartOffset(),umlOperationBodyMapper.getOperation1().getLocationInfo().getEndOffset());
             Tree dstOperationNode = dstTree.getTreeBetweenPositions(umlOperationBodyMapper.getOperation2().getLocationInfo().getStartOffset(),umlOperationBodyMapper.getOperation2().getLocationInfo().getEndOffset());
             mappingStore.addMapping(srcOperationNode,dstOperationNode);
-            mappingStore.addListOfMappingRecursively(processMethodSignature(srcOperationNode,dstOperationNode));
+            mappingStore.addListOfMapping(processMethodSignature(srcOperationNode,dstOperationNode));
             Set<AbstractCodeMapping> mappings = umlOperationBodyMapper.getMappings();
+
+            if (umlOperationBodyMapper.getOperation1().getName().equals("getCreationToken"))
+                System.out.println("ola");
+
             for (AbstractCodeMapping abstractCodeMapping : mappings)
             {
+
                 if (abstractCodeMapping.getReplacements().isEmpty())
                 {
                     int srcStartOffset = abstractCodeMapping.getFragment1().getLocationInfo().getStartOffset();
@@ -170,6 +176,57 @@ public class ProjectASTDiffer
                     {
                         Tree dstInterfaceTree = findByLocationInfo(dstTree,dstUmlType.getLocationInfo());
                         pairlist.add(new Pair<>(srcInterfaceTree, dstInterfaceTree));
+                        break;
+                    }
+                }
+
+            }
+
+        }
+        return pairlist;
+    }
+
+    private List<Pair<Tree, Tree>> processClassAttributes(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
+        List<Pair<Tree,Tree>> pairList = new ArrayList<>();
+        List<Pair<Tree, Tree>> matchedAttributes = findMatchedAttributesTree(srcTree, dstTree, classdiff);
+
+        for (Pair<Tree,Tree> matchedpair : matchedAttributes) {
+            pairList.add(new Pair<>(matchedpair.first,matchedpair.second));
+            pairList.addAll(processFeildDeclration(matchedpair.first,matchedpair.second));
+        }
+        return pairList;
+    }
+    private List<Pair<Tree,Tree>> processFeildDeclration(Tree srcFeildDelcration, Tree dstFeildDeclration)
+    {
+        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
+
+        List<String> searchingTypes = new ArrayList<>();
+        searchingTypes.add("AccessModifier");
+        searchingTypes.add("Modifier");
+        searchingTypes.add("SimpleType");
+        for (String type : searchingTypes) {
+            Pair<Tree, Tree> matched = matchBasedOnType(srcFeildDelcration,dstFeildDeclration, type);
+            if (matched != null)
+                pairlist.add(matched);
+        }
+        return pairlist;
+    }
+    private List<Pair<Tree, Tree>> findMatchedAttributesTree(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
+        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
+
+        List<UMLAttribute> srcAttributes = classdiff.getOriginalClass().getAttributes();
+        List<UMLAttribute> dstAttributes = classdiff.getNextClass().getAttributes();
+
+        List<UMLAttribute> removedOnes = classdiff.getRemovedAttributes();
+        for (UMLAttribute srcUmltype : srcAttributes) {
+            if (!removedOnes.contains(srcUmltype))
+            {
+                Tree srcFindedTree = findByLocationInfo(srcTree,srcUmltype.getLocationInfo());
+                for (UMLAttribute dstUmlType : dstAttributes) {
+                    if (dstUmlType.getName().equals(srcUmltype.getName()))
+                    {
+                        Tree dstFindedTree = findByLocationInfo(dstTree,dstUmlType.getLocationInfo());
+                        pairlist.add(new Pair<>(srcFindedTree.getParent(), dstFindedTree.getParent()));
                         break;
                     }
                 }
@@ -248,6 +305,12 @@ public class ProjectASTDiffer
         Tree result = tree.getTreeBetweenPositions(startoffset, endoffset);
         return result;
     }
+    private Tree findByLocationInfo(Tree tree, LocationInfo locationInfo, String type){
+        int startoffset = locationInfo.getStartOffset();
+        int endoffset = locationInfo.getEndOffset();
+        Tree result = tree.getTreeBetweenPositions(startoffset, endoffset,type);
+        return result;
+    }
     private List<Pair<Tree, Tree>> processMethodSignature(Tree srcOperationNode, Tree dstOperationNode) {
         //TODO: static and ... are also considered as Modifier for method declration
         //TODO: (cont.) probably, I have to change ASTVisitor to modify those types.
@@ -256,7 +319,7 @@ public class ProjectASTDiffer
         searchingTypes.add("AccessModifier");
         searchingTypes.add("Modifier");
         searchingTypes.add("SimpleName");
-        searchingTypes.add("SimpleType");
+//        searchingTypes.add("SimpleType");
         // TODO: Above line was added to check the Exceptions, probably not the right way to handle this.
         searchingTypes.add("PrimitiveType");
         searchingTypes.add("Block");
