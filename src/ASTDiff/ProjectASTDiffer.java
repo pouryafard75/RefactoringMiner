@@ -121,16 +121,10 @@ public class ProjectASTDiffer
 
             for (AbstractCodeMapping abstractCodeMapping : mappings)
             {
-
+                Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
+                Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
                 if (abstractCodeMapping.getReplacements().isEmpty())
                 {
-                    int srcStartOffset = abstractCodeMapping.getFragment1().getLocationInfo().getStartOffset();
-                    int srcEndOffset = abstractCodeMapping.getFragment1().getLocationInfo().getEndOffset();
-                    int dstStartOffset = abstractCodeMapping.getFragment2().getLocationInfo().getStartOffset();
-                    int dstEndOffset = abstractCodeMapping.getFragment2().getLocationInfo().getEndOffset();
-
-                    Tree srcStatementNode = srcTree.getTreeBetweenPositions(srcStartOffset,srcEndOffset);
-                    Tree dstStatementNode = dstTree.getTreeBetweenPositions(dstStartOffset,dstEndOffset);
                     mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
                 }
                 else
@@ -142,13 +136,6 @@ public class ProjectASTDiffer
                         if (replacement.getType() == Replacement.ReplacementType.NUMBER_LITERAL ||
                             replacement.getType() == Replacement.ReplacementType.STRING_LITERAL)
                         {
-                            int srcStartOffset = abstractCodeMapping.getFragment1().getLocationInfo().getStartOffset();
-                            int srcEndOffset = abstractCodeMapping.getFragment1().getLocationInfo().getEndOffset();
-                            int dstStartOffset = abstractCodeMapping.getFragment2().getLocationInfo().getStartOffset();
-                            int dstEndOffset = abstractCodeMapping.getFragment2().getLocationInfo().getEndOffset();
-
-                            Tree srcStatementNode = srcTree.getTreeBetweenPositions(srcStartOffset,srcEndOffset);
-                            Tree dstStatementNode = dstTree.getTreeBetweenPositions(dstStartOffset,dstEndOffset);
                             mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
                         }
 
