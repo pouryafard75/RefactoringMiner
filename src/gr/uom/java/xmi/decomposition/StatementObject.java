@@ -138,6 +138,10 @@ public class StatementObject extends AbstractStatement {
 		}
 	}
 
+	public String getStatement() {
+		return statement;
+	}
+
 	@Override
 	public List<AbstractCodeFragment> getLeaves() {
 		List<AbstractCodeFragment> leaves = new ArrayList<AbstractCodeFragment>();

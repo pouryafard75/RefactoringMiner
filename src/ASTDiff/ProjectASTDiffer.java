@@ -5,6 +5,7 @@ import actions.EditScript;
 import actions.SimplifiedChawatheScriptGenerator;
 import gr.uom.java.xmi.*;
 import gr.uom.java.xmi.decomposition.AbstractCodeMapping;
+import gr.uom.java.xmi.decomposition.StatementObject;
 import gr.uom.java.xmi.decomposition.UMLOperationBodyMapper;
 import gr.uom.java.xmi.decomposition.VariableDeclaration;
 import gr.uom.java.xmi.decomposition.replacement.Replacement;
@@ -22,6 +23,7 @@ import utils.Pair;
 
 
 import java.io.File;
+import java.sql.Statement;
 import java.util.*;
 
 public class ProjectASTDiffer
@@ -102,6 +104,7 @@ public class ProjectASTDiffer
 
         for(UMLOperationBodyMapper umlOperationBodyMapper : operationBodyMapperList)
         {
+            System.out.println("OperationName " + umlOperationBodyMapper);
             Set<Refactoring> refactorings = umlOperationBodyMapper.getRefactorings();
             for (org.apache.commons.lang3.tuple.Pair<VariableDeclaration, VariableDeclaration> matchedPair: umlOperationBodyMapper.getMatchedVariables()) {
                 VariableDeclaration leftPair = matchedPair.getLeft();
@@ -116,16 +119,20 @@ public class ProjectASTDiffer
             mappingStore.addListOfMapping(processMethodSignature(srcOperationNode,dstOperationNode));
             Set<AbstractCodeMapping> mappings = umlOperationBodyMapper.getMappings();
 
-            if (umlOperationBodyMapper.getOperation1().getName().equals("getCreationToken"))
-                System.out.println("ola");
-
             for (AbstractCodeMapping abstractCodeMapping : mappings)
             {
                 Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
                 Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
+                if (abstractCodeMapping.getFragment1() instanceof StatementObject)
+                {
+                    String srcStatement = ((StatementObject) abstractCodeMapping.getFragment1()).getStatement();
+                    String dstStatement = ((StatementObject) abstractCodeMapping.getFragment2()).getStatement();
+                    if (srcStatement.equals(dstStatement)) mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
+                }
                 if (abstractCodeMapping.getReplacements().isEmpty())
                 {
-                    mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
+                    System.out.println(abstractCodeMapping.toString());
+//                    mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
                 }
                 else
                 {
@@ -136,7 +143,7 @@ public class ProjectASTDiffer
                         if (replacement.getType() == Replacement.ReplacementType.NUMBER_LITERAL ||
                             replacement.getType() == Replacement.ReplacementType.STRING_LITERAL)
                         {
-                            mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
+//                            mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
                         }
 
                     }
