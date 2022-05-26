@@ -103,7 +103,7 @@ public class ProjectASTDiffer
 
         for(UMLOperationBodyMapper umlOperationBodyMapper : operationBodyMapperList)
         {
-//            System.out.println("OperationName " + umlOperationBodyMapper);
+            System.out.println("OperationName " + umlOperationBodyMapper);
             Set<Refactoring> refactorings = umlOperationBodyMapper.getRefactorings();
             for (org.apache.commons.lang3.tuple.Pair<VariableDeclaration, VariableDeclaration> matchedPair: umlOperationBodyMapper.getMatchedVariables()) {
                 VariableDeclaration leftPair = matchedPair.getLeft();
@@ -177,17 +177,10 @@ public class ProjectASTDiffer
                 UMLOperationBodyMapper bodyMapper = extractOperationRefactoring.getBodyMapper();
                 for (AbstractCodeMapping abstractCodeMapping : bodyMapper.getMappings())
                 {
-                    if (abstractCodeMapping.getFragment1() instanceof StatementObject)
-                    {
-                        String srcStatement = ((StatementObject) abstractCodeMapping.getFragment1()).getStatement();
-                        String dstStatement = ((StatementObject) abstractCodeMapping.getFragment2()).getStatement();
-                        if (srcStatement.equals(dstStatement))
-                        {
-                            Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
-                            Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
-                            pairlist.addAll(MappingStore.recursivePairings(srcStatementNode, dstStatementNode, null));
-                        }
-                    }
+                    Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
+                    Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
+                    if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString()))
+                        pairlist.addAll(MappingStore.recursivePairings(srcStatementNode,dstStatementNode,null));
                 }
             }
             else if (refactoring instanceof RenameAttributeRefactoring) {
@@ -258,7 +251,9 @@ public class ProjectASTDiffer
         List<String> searchingTypes = new ArrayList<>();
         searchingTypes.add("AccessModifier");
         searchingTypes.add("Modifier");
-        searchingTypes.add("SimpleType");
+        searchingTypes.add("PrimitiveType");
+        searchingTypes.add("VariableDeclarationFragment");
+
         Tree srcFeildDelcration = matchedpair.second.first;
         Tree dstFeildDeclration = matchedpair.second.second;
         pairlist.add(new Pair<>(srcFeildDelcration,dstFeildDeclration));
@@ -266,6 +261,26 @@ public class ProjectASTDiffer
             Pair<Tree, Tree> matched = matchBasedOnType(srcFeildDelcration,dstFeildDeclration, type);
             if (matched != null)
                 pairlist.add(matched);
+        }
+        String serachingType = "SimpleType";
+        Pair<Tree, Tree> result = matchBasedOnType(srcFeildDelcration, dstFeildDeclration, serachingType);
+        if (result != null)
+            pairlist.addAll(MappingStore.recursivePairings(result.first,result.second,null));
+        serachingType = "VariableDeclarationFragment";
+        Pair<Tree, Tree> VariableDeclarationFragmentPair = matchBasedOnType(srcFeildDelcration, dstFeildDeclration, serachingType);
+        if (VariableDeclarationFragmentPair != null)
+        {
+            Pair<Tree, Tree> SimpleNamePair = matchBasedOnType(VariableDeclarationFragmentPair.first, VariableDeclarationFragmentPair.second, "SimpleName");
+            pairlist.add(new Pair<>(SimpleNamePair.first,SimpleNamePair.second));
+            if (matchedpair.first.first.getVariableDeclaration().getInitializer() != null &&
+            matchedpair.first.second.getVariableDeclaration().getInitializer() != null)
+            {
+                if (VariableDeclarationFragmentPair.first.getChild(1).getType().equals(VariableDeclarationFragmentPair.second.getChild(1).getType()))
+                    pairlist.add(new Pair<>(VariableDeclarationFragmentPair.first.getChild(1), VariableDeclarationFragmentPair.second.getChild(1)));
+            }
+            if (result != null) {
+                pairlist.add(new Pair<>(result.first, result.second));
+            }
         }
         return pairlist;
     }
