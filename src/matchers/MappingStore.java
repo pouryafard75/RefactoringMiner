@@ -19,6 +19,8 @@ public class MappingStore implements Iterable<Mapping> {
     private Map<Tree, Tree> srcToDst;
     private Map<Tree, Tree> dstToSrc;
 
+
+
     /**
      * Instantiate a mapping store using the mappings of the provided
      * mapping store.
@@ -151,6 +153,7 @@ public class MappingStore implements Iterable<Mapping> {
         return srcToDst.containsKey(src);
     }
 
+
     /**
      * Return whether or not there is a mapping for the given destination node.
      */
@@ -236,5 +239,16 @@ public class MappingStore implements Iterable<Mapping> {
      */
     public boolean isMappingAllowed(Tree src, Tree dst) {
         return src.hasSameType(dst) && areBothUnmapped(src, dst);
+    }
+
+    public static List<Pair<Tree,Tree>> recursivePairings(Tree src, Tree dst, List<Pair<Tree,Tree>> pairlist)
+    {
+        if (pairlist == null)
+            pairlist = new ArrayList<>();
+        pairlist.add(new Pair<>(src,dst));
+        if (src.getChildren() != null)
+            for (int i = 0; i < src.getChildren().size(); i++)
+                recursivePairings(src.getChild(i), dst.getChild(i),pairlist);
+        return pairlist;
     }
 }

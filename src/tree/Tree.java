@@ -70,6 +70,7 @@ public interface Tree {
         return getChildren().get(position);
     }
 
+
     /**
      * Return trees contained in a text positions interval
      * @param position the begin position
