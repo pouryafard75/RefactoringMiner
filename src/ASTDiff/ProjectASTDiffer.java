@@ -1,7 +1,6 @@
 package ASTDiff;
 
 import actions.ASTDiff;
-import actions.EditScript;
 import actions.SimplifiedChawatheScriptGenerator;
 import gr.uom.java.xmi.*;
 import gr.uom.java.xmi.decomposition.*;
@@ -10,7 +9,6 @@ import gr.uom.java.xmi.diff.*;
 import matchers.*;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
-import org.refactoringminer.api.RefactoringType;
 import tree.Tree;
 import tree.TreeContext;
 import tree.TreeUtils;
@@ -18,7 +16,6 @@ import utils.Pair;
 
 
 import java.io.File;
-import java.sql.Statement;
 import java.util.*;
 import java.util.function.Function;
 
@@ -28,6 +25,8 @@ public class ProjectASTDiffer
     private UMLModelDiff umlModelDiff;
     private String srcPath;
     private String dstPath;
+
+    private static final int MIN_ACCEPTABLE_HIGHT = 0;
 
     public String getSrcPath(){
         return srcPath;
@@ -133,8 +132,10 @@ public class ProjectASTDiffer
                     mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
                 else
                 {
-
-                    match(srcStatementNode,dstStatementNode,mappingStore);
+                    if (abstractCodeMapping instanceof LeafMapping) {
+                        mappingStore.addMapping(srcStatementNode,dstStatementNode);
+                        mappingStore.addListOfMapping(match(srcStatementNode, dstStatementNode));
+                    }
 
                 }
                 if (abstractCodeMapping.getReplacements().isEmpty())
@@ -161,29 +162,29 @@ public class ProjectASTDiffer
         return new ASTDiff(treeContextPair.first, treeContextPair.second,mappingStore,new SimplifiedChawatheScriptGenerator().computeActions(mappingStore));
     }
 
-    public MappingStore match(Tree src, Tree dst, MappingStore mappings) {
+    public List<Pair<Tree, Tree>> match(Tree src, Tree dst) {
 
+        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
         Function<Tree, Integer> HEIGHT_PRIORITY_CALCULATOR = (Tree t) -> t.getMetrics().height;
 
-        PriorityTreeQueue srcTrees = new DefaultPriorityTreeQueue(src, 1, HEIGHT_PRIORITY_CALCULATOR);
-        PriorityTreeQueue dstTrees = new DefaultPriorityTreeQueue(dst, 1, HEIGHT_PRIORITY_CALCULATOR);
+        PriorityTreeQueue srcTrees = new DefaultPriorityTreeQueue(src, MIN_ACCEPTABLE_HIGHT, HEIGHT_PRIORITY_CALCULATOR);
+        PriorityTreeQueue dstTrees = new DefaultPriorityTreeQueue(dst, MIN_ACCEPTABLE_HIGHT, HEIGHT_PRIORITY_CALCULATOR);
 
         while (PriorityTreeQueue.synchronize(srcTrees, dstTrees)) {
             var localHashMappings = new HashBasedMapper();
             localHashMappings.addSrcs(srcTrees.pop());
             localHashMappings.addDsts(dstTrees.pop());
 
-            localHashMappings.unique().forEach(
-                    (pair) -> mappings.addMappingRecursively(
-                            pair.first.stream().findAny().get(), pair.second.stream().findAny().get()));
 
+            localHashMappings.unique().forEach(
+                    (pair) -> MappingStore.recursivePairings(pair.first.stream().findAny().get(), pair.second.stream().findAny().get(), pairlist));
 
             localHashMappings.unmapped().forEach((pair) -> {
                 pair.first.forEach(tree -> srcTrees.open(tree));
                 pair.second.forEach(tree -> dstTrees.open(tree));
             });
         }
-        return mappings;
+        return pairlist;
     }
 
     private List<Pair<Tree, Tree>> processRefactorings(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) throws RefactoringMinerTimedOutException {
@@ -197,8 +198,19 @@ public class ProjectASTDiffer
                 {
                     Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
                     Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
-                    if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString()))
-                        pairlist.addAll(MappingStore.recursivePairings(srcStatementNode,dstStatementNode,null));
+                    if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString())) {
+                        System.out.println(abstractCodeMapping.getFragment1());
+                        System.out.println(abstractCodeMapping.getFragment2());
+                        pairlist.addAll(MappingStore.recursivePairings(srcStatementNode, dstStatementNode, null));
+                    }
+                    else {
+                        if (abstractCodeMapping instanceof LeafMapping) {
+                            System.out.println("Calling match with");
+                            pairlist.add(new Pair<>(srcStatementNode,dstStatementNode));
+                            pairlist.addAll(match(srcStatementNode, dstStatementNode));
+//                            pairlist.add(new Pair<>(srcStatementNode.getChild(1),dstStatementNode.getChild(1)));
+                        }
+                    }
                 }
             }
             else if (refactoring instanceof RenameAttributeRefactoring) {
@@ -476,23 +488,6 @@ public class ProjectASTDiffer
             pairList.add(new Pair<>(srcChildren.get(i),dstChildren.get(i)));
         }
         return pairList;
-    }
-
-    private List<Pair<Tree, Tree>> matchAllNodesInside(Tree srcStatementNode, Tree dstStatementNode) {
-        Iterator<Tree> srcTreeIterator = TreeUtils.breadthFirstIterator(srcStatementNode);
-        List<Tree> srcTreeList = new ArrayList<Tree>();
-        srcTreeIterator.forEachRemaining(srcTreeList::add);
-
-        Iterator<Tree> dstTreeIterator = TreeUtils.breadthFirstIterator(dstStatementNode);
-        List<Tree> dstTreeList = new ArrayList<Tree>();
-        dstTreeIterator.forEachRemaining(dstTreeList::add);
-
-        List<Pair<Tree,Tree>> mappinglist = new ArrayList<Pair<Tree, Tree>>();
-
-        for (int i = 0; i < srcTreeList.size(); i++) {
-            mappinglist.add(new Pair<Tree,Tree>(srcTreeList.get(i),dstTreeList.get(i)));
-        }
-            return mappinglist;
     }
 
 
