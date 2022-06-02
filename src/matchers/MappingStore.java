@@ -19,7 +19,22 @@ public class MappingStore implements Iterable<Mapping> {
     private Map<Tree, Tree> srcToDst;
     private Map<Tree, Tree> dstToSrc;
 
+    public Map<Tree, Tree> getSrcToDst() {
+        return srcToDst;
+    }
 
+    public Map<Tree, Tree> getDstToSrc() {
+        return dstToSrc;
+    }
+
+    public void mergeMappings(MappingStore addon)
+    {
+        if (addon == null) return;
+        for (Map.Entry<Tree,Tree> entry : addon.getSrcToDst().entrySet())
+        {
+            this.addMapping(entry.getKey(),entry.getValue());
+        }
+    }
 
     /**
      * Instantiate a mapping store using the mappings of the provided

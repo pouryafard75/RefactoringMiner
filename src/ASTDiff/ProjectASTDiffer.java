@@ -7,6 +7,7 @@ import gr.uom.java.xmi.decomposition.*;
 import gr.uom.java.xmi.decomposition.replacement.Replacement;
 import gr.uom.java.xmi.diff.*;
 import matchers.*;
+import org.eclipse.jdt.core.dom.AST;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import tree.Tree;
@@ -49,6 +50,7 @@ public class ProjectASTDiffer
 
     public void diff() throws RefactoringMinerTimedOutException {
         this.commonClasses();
+        computeAllEditScripts();
     }
     public ASTDiff getASTDiffbyFileName(String filename)
     {
@@ -57,13 +59,26 @@ public class ProjectASTDiffer
 
     private void commonClasses() throws RefactoringMinerTimedOutException {
         List<UMLClassDiff> commons = this.umlModelDiff.getCommonClassDiffList();
-        for (UMLClassDiff classdiff : commons)
-        {
+        for (UMLClassDiff classdiff : commons) {
             ASTDiff classASTDiff = process(classdiff, findTreeContexts(classdiff));
             String fullPath = getSrcPath() + File.separator + classdiff.getOriginalClass().getSourceFile();
-            this.astDiffMap.put(fullPath, classASTDiff);
-        }
 
+            if (this.astDiffMap.containsKey(fullPath))
+            {
+                this.astDiffMap.get(fullPath).mappings.mergeMappings(classASTDiff.mappings);
+////                this.astDiffMap.get(fullPath).srcTC = classASTDiff.srcTC;
+////                this.astDiffMap.get(fullPath).dstTC = classASTDiff.dstTC;
+            }
+            else
+                this.astDiffMap.put(fullPath, classASTDiff);
+        }
+    }
+
+    public void computeAllEditScripts() {
+        for (Map.Entry<String,ASTDiff> entry : this.astDiffMap.entrySet())
+        {
+            entry.getValue().computeEditScript();
+        }
     }
 
     private ASTDiff process(UMLClassDiff classdiff, Pair<TreeContext, TreeContext> treeContextPair) throws RefactoringMinerTimedOutException {
@@ -78,7 +93,7 @@ public class ProjectASTDiffer
         mappingStore.addListOfMapping(processRefactorings(srcTree,dstTree,classdiff));
 
         mappingStore.addPairRecursively(processPackageDeclaration(srcTree,dstTree,classdiff));
-        mappingStore.addListOfMappingRecursively(processImports(srcTree,dstTree,classdiff.getImportDiffList().getCommonImports()));
+        mappingStore.addListOfMappingRecursively(processImports(srcTree,dstTree,classdiff.getImportDiffList()));
 
         Tree srcClassTree = findByLocationInfo(srcTree,classdiff.getOriginalClass().getLocationInfo(),"TypeDeclaration");
         Tree dstClassTree = findByLocationInfo(dstTree,classdiff.getNextClass().getLocationInfo(),"TypeDeclaration");
@@ -128,38 +143,30 @@ public class ProjectASTDiffer
                 Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
                 Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
 
-                if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString()))
-                    mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
-                else
-                {
-                    if (abstractCodeMapping instanceof LeafMapping) {
-                        mappingStore.addMapping(srcStatementNode,dstStatementNode);
+                if (abstractCodeMapping instanceof LeafMapping) {
+                    if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString())) {
+                        mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
+                    }
+                    else {
+                        mappingStore.addMapping(srcStatementNode, dstStatementNode);
                         mappingStore.addListOfMapping(match(srcStatementNode, dstStatementNode));
                     }
-
                 }
-                if (abstractCodeMapping.getReplacements().isEmpty())
+                else if (abstractCodeMapping instanceof CompositeStatementObjectMapping)
                 {
-
-                }
-                else
-                {
-                    Set<Replacement> replacements = abstractCodeMapping.getReplacements();
-                    if (replacements.size() == 1)
+                    if (srcStatementNode.getMetrics().hash == dstStatementNode.getMetrics().hash)
                     {
-                        Replacement replacement = replacements.iterator().next();
-                        if (replacement.getType() == Replacement.ReplacementType.NUMBER_LITERAL ||
-                            replacement.getType() == Replacement.ReplacementType.STRING_LITERAL)
-                        {
-
-                        }
+                        mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
+                    }
+                    else {
+                        mappingStore.addMapping(srcOperationNode,dstOperationNode);
 
                     }
                 }
             }
 
         }
-        return new ASTDiff(treeContextPair.first, treeContextPair.second,mappingStore,new SimplifiedChawatheScriptGenerator().computeActions(mappingStore));
+        return new ASTDiff(treeContextPair.first, treeContextPair.second,mappingStore);
     }
 
     public List<Pair<Tree, Tree>> match(Tree src, Tree dst) {
@@ -198,17 +205,24 @@ public class ProjectASTDiffer
                 {
                     Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
                     Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
-                    if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString())) {
-                        System.out.println(abstractCodeMapping.getFragment1());
-                        System.out.println(abstractCodeMapping.getFragment2());
-                        pairlist.addAll(MappingStore.recursivePairings(srcStatementNode, dstStatementNode, null));
-                    }
-                    else {
-                        if (abstractCodeMapping instanceof LeafMapping) {
-                            System.out.println("Calling match with");
-                            pairlist.add(new Pair<>(srcStatementNode,dstStatementNode));
+                    if (abstractCodeMapping instanceof LeafMapping) {
+                        if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString())) {
+                            pairlist.addAll(MappingStore.recursivePairings(srcStatementNode, dstStatementNode, null));
+                        }
+                        else {
+                            pairlist.add(new Pair<>(srcStatementNode, dstStatementNode));
                             pairlist.addAll(match(srcStatementNode, dstStatementNode));
-//                            pairlist.add(new Pair<>(srcStatementNode.getChild(1),dstStatementNode.getChild(1)));
+                        }
+                    }
+                    else if (abstractCodeMapping instanceof CompositeStatementObjectMapping)
+                    {
+                        if (srcStatementNode.getMetrics().hash == dstStatementNode.getMetrics().hash)
+                        {
+                            pairlist.addAll(MappingStore.recursivePairings(srcStatementNode, dstStatementNode, null));
+                        }
+                        else
+                        {
+                            pairlist.add(new Pair<>(srcStatementNode,dstStatementNode));
                         }
                     }
                 }
@@ -380,13 +394,16 @@ public class ProjectASTDiffer
         return null;
     }
 
-    private List<Pair<Tree, Tree>> processImports(Tree srcTree, Tree dstTree, Set<String> commonImports) {
+    private List<Pair<Tree, Tree>> processImports(Tree srcTree, Tree dstTree, UMLImportListDiff importDiffList) {
+        List<Pair<Tree,Tree>> matchedTrees = new ArrayList<>();
+        if (importDiffList == null) return matchedTrees;
+        Set<String> commonImports = importDiffList.getCommonImports();
         if (commonImports.isEmpty())
-             return null;
+             return matchedTrees;
         String searchingType = "ImportDeclaration";
         List<Tree> srcChildren = srcTree.getChildren();
         List<Tree> dstChildren = dstTree.getChildren();
-        List<Pair<Tree,Tree>> matchedTrees = new ArrayList<>();
+        
         for(String label : commonImports){
             Tree srcImportStatement = findImportByTypeAndLabel(srcChildren,searchingType,label);
             Tree dstImportStatement = findImportByTypeAndLabel(dstChildren,searchingType,label);
@@ -496,7 +513,7 @@ public class ProjectASTDiffer
 
 //        String filename = rootpath + File.separator + classDiff.getOriginalClass().getSourceFile();
         String filename = classDiff.getOriginalClass().getSourceFile();
-        return new Pair<TreeContext,TreeContext>
+        return new Pair<>
                 (this.umlModelDiff.getParentModel().getTreeContextMap().get(filename),
                  this.umlModelDiff.getChildModel().getTreeContextMap().get(filename));
     }

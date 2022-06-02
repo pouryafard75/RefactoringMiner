@@ -2,6 +2,7 @@
 package actions;
 import gr.uom.java.xmi.diff.UMLClassDiff;
 import matchers.MappingStore;
+import org.eclipse.jgit.diff.Edit;
 import tree.Tree;
 import tree.TreeContext;
 
@@ -15,29 +16,36 @@ public class ASTDiff {
 //    public String srcPath;
 //    public String dstPath;
 
-    public final TreeContext srcTC;
+    public TreeContext srcTC;
 
-    public final TreeContext dstTC;
+    public TreeContext dstTC;
 
-    public final MappingStore mappings;
+    public MappingStore mappings;
 
     /**
      * The edit script between the two ASTs.
      */
-    public final EditScript editScript;
+    private EditScript editScript;
+
+    public EditScript getEditScript() {
+        return editScript;
+    }
 
     /**
      * Instantiate a diff object with the provided source and destination
      * ASTs, the provided mappings, and the provided editScript.
      */
     public ASTDiff(TreeContext src, TreeContext dst,
-                MappingStore mappings, EditScript editScript) {
+                MappingStore mappings) {
 //        this.srcPath = srcPath;
 //        this.dstPath = dstPath;
         this.srcTC = src;
         this.dstTC = dst;
         this.mappings = mappings;
-        this.editScript = editScript;
+    }
+    public void computeEditScript()
+    {
+        this.editScript = new SimplifiedChawatheScriptGenerator().computeActions(this.mappings);
     }
     /**
      * Compute and return a all node classifier that indicates which node have

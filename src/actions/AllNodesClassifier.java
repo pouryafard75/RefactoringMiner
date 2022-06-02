@@ -18,7 +18,7 @@ public class AllNodesClassifier extends AbstractITreeClassifier {
 
     @Override
     public void classify() {
-        for (Action a: diff.editScript) {
+        for (Action a: diff.getEditScript()) {
             if (a instanceof Delete)
                 srcDelTrees.add(a.getNode());
             else if (a instanceof TreeDelete) {
