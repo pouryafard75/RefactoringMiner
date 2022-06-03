@@ -148,8 +148,16 @@ public class ProjectASTDiffer
                         mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
                     }
                     else {
-                        mappingStore.addMapping(srcStatementNode, dstStatementNode);
-                        mappingStore.addListOfMapping(match(srcStatementNode, dstStatementNode));
+                        if (srcStatementNode.isIsoStructuralTo(dstStatementNode))
+                        {
+                            System.out.println("ola here");
+                            System.out.println(abstractCodeMapping);
+                            mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
+                        }
+                        else {
+                            mappingStore.addMapping(srcStatementNode, dstStatementNode);
+                            mappingStore.addListOfMapping(match(srcStatementNode, dstStatementNode));
+                        }
                     }
                 }
                 else if (abstractCodeMapping instanceof CompositeStatementObjectMapping)
@@ -210,8 +218,13 @@ public class ProjectASTDiffer
                             pairlist.addAll(MappingStore.recursivePairings(srcStatementNode, dstStatementNode, null));
                         }
                         else {
-                            pairlist.add(new Pair<>(srcStatementNode, dstStatementNode));
-                            pairlist.addAll(match(srcStatementNode, dstStatementNode));
+                            if (srcStatementNode.isIsoStructuralTo(dstStatementNode)) {
+                                pairlist.addAll(MappingStore.recursivePairings(srcStatementNode, dstStatementNode, null));
+                            }
+                            else {
+                                pairlist.add(new Pair<>(srcStatementNode, dstStatementNode));
+                                pairlist.addAll(match(srcStatementNode, dstStatementNode));
+                            }
                         }
                     }
                     else if (abstractCodeMapping instanceof CompositeStatementObjectMapping)
