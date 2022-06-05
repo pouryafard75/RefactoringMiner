@@ -49,7 +49,11 @@ public class UMLOperationDiff {
 	private List<UMLType> removedExceptionTypes;
 	private Set<Pair<UMLType, UMLType>> commonExceptionTypes;
 	private SimpleEntry<Set<UMLType>, Set<UMLType>> changedExceptionTypes;
-	
+
+	public UMLAnnotationListDiff getAnnotationListDiff() {
+		return annotationListDiff;
+	}
+
 	public UMLOperationDiff(UMLOperation removedOperation, UMLOperation addedOperation) {
 		process(removedOperation, addedOperation);
 	}

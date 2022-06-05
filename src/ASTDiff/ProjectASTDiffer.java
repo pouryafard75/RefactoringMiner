@@ -1,13 +1,10 @@
 package ASTDiff;
 
 import actions.ASTDiff;
-import actions.SimplifiedChawatheScriptGenerator;
 import gr.uom.java.xmi.*;
 import gr.uom.java.xmi.decomposition.*;
-import gr.uom.java.xmi.decomposition.replacement.Replacement;
 import gr.uom.java.xmi.diff.*;
 import matchers.*;
-import org.eclipse.jdt.core.dom.AST;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import tree.Tree;
@@ -119,9 +116,12 @@ public class ProjectASTDiffer
 
         for(UMLOperationBodyMapper umlOperationBodyMapper : operationBodyMapperList)
         {
-            UMLOperationDiff operationDiff = classdiff.getOperationDiff(umlOperationBodyMapper.getOperation1(), umlOperationBodyMapper.getOperation2());
+
             System.out.println("OperationName " + umlOperationBodyMapper);
             Set<Refactoring> refactorings = umlOperationBodyMapper.getRefactorings();
+            mappingStore.addListOfMapping(processOperationDiff(srcTree,dstTree,umlOperationBodyMapper));
+
+
 
             for (org.apache.commons.lang3.tuple.Pair<VariableDeclaration, VariableDeclaration> matchedPair: umlOperationBodyMapper.getMatchedVariables()) {
                 VariableDeclaration leftPair = matchedPair.getLeft();
@@ -175,6 +175,20 @@ public class ProjectASTDiffer
 
         }
         return new ASTDiff(treeContextPair.first, treeContextPair.second,mappingStore);
+    }
+
+    private static List<Pair<Tree, Tree>> processOperationDiff(Tree srcTree, Tree dstTree, UMLOperationBodyMapper umlOperationBodyMapper) {
+        List<Pair<Tree, Tree>> pairlist = new ArrayList<>();
+        UMLOperationDiff umlOperationDiff = umlOperationBodyMapper.getOperationSignatureDiff().isPresent() ? umlOperationBodyMapper.getOperationSignatureDiff().get() : null;
+        if (umlOperationDiff == null) return pairlist;
+
+        for (org.apache.commons.lang3.tuple.Pair<UMLAnnotation, UMLAnnotation>  umlAnnotationUMLAnnotationPair : umlOperationDiff.getAnnotationListDiff().getCommonAnnotations())
+        {
+            Tree srcClassAnnotationTree = findByLocationInfo(srcTree , umlAnnotationUMLAnnotationPair.getLeft().getLocationInfo());
+            Tree dstClassAnnotationTree = findByLocationInfo(dstTree, umlAnnotationUMLAnnotationPair.getRight().getLocationInfo());
+            pairlist.addAll(MappingStore.recursivePairings(srcClassAnnotationTree,dstClassAnnotationTree,null));
+        }
+        return pairlist;
     }
 
     public List<Pair<Tree, Tree>> match(Tree src, Tree dst) {
@@ -436,13 +450,13 @@ public class ProjectASTDiffer
         return null;
     }
 
-    private Tree findByLocationInfo(Tree tree, LocationInfo locationInfo){
+    private static Tree findByLocationInfo(Tree tree, LocationInfo locationInfo){
         int startoffset = locationInfo.getStartOffset();
         int endoffset = locationInfo.getEndOffset();
         Tree result = tree.getTreeBetweenPositions(startoffset, endoffset);
         return result;
     }
-    private Tree findByLocationInfo(Tree tree, LocationInfo locationInfo, String type){
+    private static Tree findByLocationInfo(Tree tree, LocationInfo locationInfo, String type){
         int startoffset = locationInfo.getStartOffset();
         int endoffset = locationInfo.getEndOffset();
         Tree result = tree.getTreeBetweenPositions(startoffset, endoffset,type);
