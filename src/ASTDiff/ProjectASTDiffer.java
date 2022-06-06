@@ -17,6 +17,8 @@ import java.io.File;
 import java.util.*;
 import java.util.function.Function;
 
+import static tree.TreeUtils.findChildByTypeAndLabel;
+
 public class ProjectASTDiffer
 {
     private Map<String, ASTDiff> astDiffMap = new HashMap<>();
@@ -94,7 +96,7 @@ public class ProjectASTDiffer
 
         Tree srcClassTree = findByLocationInfo(srcTree,classdiff.getOriginalClass().getLocationInfo(),"TypeDeclaration");
         Tree dstClassTree = findByLocationInfo(dstTree,classdiff.getNextClass().getLocationInfo(),"TypeDeclaration");
-        mappingStore.addListOfMapping(classDeclarationMapping(srcClassTree,dstClassTree));
+        mappingStore.addListOfMapping(classDeclarationMapping(srcClassTree,dstClassTree,classdiff));
         mappingStore.addPairRecursively(processSuperClass(srcTree,dstTree,classdiff));
         mappingStore.addListOfMappingRecursively(processClassImplemetedInterfaces(srcTree,dstTree,classdiff));
         mappingStore.addListOfMapping(processClassAttributes(srcTree,dstTree,classdiff));
@@ -206,6 +208,8 @@ public class ProjectASTDiffer
                 pairlist.addAll(MappingStore.recursivePairings(srcNode, dstNode, null));
             }
         }
+        System.out.println("h");
+//        umlOperationDiff.getAddedOperation().getTypeParameters()
         return pairlist;
     }
 
@@ -513,20 +517,6 @@ public class ProjectASTDiffer
         return pairlist;
     }
 
-    private List<Pair<Tree, Tree>> processClassDesc(Tree srcOperationNode, Tree dstOperationNode) {
-        List<Pair<Tree,Tree>> pairList = new ArrayList<>();
-        List<String> searchingTypes = new ArrayList<>();
-        searchingTypes.add("AccessModifier");
-        searchingTypes.add("SimpleName");
-        searchingTypes.add("TYPE_DECLARATION_KIND");
-        for (String type : searchingTypes) {
-            Pair<Tree,Tree> matched = matchBasedOnType(srcOperationNode,dstOperationNode,type);
-            if (matched != null)
-                pairList.add(matched);
-        }
-        return pairList;
-    }
-
 
     private Pair<Tree, Tree> matchBasedOnType(Tree srcOperationNode, Tree dstOperationNode, String searchingType) {
         Tree srcModifier = TreeUtils.findChildByType(srcOperationNode,searchingType);
@@ -536,9 +526,36 @@ public class ProjectASTDiffer
         return null;
     }
 
-    private List<Pair<Tree, Tree>> classDeclarationMapping(Tree srcTypeDeclartion, Tree dstTypeDeclartion) {
-        List<Pair<Tree, Tree>> pairlist = processClassDesc(srcTypeDeclartion, dstTypeDeclartion);
+    private List<Pair<Tree, Tree>> classDeclarationMapping(Tree srcTypeDeclartion, Tree dstTypeDeclartion, UMLClassDiff classdiff) {
+        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
         pairlist.add(new Pair<>(srcTypeDeclartion,dstTypeDeclartion));
+        List<String> searchingTypes = new ArrayList<>();
+        searchingTypes.add("AccessModifier");
+        searchingTypes.add("SimpleName");
+        searchingTypes.add("TYPE_DECLARATION_KIND");
+        for (String type : searchingTypes) {
+            Pair<Tree,Tree> matched = matchBasedOnType(srcTypeDeclartion,dstTypeDeclartion,type);
+            if (matched != null)
+                pairlist.add(matched);
+        }
+        if (classdiff.getOriginalClass().isStatic() && classdiff.getNextClass().isStatic())
+            pairlist.addAll(matchModifier(srcTypeDeclartion,dstTypeDeclartion,"static"));
+        if (classdiff.getOriginalClass().isFinal() && classdiff.getNextClass().isFinal())
+            pairlist.addAll(matchModifier(srcTypeDeclartion,dstTypeDeclartion,"final"));
+        if (classdiff.getOriginalClass().isAbstract() && classdiff.getNextClass().isAbstract())
+            pairlist.addAll(matchModifier(srcTypeDeclartion,dstTypeDeclartion,"abstract"));
+
+        return pairlist;
+    }
+
+    private List<Pair<Tree, Tree>> matchModifier(Tree srcTypeDeclartion, Tree dstTypeDeclartion, String modifier) {
+        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
+        String type = "Modifier";
+        Tree srcTree = findChildByTypeAndLabel(srcTypeDeclartion,type,modifier);
+        Tree dstTree = findChildByTypeAndLabel(dstTypeDeclartion,type,modifier);
+        if (srcTree != null && dstTree != null){
+            pairlist.add(new Pair<>(srcTree,dstTree));
+        }
         return pairlist;
     }
 

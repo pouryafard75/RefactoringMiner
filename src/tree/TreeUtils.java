@@ -240,4 +240,14 @@ public final class TreeUtils {
         }
         return null;
     }
+    public static Tree findChildByTypeAndLabel(Tree tree, String type,String label) {
+        if (!tree.getChildren().isEmpty())
+        {
+            for (Tree child: tree.getChildren()) {
+                if (child.getType().name.equals(type) && child.getLabel().equals(label))
+                    return child;
+            }
+        }
+        return null;
+    }
 }
