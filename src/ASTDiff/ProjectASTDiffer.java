@@ -197,6 +197,15 @@ public class ProjectASTDiffer
                 pairlist.addAll(MappingStore.recursivePairings(srcExceptionNode, dstExceptionNode, null));
             }
         }
+        if (!umlOperationDiff.isReturnTypeChanged()) {
+            if (umlOperationDiff.getAddedOperation().getReturnParameter() != null && umlOperationDiff.getAddedOperation().getReturnParameter() != null ) {
+                LocationInfo srcLocationInfo = umlOperationDiff.getRemovedOperation().getReturnParameter().getType().getLocationInfo();
+                LocationInfo dstLocationInfo = umlOperationDiff.getAddedOperation().getReturnParameter().getType().getLocationInfo();
+                Tree srcNode = findByLocationInfo(srcTree, srcLocationInfo);
+                Tree dstNode = findByLocationInfo(dstTree, dstLocationInfo);
+                pairlist.addAll(MappingStore.recursivePairings(srcNode, dstNode, null));
+            }
+        }
         return pairlist;
     }
 
