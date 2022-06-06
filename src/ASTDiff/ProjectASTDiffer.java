@@ -86,7 +86,7 @@ public class ProjectASTDiffer
         List<Refactoring> ret = classdiff.getRefactorings();
 
 
-
+        List<Tree> test = new ArrayList<>();
         mappingStore.addListOfMapping(processRefactorings(srcTree,dstTree,classdiff));
 
         mappingStore.addPairRecursively(processPackageDeclaration(srcTree,dstTree,classdiff));
@@ -187,6 +187,15 @@ public class ProjectASTDiffer
             Tree srcClassAnnotationTree = findByLocationInfo(srcTree , umlAnnotationUMLAnnotationPair.getLeft().getLocationInfo());
             Tree dstClassAnnotationTree = findByLocationInfo(dstTree, umlAnnotationUMLAnnotationPair.getRight().getLocationInfo());
             pairlist.addAll(MappingStore.recursivePairings(srcClassAnnotationTree,dstClassAnnotationTree,null));
+        }
+        Set<org.apache.commons.lang3.tuple.Pair<UMLType, UMLType>> commonExceptionTypes = umlOperationDiff.getCommonExceptionTypes();
+        if (commonExceptionTypes != null)
+        {
+            for (org.apache.commons.lang3.tuple.Pair<UMLType, UMLType> matchedException : commonExceptionTypes) {
+                Tree srcExceptionNode = findByLocationInfo(srcTree, matchedException.getLeft().getLocationInfo());
+                Tree dstExceptionNode = findByLocationInfo(dstTree, matchedException.getRight().getLocationInfo());
+                pairlist.addAll(MappingStore.recursivePairings(srcExceptionNode, dstExceptionNode, null));
+            }
         }
         return pairlist;
     }
@@ -470,6 +479,7 @@ public class ProjectASTDiffer
         searchingTypes.add("AccessModifier");
         searchingTypes.add("Modifier");
         searchingTypes.add("SimpleName");
+        searchingTypes.add("SimpleName");
 //        searchingTypes.add("SimpleType");
         // TODO: Above line was added to check the Exceptions, probably not the right way to handle this.
 //        searchingTypes.add("SimpleType");
@@ -480,7 +490,7 @@ public class ProjectASTDiffer
             if (matched != null)
                 pairList.add(matched);
         }
-        pairList.addAll(processReturnType(srcOperationNode,dstOperationNode));
+//        pairList.addAll(processReturnType(srcOperationNode,dstOperationNode));
         return pairList;
     }
 

@@ -354,9 +354,9 @@ public class UMLOperationDiff {
 		return matchedVariables;
 	}
 
-	public UMLAnnotationListDiff getAnnotationListDiff() {
-		return annotationListDiff;
-	}
+//	public UMLAnnotationListDiff getAnnotationListDiff() {
+//		return annotationListDiff;
+//	}
 
 	public UMLTypeParameterListDiff getTypeParameterListDiff() {
 		return typeParameterListDiff;

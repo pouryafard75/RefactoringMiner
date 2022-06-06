@@ -34,8 +34,10 @@ public class Run {
 //        UMLModel model1 = new UMLModelASTReader(new File("D:\\DebugCases\\sa\\cases\\v1")).getUmlModel();
 //        UMLModel model2 = new UMLModelASTReader(new File("D:\\DebugCases\\sa\\cases\\v2")).getUmlModel();
 //        UMLModel model1 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/SimpleCase/v1/")).getUmlModel();
-        UMLModel model1 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/SimpleCase/v1/")).getUmlModel();
-        UMLModel model2 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/SimpleCase/v2/")).getUmlModel();
+//        UMLModel model1 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/DebugCases/Examples/cases/v1/")).getUmlModel();
+//        UMLModel model2 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/DebugCases/Examples/cases/v2/")).getUmlModel();
+        UMLModel model1 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/DebugCases/Examples/working/v1/")).getUmlModel();
+        UMLModel model2 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/DebugCases/Examples/working/v2/")).getUmlModel();
         UMLModelDiff modelDiff = model1.diff(model2);
         ProjectASTDiffer projectASTDiffer = new ProjectASTDiffer(modelDiff);
         projectASTDiffer.diff();
