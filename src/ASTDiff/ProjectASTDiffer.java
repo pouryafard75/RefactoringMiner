@@ -94,6 +94,7 @@ public class ProjectASTDiffer
         mappingStore.addPairRecursively(processSuperClass(srcTree,dstTree,classdiff));
         mappingStore.addListOfMappingRecursively(processClassImplemetedInterfaces(srcTree,dstTree,classdiff));
         mappingStore.addListOfMapping(processClassAttributes(srcTree,dstTree,classdiff));
+        mappingStore.addListOfMapping(processClassJavaDocs(srcTree,dstTree,classdiff));
 
 
         for (org.apache.commons.lang3.tuple.Pair<UMLAnnotation, UMLAnnotation> umlAnnotationUMLAnnotationPair : classdiff.getAnnotationListDiff().getCommonAnnotations()) {
@@ -173,6 +174,18 @@ public class ProjectASTDiffer
 
         }
         return new ASTDiff(treeContextPair.first, treeContextPair.second,mappingStore);
+    }
+
+    private List<Pair<Tree, Tree>> processClassJavaDocs(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
+        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
+        UMLJavadoc javadoc1 = classdiff.getOriginalClass().getJavadoc();
+        UMLJavadoc javadoc2 = classdiff.getNextClass().getJavadoc();
+        if (javadoc1 != null && javadoc2 != null) {
+            Tree srcJavaDocNode = findByLocationInfo(srcTree, javadoc1.getLocationInfo());
+            Tree dstJavaDocNode = findByLocationInfo(dstTree, javadoc2.getLocationInfo());
+            pairlist.addAll(MappingStore.recursivePairings(srcJavaDocNode, dstJavaDocNode, null));
+        }
+        return pairlist;
     }
 
     private List<Pair<Tree, Tree>> processMethodJavaDoc(Tree srcTree, Tree dstTree, UMLJavadoc javadoc1, UMLJavadoc javadoc2) {
