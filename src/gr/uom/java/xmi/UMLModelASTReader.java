@@ -100,11 +100,12 @@ public class UMLModelASTReader {
 				CompilationUnit compilationUnit = (CompilationUnit)parser.createAST(null);
 
 
-				IScanner scanner = ToolFactory.createScanner(false, false, false, false);
+				IScanner scanner = ToolFactory.createScanner(true, false, false, false);
 				scanner.setSource(javaFileContent.toCharArray());
 				JdtVisitor visitor = new JdtVisitor(scanner);
 				compilationUnit.accept(visitor);
 				TreeContext treeContext = visitor.getTreeContext();
+
 				this.getUmlModel().addCompilationUnit(filePath,treeContext); //TODO:  Use fullpath to avoid errors while two files have the same name
 				processCompilationUnit(filePath, compilationUnit, javaFileContent);
 			}

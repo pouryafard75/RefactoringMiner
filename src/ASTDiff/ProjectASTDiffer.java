@@ -35,10 +35,6 @@ public class ProjectASTDiffer
         return dstPath;
     }
 
-    public UMLModelDiff getUmlModelDiff() {
-        return umlModelDiff;
-    }
-
     public ProjectASTDiffer(UMLModelDiff umlModelDiff) throws RefactoringMinerTimedOutException {
         this.umlModelDiff = umlModelDiff;
         umlModelDiff.getRefactorings();
@@ -65,8 +61,6 @@ public class ProjectASTDiffer
             if (this.astDiffMap.containsKey(fullPath))
             {
                 this.astDiffMap.get(fullPath).mappings.mergeMappings(classASTDiff.mappings);
-////                this.astDiffMap.get(fullPath).srcTC = classASTDiff.srcTC;
-////                this.astDiffMap.get(fullPath).dstTC = classASTDiff.dstTC;
             }
             else
                 this.astDiffMap.put(fullPath, classASTDiff);
@@ -110,6 +104,7 @@ public class ProjectASTDiffer
 
 
 
+
         ArrayList<UMLOperationBodyMapper> operationBodyMapperList = new ArrayList<>(classdiff.getOperationBodyMapperList());
 
 
@@ -133,6 +128,9 @@ public class ProjectASTDiffer
                 mappingStore.addMappingRecursively(leftTree,rightTree);
             }
 
+//            mappingStore.addListOfMapping(processCommentsInsideMethod(srcTree, dstTree, umlOperationBodyMapper.getOperation1(),umlOperationBodyMapper.getOperation2()));
+            mappingStore.addListOfMapping(processMethodJavaDoc(srcTree, dstTree, umlOperationBodyMapper.getOperation1().getJavadoc(),umlOperationBodyMapper.getOperation2().getJavadoc()));
+
 
             Tree srcOperationNode = srcTree.getTreeBetweenPositions(umlOperationBodyMapper.getOperation1().getLocationInfo().getStartOffset(),umlOperationBodyMapper.getOperation1().getLocationInfo().getEndOffset());
             Tree dstOperationNode = dstTree.getTreeBetweenPositions(umlOperationBodyMapper.getOperation2().getLocationInfo().getStartOffset(),umlOperationBodyMapper.getOperation2().getLocationInfo().getEndOffset());
@@ -152,8 +150,6 @@ public class ProjectASTDiffer
                     else {
                         if (srcStatementNode.isIsoStructuralTo(dstStatementNode))
                         {
-                            System.out.println("ola here");
-                            System.out.println(abstractCodeMapping);
                             mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
                         }
                         else {
@@ -177,6 +173,35 @@ public class ProjectASTDiffer
 
         }
         return new ASTDiff(treeContextPair.first, treeContextPair.second,mappingStore);
+    }
+
+    private List<Pair<Tree, Tree>> processMethodJavaDoc(Tree srcTree, Tree dstTree, UMLJavadoc javadoc1, UMLJavadoc javadoc2) {
+        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
+        if (javadoc1 != null && javadoc2 != null)
+            if (javadoc1.equalText(javadoc2))
+            {
+                Tree srcJavaDocNode = findByLocationInfo(srcTree,javadoc1.getLocationInfo());
+                Tree dstJavaDocNode = findByLocationInfo(dstTree,javadoc2.getLocationInfo());
+                pairlist.addAll(MappingStore.recursivePairings(srcJavaDocNode,dstJavaDocNode,null));
+            }
+        return pairlist;
+    }
+
+    private List<Pair<Tree, Tree>> processCommentsInsideMethod(Tree srcTree, Tree dstTree ,UMLOperation operation1, UMLOperation operation2) {
+        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
+        List<UMLComment> operation1Comments = operation1.getComments();
+        List<UMLComment> operation2Comments = operation1.getComments();
+        for(UMLComment umlComment1 : operation1Comments)
+        {
+            for(UMLComment umlComment2 : operation2Comments)
+            {
+                if (umlComment1.getText().equals(umlComment2.getText()))
+                {
+                    pairlist.add(new Pair<>(findByLocationInfo(srcTree,umlComment1.getLocationInfo()),findByLocationInfo(dstTree,umlComment2.getLocationInfo())));
+                }
+            }
+        }
+        return pairlist;
     }
 
     private static List<Pair<Tree, Tree>> processOperationDiff(Tree srcTree, Tree dstTree, UMLOperationBodyMapper umlOperationBodyMapper) {
