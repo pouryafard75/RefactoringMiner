@@ -2,6 +2,7 @@
 
 package actions;
 
+import ASTDiff.actions.model.*;
 import actions.model.*;
 import actions.model.Delete;
 import tree.Tree;
@@ -42,7 +43,7 @@ public class OnlyRootsClassifier extends AbstractITreeClassifier {
                         && insertedDsts.contains(a.getNode().getParent())))
                     dstAddTrees.add(a.getNode());
             }
-            else if (a instanceof TreeInsert )
+            else if (a instanceof TreeInsert)
                 dstAddTrees.add(a.getNode());
             else if (a instanceof Update) {
                 srcUpdTrees.add(a.getNode());

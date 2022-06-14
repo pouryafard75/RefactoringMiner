@@ -22,9 +22,8 @@ import java.util.stream.Stream;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-import gen.SyntaxException;
-import jdt.AbstractJdtVisitor;
-import jdt.JdtTreeGenerator;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import jdt.CommentVisitor;
 import jdt.JdtVisitor;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.JavaCore;
@@ -65,7 +64,9 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import gr.uom.java.xmi.LocationInfo.CodeElementType;
 import gr.uom.java.xmi.decomposition.OperationBody;
 import gr.uom.java.xmi.decomposition.VariableDeclaration;
+import tree.Tree;
 import tree.TreeContext;
+import tree.TypeSet;
 
 public class UMLModelASTReader {
 	private static final String FREE_MARKER_GENERATED = "generated using freemarker";
@@ -98,14 +99,13 @@ public class UMLModelASTReader {
 			}
 			try {
 				CompilationUnit compilationUnit = (CompilationUnit)parser.createAST(null);
-
-
 				IScanner scanner = ToolFactory.createScanner(true, false, false, false);
 				scanner.setSource(javaFileContent.toCharArray());
 				JdtVisitor visitor = new JdtVisitor(scanner);
 				compilationUnit.accept(visitor);
-				TreeContext treeContext = visitor.getTreeContext();
 
+				TreeContext treeContext = visitor.getTreeContext();
+				treeContext.setUmlCommentList(extractInternalComments(compilationUnit, filePath, javaFileContent));
 				this.getUmlModel().addCompilationUnit(filePath,treeContext); //TODO:  Use fullpath to avoid errors while two files have the same name
 				processCompilationUnit(filePath, compilationUnit, javaFileContent);
 			}
@@ -220,7 +220,7 @@ public class UMLModelASTReader {
 	private UMLJavadoc generateJavadoc(CompilationUnit cu, BodyDeclaration bodyDeclaration, String sourceFile) {
 		Javadoc javaDoc = bodyDeclaration.getJavadoc();
 		return generateJavadoc(cu, sourceFile, javaDoc);
-	}
+	} 
 
 	private UMLJavadoc generateJavadoc(CompilationUnit cu, String sourceFile, Javadoc javaDoc) {
 		UMLJavadoc doc = null;

@@ -1,24 +1,12 @@
 package ASTDiff;
-import actions.ASTDiff;
 import gr.uom.java.xmi.UMLModel;
 import gr.uom.java.xmi.UMLModelASTReader;
 import gr.uom.java.xmi.diff.UMLModelDiff;
-import io.DirectoryComparator;
-import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
-import org.rendersnake.Renderable;
-import spark.Spark;
-import utils.Pair;
-import view.webdiff.DirectoryDiffView;
-import view.webdiff.VanillaDiffView;
 import view.webdiff.WebDiff;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.List;
-import static spark.Spark.*;
-
 
 
 public class Run {

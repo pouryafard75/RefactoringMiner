@@ -4,6 +4,7 @@ import actions.ASTDiff;
 import gr.uom.java.xmi.*;
 import gr.uom.java.xmi.decomposition.*;
 import gr.uom.java.xmi.diff.*;
+import jdt.CommentVisitor;
 import matchers.*;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
@@ -68,6 +69,7 @@ public class ProjectASTDiffer
     }
 
     public void computeAllEditScripts() {
+
         for (Map.Entry<String,ASTDiff> entry : this.astDiffMap.entrySet())
         {
             entry.getValue().computeEditScript();
@@ -173,7 +175,12 @@ public class ProjectASTDiffer
             }
 
         }
-        return new ASTDiff(treeContextPair.first, treeContextPair.second,mappingStore);
+
+
+        new CommentVisitor(treeContextPair.first);
+        new CommentVisitor(treeContextPair.second);
+
+        return new ASTDiff(treeContextPair.first, treeContextPair.second, mappingStore);
     }
 
     private List<Pair<Tree, Tree>> processClassJavaDocs(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
@@ -246,7 +253,6 @@ public class ProjectASTDiffer
                 pairlist.addAll(MappingStore.recursivePairings(srcNode, dstNode, null));
             }
         }
-        System.out.println("h");
 //        umlOperationDiff.getAddedOperation().getTypeParameters()
         return pairlist;
     }

@@ -1,12 +1,7 @@
 
 package actions;
-import gr.uom.java.xmi.diff.UMLClassDiff;
 import matchers.MappingStore;
-import org.eclipse.jgit.diff.Edit;
-import tree.Tree;
 import tree.TreeContext;
-
-import java.io.IOException;
 
 /**
  * Class to facilitate the computation of diffs between ASTs.

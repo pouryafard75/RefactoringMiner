@@ -7,7 +7,6 @@ import java.util.HashSet;
 
 import java.util.Set;
 
-import spark.Spark;
 public abstract class AbstractITreeClassifier implements TreeClassifier {
     protected final ASTDiff diff;
 

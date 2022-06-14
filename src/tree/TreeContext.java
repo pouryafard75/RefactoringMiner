@@ -2,6 +2,8 @@
 
 package tree;
 
+import gr.uom.java.xmi.UMLClass;
+import gr.uom.java.xmi.UMLComment;
 import io.TreeIoUtils;
 import io.TreeIoUtils.MetadataSerializer;
 import io.TreeIoUtils.MetadataUnserializer;
@@ -17,6 +19,7 @@ import java.util.regex.Pattern;
  * @see Tree
  */
 public class TreeContext {
+    private List<UMLComment> umlCommentList;
     private final Map<String, Object> metadata = new HashMap<>();
 
     private final MetadataSerializers serializers = new MetadataSerializers();
@@ -85,9 +88,19 @@ public class TreeContext {
         return metadata.put(key, value);
     }
 
+    public void setUmlCommentList(List<UMLComment> umlCommentList) {
+        this.umlCommentList = umlCommentList;
+    }
+
+    public List<UMLComment> getUmlCommentList() {
+        return umlCommentList;
+    }
+
     /**
      * Get an iterator on the AST metadata.
      */
+
+
     public Iterator<Entry<String, Object>> getMetadata() {
         return metadata.entrySet().iterator();
     }

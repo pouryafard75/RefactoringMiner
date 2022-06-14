@@ -72,6 +72,20 @@ public abstract class AbstractTree implements Tree {
         t.setParent(this);
     }
 
+    @Override
+    public void properInsertChild(Tree t) {
+        int position = 0;
+        for(Tree child : children)
+        {
+            if (child.getPos() < t.getPos()) {
+                position += 1;
+            }
+            else
+                break;
+        }
+        insertChild(t,position);
+    }
+
     public TreeMetrics getMetrics() {
         if (metrics == null) {
             Tree root = this;

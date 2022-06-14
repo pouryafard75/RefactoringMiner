@@ -2,6 +2,8 @@
 
 package tree;
 
+import gr.uom.java.xmi.UMLComment;
+
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
@@ -50,6 +52,8 @@ public interface Tree {
      */
     void insertChild(Tree t, int position);
 
+    default void properInsertChild(Tree t){}
+
     /**
      * Sets the list of children of this node.
      *
@@ -68,6 +72,10 @@ public interface Tree {
      */
     default Tree getChild(int position) {
         return getChildren().get(position);
+//        Tree result = getChildren().get(position);
+//        if (!result.getType().name.equals("Comment")) return result;
+//        return result;
+
     }
 
 
@@ -90,6 +98,22 @@ public interface Tree {
             if (t.getPos() >= position && t.getEndPos() <= endPosition)
                 return t;
         }
+        return null;
+    }
+    default Tree getProperTreeBetweenPositions(int position, int endPosition) {
+        if (this.getPos() <= position && this.getEndPos() >= endPosition)
+        {
+            if (this.isLeaf()) return this;
+            for (Tree child : this.getChildren())
+            {
+                if (child.getPos() <= position && child.getEndPos() >= endPosition)
+                {
+                    return child.getProperTreeBetweenPositions(position,endPosition);
+                }
+            }
+            return this;
+        }
+
         return null;
     }
     default Tree getTreeBetweenPositions(int position, int endPosition,String type) {
@@ -353,4 +377,6 @@ public interface Tree {
      * Returns an iterator for all metadata of this node.
      */
     Iterator<Entry<String, Object>> getMetadata();
+
+    default void addComments(List<UMLComment> commentsList){}
 }
