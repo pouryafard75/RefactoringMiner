@@ -2,7 +2,6 @@
 
 package actions;
 
-import ASTDiff.actions.model.*;
 import actions.model.*;
 import actions.model.Delete;
 import tree.Tree;

@@ -1,7 +1,6 @@
 
 package actions;
 
-import ASTDiff.actions.model.*;
 import actions.model.*;
 import matchers.Mapping;
 import matchers.MappingStore;
