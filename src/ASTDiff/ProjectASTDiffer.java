@@ -168,7 +168,27 @@ public class ProjectASTDiffer
                         mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
                     }
                     else {
-                        mappingStore.addMapping(srcOperationNode,dstOperationNode);
+
+                        mappingStore.addMapping(srcStatementNode,dstStatementNode);
+                        CompositeStatementObject frag1Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment1());
+                        CompositeStatementObject frag2Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment2());
+                        List<AbstractExpression> frag1ExprList = frag1Comp.getExpressions();
+                        List<AbstractExpression> frag2ExprList = frag2Comp.getExpressions();
+                        for (AbstractExpression frag1Expr : frag1ExprList) {
+                            for (AbstractExpression frag2Expr : frag2ExprList)
+                            {
+                                if (frag1Expr.getExpression().equals(frag2Expr.getExpression()))
+                                {
+                                    Tree frag1Node = findByLocationInfo(srcTree,frag1Expr.getLocationInfo());
+                                    Tree frag2Node = findByLocationInfo(dstTree,frag2Expr.getLocationInfo());
+                                    if (frag1Node.getParent().getType().name.equals("IfStatement") &&
+                                        frag2Node.getParent().getType().name.equals("IfStatement"))
+                                        mappingStore.addMapping(frag1Node.getParent(),frag2Node.getParent());
+                                    mappingStore.addMappingRecursively(frag1Node,frag2Node);
+                                    break;
+                                }
+                            }
+                        }
 
                     }
                 }
