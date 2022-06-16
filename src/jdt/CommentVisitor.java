@@ -2,28 +2,30 @@ package jdt;
 
 import gr.uom.java.xmi.LocationInfo;
 import gr.uom.java.xmi.UMLComment;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.BlockComment;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.LineComment;
 import tree.Tree;
 import tree.TreeContext;
 import tree.TypeSet;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommentVisitor {
     private List<UMLComment> umlCommentList;
     private TreeContext treeContext;
+    private List<Tree> comments = new ArrayList<>();
+
+    public List<Tree> getComments() {
+        return comments;
+    }
+
     private boolean added = false;
     public CommentVisitor(TreeContext treeContext)
     {
         this.treeContext = treeContext;
         this.umlCommentList = treeContext.getUmlCommentList();
-        addCommentToProperSubtree();
     }
-    void addCommentToProperSubtree()
+
+    public void addCommentToProperSubtree()
     {
         if (added) return;
         added = true;
@@ -35,6 +37,7 @@ public class CommentVisitor {
             Tree target = findProperSubTree(root,commentStartOffset,commentEndffset);
             Tree commentSubTree = makeCommentSubTree(umlComment);
             target.properInsertChild(commentSubTree);
+            comments.add(commentSubTree);
     }
 
 }

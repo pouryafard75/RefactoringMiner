@@ -176,11 +176,48 @@ public class ProjectASTDiffer
 
         }
 
+        Pair<List<Tree>, List<Tree>> addedCommentsPair = addComments(treeContextPair.first, treeContextPair.second);
+        matchComments(addedCommentsPair,mappingStore);
 
-        new CommentVisitor(treeContextPair.first);
-        new CommentVisitor(treeContextPair.second);
 
         return new ASTDiff(treeContextPair.first, treeContextPair.second, mappingStore);
+    }
+
+    private void matchComments(Pair<List<Tree>, List<Tree>> addedCommentsPair, MappingStore mappingStore) {
+        List<Tree> srcComments = addedCommentsPair.first;
+        List<Tree> dstComments = addedCommentsPair.second;
+        Map<Tree,List<Tree>> candidates = new HashMap<>();
+        for (Tree srcComment : srcComments)
+            {
+                List<Tree> candidateList = new ArrayList<>();
+                for (Tree dstComment : dstComments)
+                {
+                    if (srcComment.getMetrics().hash == dstComment.getMetrics().hash)
+                        candidateList.add(dstComment);
+                }
+                if (!candidateList.isEmpty())
+                    candidates.put(srcComment,candidateList);
+            }
+        for (Map.Entry<Tree,List<Tree>> entry : candidates.entrySet())
+        {
+            Tree srcTree = entry.getKey();
+            List<Tree> matches = entry.getValue();
+            if (matches.size() == 1) {
+                mappingStore.addMappingRecursively(srcTree, matches.get(0));
+            }
+            else
+            {
+                //TODO: ignore so far
+            }
+        }
+    }
+
+    private Pair<List<Tree> , List<Tree>> addComments(TreeContext first, TreeContext second) {
+        CommentVisitor firstCommentVisior = new CommentVisitor(first);
+        firstCommentVisior.addCommentToProperSubtree();
+        CommentVisitor secondCommentVisitor = new CommentVisitor(second);
+        secondCommentVisitor.addCommentToProperSubtree();
+        return new Pair<>(firstCommentVisior.getComments(),secondCommentVisitor.getComments());
     }
 
     private List<Pair<Tree, Tree>> processClassJavaDocs(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
