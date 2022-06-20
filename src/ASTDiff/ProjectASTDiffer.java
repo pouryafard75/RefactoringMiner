@@ -11,12 +11,14 @@ import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import tree.Tree;
 import tree.TreeContext;
 import tree.TreeUtils;
+import tree.Type;
 import utils.Pair;
 
 
 import java.io.File;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static tree.TreeUtils.findChildByTypeAndLabel;
 
@@ -148,6 +150,7 @@ public class ProjectASTDiffer
                 Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
 
                 if (abstractCodeMapping instanceof LeafMapping) {
+//                    if (true) continue;
                     if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString())) {
                         mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
                     }
@@ -347,7 +350,56 @@ public class ProjectASTDiffer
                 pair.second.forEach(tree -> dstTrees.open(tree));
             });
         }
+        Pair<List<Tree>, List<Tree>> complementPair = calcComplements(src,dst,pairlist);
+        postProcess(complementPair,pairlist);
         return pairlist;
+    }
+
+    private void postProcess(Pair<List<Tree>, List<Tree>> complementPair, List<Pair<Tree, Tree>> pairlist) {
+        List<Tree> srcComplement = complementPair.first;
+        List<Tree> dstComplement = complementPair.second;
+        for(Tree srcSubTree : srcComplement)
+        {
+            Tree dstSelected = findSimilarCriteria(srcSubTree,dstComplement);
+            if (dstSelected == null) continue;
+            dstComplement.remove(dstSelected);
+            pairlist.add(new Pair<>(srcSubTree,dstSelected));
+        }
+    }
+
+    private Tree findSimilarCriteria(Tree srcSubTree, List<Tree> dstComplement) {
+        String searchingType = srcSubTree.getType().name;
+        List<Tree> candidates = new ArrayList<>();
+        for (Tree dstSubTree : dstComplement)
+        {
+            if (dstSubTree.getType().name.equals(searchingType))
+                candidates.add(dstSubTree);
+        }
+        if (candidates.isEmpty()) return null;
+        return findTheBest(srcSubTree,candidates);
+    }
+
+    private Tree findTheBest(Tree srcSubTree, List<Tree> candidates) {
+        int serachingHeight = srcSubTree.getMetrics().height;
+        for (Tree dstSubTree : candidates)
+        {
+            if (serachingHeight == dstSubTree.getMetrics().height)
+                return dstSubTree;
+        }
+        return candidates.get(0);
+        //TODO
+    }
+
+    private Pair<List<Tree>, List<Tree>> calcComplements(Tree src, Tree dst, List<Pair<Tree, Tree>> pairlist) {
+        List<Tree> srcMatchedList = pairlist.stream().map(pair -> pair.first).collect(Collectors.toList());
+        List<Tree> dstMatchedList = pairlist.stream().map(pair -> pair.second).collect(Collectors.toList());
+
+        List<Tree> srcComplement = src.getDescendants();
+        srcComplement.removeAll(srcMatchedList);
+
+        List<Tree> dstComplement = dst.getDescendants();
+        dstComplement.removeAll(dstMatchedList);
+        return new Pair<>(srcComplement,dstComplement);
     }
 
     private List<Pair<Tree, Tree>> processRefactorings(Tree srcTree, Tree dstTree, UMLClassDiff classdiff,MappingStore mappingStore) throws RefactoringMinerTimedOutException {
@@ -362,6 +414,7 @@ public class ProjectASTDiffer
                     Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
                     Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
                     if (abstractCodeMapping instanceof LeafMapping) {
+//                        if (true) continue;
                         if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString())) {
                             pairlist.addAll(MappingStore.recursivePairings(srcStatementNode, dstStatementNode, null));
                             mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
