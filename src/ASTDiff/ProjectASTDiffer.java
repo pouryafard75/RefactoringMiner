@@ -11,7 +11,6 @@ import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import tree.Tree;
 import tree.TreeContext;
 import tree.TreeUtils;
-import tree.Type;
 import utils.Pair;
 
 
@@ -120,9 +119,7 @@ public class ProjectASTDiffer
 
             System.out.println("OperationName " + umlOperationBodyMapper);
             Set<Refactoring> refactorings = umlOperationBodyMapper.getRefactorings();
-            mappingStore.addListOfMapping(processOperationDiff(srcTree,dstTree,umlOperationBodyMapper));
-
-
+            processOperationDiff(srcTree,dstTree,umlOperationBodyMapper,mappingStore);
 
             for (org.apache.commons.lang3.tuple.Pair<VariableDeclaration, VariableDeclaration> matchedPair: umlOperationBodyMapper.getMatchedVariables()) {
                 VariableDeclaration leftPair = matchedPair.getLeft();
@@ -295,16 +292,20 @@ public class ProjectASTDiffer
         return pairlist;
     }
 
-    private static List<Pair<Tree, Tree>> processOperationDiff(Tree srcTree, Tree dstTree, UMLOperationBodyMapper umlOperationBodyMapper) {
-        List<Pair<Tree, Tree>> pairlist = new ArrayList<>();
+    private void processOperationDiff(Tree srcTree, Tree dstTree, UMLOperationBodyMapper umlOperationBodyMapper, MappingStore mappingStore) {
         UMLOperationDiff umlOperationDiff = umlOperationBodyMapper.getOperationSignatureDiff().isPresent() ? umlOperationBodyMapper.getOperationSignatureDiff().get() : null;
-        if (umlOperationDiff == null) return pairlist;
-
+        if (umlOperationDiff == null) return;
+        UMLTypeParameterListDiff umlTypeParameterListDiff = umlOperationDiff.getTypeParameterListDiff();
+        for (org.apache.commons.lang3.tuple.Pair<UMLTypeParameter, UMLTypeParameter> commonTypeParamSet : umlTypeParameterListDiff.getCommonTypeParameters()) {
+            Tree srcTypeParam = findByLocationInfo(srcTree, commonTypeParamSet.getLeft().getLocationInfo());
+            Tree dstTypeParam = findByLocationInfo(dstTree, commonTypeParamSet.getRight().getLocationInfo());
+            mappingStore.addMappingRecursively(srcTypeParam,dstTypeParam);
+        }
         for (org.apache.commons.lang3.tuple.Pair<UMLAnnotation, UMLAnnotation>  umlAnnotationUMLAnnotationPair : umlOperationDiff.getAnnotationListDiff().getCommonAnnotations())
         {
             Tree srcClassAnnotationTree = findByLocationInfo(srcTree , umlAnnotationUMLAnnotationPair.getLeft().getLocationInfo());
             Tree dstClassAnnotationTree = findByLocationInfo(dstTree, umlAnnotationUMLAnnotationPair.getRight().getLocationInfo());
-            pairlist.addAll(MappingStore.recursivePairings(srcClassAnnotationTree,dstClassAnnotationTree,null));
+            mappingStore.addMappingRecursively(srcClassAnnotationTree,dstClassAnnotationTree);
         }
         Set<org.apache.commons.lang3.tuple.Pair<UMLType, UMLType>> commonExceptionTypes = umlOperationDiff.getCommonExceptionTypes();
         if (commonExceptionTypes != null)
@@ -312,7 +313,7 @@ public class ProjectASTDiffer
             for (org.apache.commons.lang3.tuple.Pair<UMLType, UMLType> matchedException : commonExceptionTypes) {
                 Tree srcExceptionNode = findByLocationInfo(srcTree, matchedException.getLeft().getLocationInfo());
                 Tree dstExceptionNode = findByLocationInfo(dstTree, matchedException.getRight().getLocationInfo());
-                pairlist.addAll(MappingStore.recursivePairings(srcExceptionNode, dstExceptionNode, null));
+                mappingStore.addMappingRecursively(srcExceptionNode,dstExceptionNode);
             }
         }
         if (!umlOperationDiff.isReturnTypeChanged()) {
@@ -321,11 +322,9 @@ public class ProjectASTDiffer
                 LocationInfo dstLocationInfo = umlOperationDiff.getAddedOperation().getReturnParameter().getType().getLocationInfo();
                 Tree srcNode = findByLocationInfo(srcTree, srcLocationInfo);
                 Tree dstNode = findByLocationInfo(dstTree, dstLocationInfo);
-                pairlist.addAll(MappingStore.recursivePairings(srcNode, dstNode, null));
+                mappingStore.addMappingRecursively(srcNode,dstNode);
             }
         }
-//        umlOperationDiff.getAddedOperation().getTypeParameters()
-        return pairlist;
     }
 
     public List<Pair<Tree, Tree>> match(Tree src, Tree dst) {
