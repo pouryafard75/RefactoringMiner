@@ -82,43 +82,19 @@ public class ProjectASTDiffer
         Tree dstTree = treeContextPair.second.getRoot();
         MappingStore mappingStore = new MappingStore(srcTree,dstTree);
         mappingStore.addMapping(srcTree,dstTree);
-        List<Refactoring> ret = classdiff.getRefactorings();
-
 
         processRefactorings(srcTree,dstTree,classdiff,mappingStore);
-
-        mappingStore.addPairRecursively(processPackageDeclaration(srcTree,dstTree,classdiff));
-        mappingStore.addListOfMappingRecursively(processImports(srcTree,dstTree,classdiff.getImportDiffList()));
+        processPackageDeclaration(srcTree,dstTree,classdiff,mappingStore);
+        processImports(srcTree,dstTree,classdiff.getImportDiffList(),mappingStore);
 
         Tree srcClassTree = findByLocationInfo(srcTree,classdiff.getOriginalClass().getLocationInfo(),"TypeDeclaration");
         Tree dstClassTree = findByLocationInfo(dstTree,classdiff.getNextClass().getLocationInfo(),"TypeDeclaration");
-        mappingStore.addListOfMapping(classDeclarationMapping(srcClassTree,dstClassTree,classdiff));
-        mappingStore.addPairRecursively(processSuperClass(srcTree,dstTree,classdiff));
-        mappingStore.addListOfMappingRecursively(processClassImplemetedInterfaces(srcTree,dstTree,classdiff));
-        mappingStore.addListOfMapping(processClassAttributes(srcTree,dstTree,classdiff));
-        mappingStore.addListOfMapping(processClassJavaDocs(srcTree,dstTree,classdiff));
+        processClassDeclarationMapping(srcClassTree,dstClassTree,classdiff,mappingStore);
 
-
-        for (org.apache.commons.lang3.tuple.Pair<UMLAnnotation, UMLAnnotation> umlAnnotationUMLAnnotationPair : classdiff.getAnnotationListDiff().getCommonAnnotations()) {
-            Tree srcClassAnnotationTree = findByLocationInfo(srcTree , umlAnnotationUMLAnnotationPair.getLeft().getLocationInfo());
-            Tree dstClassAnnotationTree = findByLocationInfo(dstTree, umlAnnotationUMLAnnotationPair.getRight().getLocationInfo());
-            mappingStore.addMappingRecursively(srcClassAnnotationTree,dstClassAnnotationTree);
-        }
-
-
-
-
-        ArrayList<UMLOperationBodyMapper> operationBodyMapperList = new ArrayList<>(classdiff.getOperationBodyMapperList());
-
-
-
-
-
-        for(UMLOperationBodyMapper umlOperationBodyMapper : operationBodyMapperList)
+        for(UMLOperationBodyMapper umlOperationBodyMapper : new ArrayList<>(classdiff.getOperationBodyMapperList()))
         {
 
             System.out.println("OperationName " + umlOperationBodyMapper);
-            Set<Refactoring> refactorings = umlOperationBodyMapper.getRefactorings();
             processOperationDiff(srcTree,dstTree,umlOperationBodyMapper,mappingStore);
 
             for (org.apache.commons.lang3.tuple.Pair<VariableDeclaration, VariableDeclaration> matchedPair: umlOperationBodyMapper.getMatchedVariables()) {
@@ -131,7 +107,6 @@ public class ProjectASTDiffer
                     mappingStore.addMappingRecursively(leftTree,rightTree);
             }
 
-//            mappingStore.addListOfMapping(processCommentsInsideMethod(srcTree, dstTree, umlOperationBodyMapper.getOperation1(),umlOperationBodyMapper.getOperation2()));
             mappingStore.addListOfMapping(processMethodJavaDoc(srcTree, dstTree, umlOperationBodyMapper.getOperation1().getJavadoc(),umlOperationBodyMapper.getOperation2().getJavadoc()));
 
 
@@ -139,65 +114,7 @@ public class ProjectASTDiffer
             Tree dstOperationNode = dstTree.getTreeBetweenPositions(umlOperationBodyMapper.getOperation2().getLocationInfo().getStartOffset(),umlOperationBodyMapper.getOperation2().getLocationInfo().getEndOffset());
             mappingStore.addMapping(srcOperationNode,dstOperationNode);
             mappingStore.addListOfMapping(processMethodSignature(srcOperationNode,dstOperationNode));
-            ArrayList<AbstractCodeMapping> mappings = new ArrayList<>(umlOperationBodyMapper.getMappings());
-
-            for (AbstractCodeMapping abstractCodeMapping : mappings)
-            {
-                Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
-                Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
-
-                if (abstractCodeMapping instanceof LeafMapping) {
-//                    if (true) continue;
-                    if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString())) {
-                        mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
-                    }
-                    else {
-                        if (srcStatementNode.isIsoStructuralTo(dstStatementNode))
-                        {
-                            mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
-                        }
-                        else {
-                            mappingStore.addMapping(srcStatementNode, dstStatementNode);
-                            mappingStore.addListOfMapping(match(srcStatementNode, dstStatementNode));
-                        }
-                    }
-                }
-                else if (abstractCodeMapping instanceof CompositeStatementObjectMapping)
-                {
-                    if (srcStatementNode.getMetrics().hash == dstStatementNode.getMetrics().hash)
-                    {
-                        mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
-                    }
-                    else {
-                        mappingStore.addMapping(srcStatementNode,dstStatementNode);
-                        if ( (srcStatementNode.getType().name.equals("TryStatement") && dstStatementNode.getType().name.equals("TryStatement")) ||
-                             (srcStatementNode.getType().name.equals("CatchClause") && dstStatementNode.getType().name.equals("CatchClause")))
-                            matchBlocks(srcStatementNode,dstStatementNode,mappingStore);
-                        CompositeStatementObject frag1Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment1());
-                        CompositeStatementObject frag2Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment2());
-
-                        List<AbstractExpression> frag1ExprList = frag1Comp.getExpressions();
-                        List<AbstractExpression> frag2ExprList = frag2Comp.getExpressions();
-
-                        for (AbstractExpression frag1Expr : frag1ExprList) {
-                            for (AbstractExpression frag2Expr : frag2ExprList)
-                            {
-                                if (frag1Expr.getExpression().equals(frag2Expr.getExpression()))
-                                {
-                                    Tree frag1Node = findByLocationInfo(srcTree,frag1Expr.getLocationInfo());
-                                    Tree frag2Node = findByLocationInfo(dstTree,frag2Expr.getLocationInfo());
-                                    if ((frag1Node.getParent().getType().name.equals("IfStatement") &&
-                                        frag2Node.getParent().getType().name.equals("IfStatement")))
-                                        mappingStore.addMapping(frag1Node.getParent(),frag2Node.getParent());
-                                    mappingStore.addMappingRecursively(frag1Node,frag2Node);
-                                    break;
-                                }
-                            }
-                        }
-
-                    }
-                }
-            }
+            fromRefMiner(srcTree,dstTree,umlOperationBodyMapper.getMappings(),mappingStore);
 
         }
 
@@ -206,6 +123,75 @@ public class ProjectASTDiffer
 
 
         return new ASTDiff(treeContextPair.first, treeContextPair.second, mappingStore);
+    }
+
+    private void fromRefMiner(Tree srcTree, Tree dstTree, Set<AbstractCodeMapping> mappingSet, MappingStore mappingStore) {
+        ArrayList<AbstractCodeMapping> mappings = new ArrayList<>(mappingSet);
+        for (AbstractCodeMapping abstractCodeMapping : mappings)
+        {
+            Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
+            Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
+
+            if (abstractCodeMapping instanceof LeafMapping) {
+//                    if (true) continue;
+                if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString())) {
+                    mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
+                }
+                else {
+                    if (srcStatementNode.isIsoStructuralTo(dstStatementNode))
+                    {
+                        mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
+                    }
+                    else {
+                        mappingStore.addMapping(srcStatementNode, dstStatementNode);
+                        mappingStore.addListOfMapping(match(srcStatementNode, dstStatementNode));
+                    }
+                }
+            }
+            else if (abstractCodeMapping instanceof CompositeStatementObjectMapping)
+            {
+                if (srcStatementNode.getMetrics().hash == dstStatementNode.getMetrics().hash)
+                {
+                    mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
+                }
+                else {
+                    mappingStore.addMapping(srcStatementNode,dstStatementNode);
+                    if ( (srcStatementNode.getType().name.equals("TryStatement") && dstStatementNode.getType().name.equals("TryStatement")) ||
+                            (srcStatementNode.getType().name.equals("CatchClause") && dstStatementNode.getType().name.equals("CatchClause")))
+                        matchBlocks(srcStatementNode,dstStatementNode,mappingStore);
+                    CompositeStatementObject frag1Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment1());
+                    CompositeStatementObject frag2Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment2());
+
+                    List<AbstractExpression> frag1ExprList = frag1Comp.getExpressions();
+                    List<AbstractExpression> frag2ExprList = frag2Comp.getExpressions();
+
+                    for (AbstractExpression frag1Expr : frag1ExprList) {
+                        for (AbstractExpression frag2Expr : frag2ExprList)
+                        {
+                            if (frag1Expr.getExpression().equals(frag2Expr.getExpression()))
+                            {
+                                Tree frag1Node = findByLocationInfo(srcTree,frag1Expr.getLocationInfo());
+                                Tree frag2Node = findByLocationInfo(dstTree,frag2Expr.getLocationInfo());
+                                if ((frag1Node.getParent().getType().name.equals("IfStatement") &&
+                                        frag2Node.getParent().getType().name.equals("IfStatement")))
+                                    mappingStore.addMapping(frag1Node.getParent(),frag2Node.getParent());
+                                mappingStore.addMappingRecursively(frag1Node,frag2Node);
+                                break;
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    private void processClassAnnotations(Tree srcTree, Tree dstTree, UMLAnnotationListDiff annotationListDiff, MappingStore mappingStore) {
+        for (org.apache.commons.lang3.tuple.Pair<UMLAnnotation, UMLAnnotation> umlAnnotationUMLAnnotationPair : annotationListDiff.getCommonAnnotations()) {
+            Tree srcClassAnnotationTree = findByLocationInfo(srcTree , umlAnnotationUMLAnnotationPair.getLeft().getLocationInfo());
+            Tree dstClassAnnotationTree = findByLocationInfo(dstTree, umlAnnotationUMLAnnotationPair.getRight().getLocationInfo());
+            mappingStore.addMappingRecursively(srcClassAnnotationTree,dstClassAnnotationTree);
+        }
     }
 
     private void matchBlocks(Tree srcStatementNode, Tree dstStatementNode, MappingStore mappingStore) {
@@ -251,16 +237,14 @@ public class ProjectASTDiffer
         return new Pair<>(firstCommentVisior.getComments(),secondCommentVisitor.getComments());
     }
 
-    private List<Pair<Tree, Tree>> processClassJavaDocs(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
-        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
+    private void processClassJavaDocs(Tree srcTree, Tree dstTree, UMLClassDiff classdiff, MappingStore mappingStore) {
         UMLJavadoc javadoc1 = classdiff.getOriginalClass().getJavadoc();
         UMLJavadoc javadoc2 = classdiff.getNextClass().getJavadoc();
         if (javadoc1 != null && javadoc2 != null) {
             Tree srcJavaDocNode = findByLocationInfo(srcTree, javadoc1.getLocationInfo());
             Tree dstJavaDocNode = findByLocationInfo(dstTree, javadoc2.getLocationInfo());
-            pairlist.addAll(MappingStore.recursivePairings(srcJavaDocNode, dstJavaDocNode, null));
+            mappingStore.addMappingRecursively(srcJavaDocNode,dstJavaDocNode);
         }
-        return pairlist;
     }
 
     private List<Pair<Tree, Tree>> processMethodJavaDoc(Tree srcTree, Tree dstTree, UMLJavadoc javadoc1, UMLJavadoc javadoc2) {
@@ -408,68 +392,7 @@ public class ProjectASTDiffer
             if (refactoring instanceof ExtractOperationRefactoring) {
                 ExtractOperationRefactoring extractOperationRefactoring = (ExtractOperationRefactoring) (refactoring);
                 UMLOperationBodyMapper bodyMapper = extractOperationRefactoring.getBodyMapper();
-                for (AbstractCodeMapping abstractCodeMapping : bodyMapper.getMappings())
-                {
-                    Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
-                    Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
-                    if (abstractCodeMapping instanceof LeafMapping) {
-//                        if (true) continue;
-                        if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString())) {
-                            pairlist.addAll(MappingStore.recursivePairings(srcStatementNode, dstStatementNode, null));
-                            mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
-                        }
-                        else {
-                            if (srcStatementNode.isIsoStructuralTo(dstStatementNode)) {
-                                pairlist.addAll(MappingStore.recursivePairings(srcStatementNode, dstStatementNode, null));
-                                mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
-                            }
-                            else {
-                                pairlist.add(new Pair<>(srcStatementNode, dstStatementNode));
-                                mappingStore.addMapping(srcStatementNode, dstStatementNode);
-                                pairlist.addAll(match(srcStatementNode, dstStatementNode));
-                                mappingStore.addListOfMapping(match(srcStatementNode,dstStatementNode));
-                            }
-                        }
-                    }
-                    else if (abstractCodeMapping instanceof CompositeStatementObjectMapping)
-                    {
-                        if (srcStatementNode.getMetrics().hash == dstStatementNode.getMetrics().hash)
-                        {
-                            pairlist.addAll(MappingStore.recursivePairings(srcStatementNode, dstStatementNode, null));
-                            mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
-                        }
-                        else
-                        {
-                            pairlist.add(new Pair<>(srcStatementNode,dstStatementNode));
-                            mappingStore.addMapping(srcStatementNode,dstStatementNode);
-                            if ( (srcStatementNode.getType().name.equals("TryStatement") && dstStatementNode.getType().name.equals("TryStatement")) ||
-                                    (srcStatementNode.getType().name.equals("CatchClause") && dstStatementNode.getType().name.equals("CatchClause")))
-                                matchBlocks(srcStatementNode,dstStatementNode,mappingStore);
-                            CompositeStatementObject frag1Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment1());
-                            CompositeStatementObject frag2Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment2());
-                            List<AbstractExpression> frag1ExprList = frag1Comp.getExpressions();
-                            List<AbstractExpression> frag2ExprList = frag2Comp.getExpressions();
-                            for (AbstractExpression frag1Expr : frag1ExprList) {
-                                for (AbstractExpression frag2Expr : frag2ExprList)
-                                {
-                                    if (frag1Expr.getExpression().equals(frag2Expr.getExpression()))
-                                    {
-                                        Tree frag1Node = findByLocationInfo(srcTree,frag1Expr.getLocationInfo());
-                                        Tree frag2Node = findByLocationInfo(dstTree,frag2Expr.getLocationInfo());
-                                        if ((frag1Node.getParent().getType().name.equals("IfStatement") &&
-                                                frag2Node.getParent().getType().name.equals("IfStatement"))) {
-                                            pairlist.add(new Pair<>(frag1Node.getParent(), frag2Node.getParent()));
-                                            mappingStore.addMapping(frag1Node.getParent(),frag2Node.getParent());
-                                        }
-                                        pairlist.addAll(MappingStore.recursivePairings(frag1Node,frag2Node,null));
-                                        mappingStore.addMappingRecursively(frag1Node,frag2Node);
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                fromRefMiner(srcTree,dstTree,bodyMapper.getMappings(),mappingStore);
             }
             else if (refactoring instanceof RenameAttributeRefactoring) {
                 RenameAttributeRefactoring renameAttributeRefactoring = (RenameAttributeRefactoring) (refactoring);
@@ -487,12 +410,9 @@ public class ProjectASTDiffer
         return pairlist;
     }
 
-    private List<Pair<Tree, Tree>> processClassImplemetedInterfaces(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
-        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
-
+    private void processClassImplemetedInterfaces(Tree srcTree, Tree dstTree, UMLClassDiff classdiff, MappingStore mappingStore) {
         List<UMLType> srcImplementedInterfaces = classdiff.getOriginalClass().getImplementedInterfaces();
         List<UMLType> dstImplementedInterfaces = classdiff.getNextClass().getImplementedInterfaces();
-
         List<UMLType> removedOnes = classdiff.getRemovedImplementedInterfaces();
         for (UMLType srcUmltype : srcImplementedInterfaces) {
             if (!removedOnes.contains(srcUmltype))
@@ -502,7 +422,7 @@ public class ProjectASTDiffer
                     if (dstUmlType.getClassType().equals(srcUmltype.getClassType()))
                     {
                         Tree dstInterfaceTree = findByLocationInfo(dstTree,dstUmlType.getLocationInfo());
-                        pairlist.add(new Pair<>(srcInterfaceTree, dstInterfaceTree));
+                        mappingStore.addMappingRecursively(srcInterfaceTree, dstInterfaceTree);
                         break;
                     }
                 }
@@ -510,11 +430,9 @@ public class ProjectASTDiffer
             }
 
         }
-        return pairlist;
     }
 
-    private List<Pair<Tree, Tree>> processClassAttributes(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
-        List<Pair<Tree,Tree>> pairList = new ArrayList<>();
+    private void processClassAttributes(Tree srcTree, Tree dstTree, UMLClassDiff classdiff, MappingStore mappingStore) {
         List<Pair<Pair<UMLAttribute, UMLAttribute>, Pair<Tree, Tree>>> matchedAttributes = findMatchedAttributesTree(srcTree, dstTree, classdiff);
 
 
@@ -524,19 +442,15 @@ public class ProjectASTDiffer
             {
                 System.out.println(umlAttrPair.first);
                 System.out.println(umlAttrPair.second);
-                pairList.addAll(MappingStore.recursivePairings(matchedpair.second.first, matchedpair.second.second, null));
+                mappingStore.addMappingRecursively(matchedpair.second.first, matchedpair.second.second);
             }
             else {
-                pairList.addAll(processFeildDeclration(matchedpair));
+                processFeildDeclration(matchedpair,mappingStore);
             }
-//            pairList.add(new Pair<>(matchedpair.first,matchedpair.second));
-
         }
-        return pairList;
     }
-    private List<Pair<Tree,Tree>> processFeildDeclration(Pair<Pair<UMLAttribute, UMLAttribute>, Pair<Tree, Tree>> matchedpair)
+    private void processFeildDeclration(Pair<Pair<UMLAttribute, UMLAttribute>, Pair<Tree, Tree>> matchedpair, MappingStore mappingStore)
     {
-        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
         List<String> searchingTypes = new ArrayList<>();
         searchingTypes.add("AccessModifier");
         searchingTypes.add("Modifier");
@@ -545,33 +459,34 @@ public class ProjectASTDiffer
 
         Tree srcFeildDelcration = matchedpair.second.first;
         Tree dstFeildDeclration = matchedpair.second.second;
-        pairlist.add(new Pair<>(srcFeildDelcration,dstFeildDeclration));
+        mappingStore.addMapping(srcFeildDelcration,dstFeildDeclration);
         for (String type : searchingTypes) {
             Pair<Tree, Tree> matched = matchBasedOnType(srcFeildDelcration,dstFeildDeclration, type);
             if (matched != null)
-                pairlist.add(matched);
+                mappingStore.addMapping(matched.first,matched.second);
         }
         String serachingType = "SimpleType";
         Pair<Tree, Tree> result = matchBasedOnType(srcFeildDelcration, dstFeildDeclration, serachingType);
         if (result != null)
-            pairlist.addAll(MappingStore.recursivePairings(result.first,result.second,null));
+            mappingStore.addMappingRecursively(result.first,result.second);
         serachingType = "VariableDeclarationFragment";
         Pair<Tree, Tree> VariableDeclarationFragmentPair = matchBasedOnType(srcFeildDelcration, dstFeildDeclration, serachingType);
         if (VariableDeclarationFragmentPair != null)
         {
-            Pair<Tree, Tree> SimpleNamePair = matchBasedOnType(VariableDeclarationFragmentPair.first, VariableDeclarationFragmentPair.second, "SimpleName");
-            pairlist.add(new Pair<>(SimpleNamePair.first,SimpleNamePair.second));
+            Pair<Tree, Tree> simpleNamePair = matchBasedOnType(VariableDeclarationFragmentPair.first, VariableDeclarationFragmentPair.second, "SimpleName");
+            mappingStore.addMapping(simpleNamePair.first,simpleNamePair.second);
             if (matchedpair.first.first.getVariableDeclaration().getInitializer() != null &&
             matchedpair.first.second.getVariableDeclaration().getInitializer() != null)
             {
-                if (VariableDeclarationFragmentPair.first.getChild(1).getType().equals(VariableDeclarationFragmentPair.second.getChild(1).getType()))
-                    pairlist.add(new Pair<>(VariableDeclarationFragmentPair.first.getChild(1), VariableDeclarationFragmentPair.second.getChild(1)));
+                if (VariableDeclarationFragmentPair.first.getChild(1).getType().equals(VariableDeclarationFragmentPair.second.getChild(1).getType())) {
+                    mappingStore.addMapping(VariableDeclarationFragmentPair.first.getChild(1), VariableDeclarationFragmentPair.second.getChild(1));
+                    //TODO
+                }
             }
             if (result != null) {
-                pairlist.add(new Pair<>(result.first, result.second));
+                mappingStore.addMapping(result.first,result.second);
             }
         }
-        return pairlist;
     }
     private List<Pair<Pair<UMLAttribute,UMLAttribute>, Pair<Tree, Tree>>> findMatchedAttributesTree(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
         List<Pair<Pair<UMLAttribute,UMLAttribute>, Pair<Tree, Tree>>> pairlist = new ArrayList<>();
@@ -604,25 +519,23 @@ public class ProjectASTDiffer
     }
 
 
-    private Pair<Tree, Tree> processSuperClass(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
+    private void processSuperClass(Tree srcTree, Tree dstTree, UMLClassDiff classdiff, MappingStore mappingStore) {
         UMLType srcParentUML = classdiff.getOldSuperclass();
         UMLType dstParentUML = classdiff.getNewSuperclass();
         if (srcParentUML != null && dstParentUML != null) {
             Tree srcParentClassTree = findByLocationInfo(srcTree, srcParentUML.getLocationInfo());
             Tree dstParentClassTree = findByLocationInfo(dstTree, dstParentUML.getLocationInfo());
-            return new Pair<>(srcParentClassTree,dstParentClassTree);
+            mappingStore.addMappingRecursively(srcParentClassTree,dstParentClassTree);
         }
-        return null;
     }
 
-    private Pair<Tree, Tree> processPackageDeclaration(Tree srcTree, Tree dstTree, UMLClassDiff classdiff) {
+    private void processPackageDeclaration(Tree srcTree, Tree dstTree, UMLClassDiff classdiff, MappingStore mappingStore) {
         //TODO: In current implementation, I assumed that these two package-statements are matched since they both belong to the same class
         //TODO : Question: Can single file have multiple package declaration? if yes, I have to use list of pairs
         Tree srcPackageDeclaration = findPackageDeclaration(srcTree);
         Tree dstPackageDeclaration = findPackageDeclaration(dstTree);
         if (srcPackageDeclaration != null && dstPackageDeclaration != null)
-            return new Pair<Tree,Tree>(srcPackageDeclaration,dstPackageDeclaration);
-        return null;
+            mappingStore.addMappingRecursively(srcPackageDeclaration,dstPackageDeclaration);
     }
 
     private Tree findPackageDeclaration(Tree inputTree) {
@@ -639,12 +552,11 @@ public class ProjectASTDiffer
         return null;
     }
 
-    private List<Pair<Tree, Tree>> processImports(Tree srcTree, Tree dstTree, UMLImportListDiff importDiffList) {
-        List<Pair<Tree,Tree>> matchedTrees = new ArrayList<>();
-        if (importDiffList == null) return matchedTrees;
+    private void processImports(Tree srcTree, Tree dstTree, UMLImportListDiff importDiffList, MappingStore mappingStore) {
+        if (importDiffList == null) return;
         Set<String> commonImports = importDiffList.getCommonImports();
         if (commonImports.isEmpty())
-             return matchedTrees;
+             return;
         String searchingType = "ImportDeclaration";
         List<Tree> srcChildren = srcTree.getChildren();
         List<Tree> dstChildren = dstTree.getChildren();
@@ -653,9 +565,8 @@ public class ProjectASTDiffer
             Tree srcImportStatement = findImportByTypeAndLabel(srcChildren,searchingType,label);
             Tree dstImportStatement = findImportByTypeAndLabel(dstChildren,searchingType,label);
             if (srcImportStatement != null && dstImportStatement != null)
-                matchedTrees.add(new Pair<>(srcImportStatement,dstImportStatement));
+                mappingStore.addMappingRecursively(srcImportStatement,dstImportStatement);
         }
-        return matchedTrees;
     }
 
     private Tree findImportByTypeAndLabel(List<Tree> inputTree, String searchingType, String label) {
@@ -722,9 +633,8 @@ public class ProjectASTDiffer
         return null;
     }
 
-    private List<Pair<Tree, Tree>> classDeclarationMapping(Tree srcTypeDeclartion, Tree dstTypeDeclartion, UMLClassDiff classdiff) {
-        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
-        pairlist.add(new Pair<>(srcTypeDeclartion,dstTypeDeclartion));
+    private void processClassDeclarationMapping(Tree srcTypeDeclartion, Tree dstTypeDeclartion, UMLClassDiff classdiff, MappingStore mappingStore) {
+        mappingStore.addMapping(srcTypeDeclartion,dstTypeDeclartion);
         List<String> searchingTypes = new ArrayList<>();
         searchingTypes.add("AccessModifier");
         searchingTypes.add("SimpleName");
@@ -732,40 +642,36 @@ public class ProjectASTDiffer
         for (String type : searchingTypes) {
             Pair<Tree,Tree> matched = matchBasedOnType(srcTypeDeclartion,dstTypeDeclartion,type);
             if (matched != null)
-                pairlist.add(matched);
+                mappingStore.addMapping(matched.first,matched.second);
         }
         if (classdiff.getOriginalClass().isStatic() && classdiff.getNextClass().isStatic())
-            pairlist.addAll(matchModifier(srcTypeDeclartion,dstTypeDeclartion,"static"));
+            matchModifier(srcTypeDeclartion,dstTypeDeclartion,"static",mappingStore);
         if (classdiff.getOriginalClass().isFinal() && classdiff.getNextClass().isFinal())
-            pairlist.addAll(matchModifier(srcTypeDeclartion,dstTypeDeclartion,"final"));
+            matchModifier(srcTypeDeclartion,dstTypeDeclartion,"final",mappingStore);
         if (classdiff.getOriginalClass().isAbstract() && classdiff.getNextClass().isAbstract())
-            pairlist.addAll(matchModifier(srcTypeDeclartion,dstTypeDeclartion,"abstract"));
+            matchModifier(srcTypeDeclartion,dstTypeDeclartion,"abstract",mappingStore);
 
-        return pairlist;
+        for (org.apache.commons.lang3.tuple.Pair<UMLTypeParameter, UMLTypeParameter> commonTypeParamSet : classdiff.getTypeParameterDiffList().getCommonTypeParameters()) {
+            Tree srcTypeParam = findByLocationInfo(srcTypeDeclartion, commonTypeParamSet.getLeft().getLocationInfo());
+            Tree dstTypeParam = findByLocationInfo(dstTypeDeclartion, commonTypeParamSet.getRight().getLocationInfo());
+            mappingStore.addMappingRecursively(srcTypeParam,dstTypeParam);
+        }
+        processSuperClass(srcTypeDeclartion,dstTypeDeclartion,classdiff,mappingStore);
+        processClassImplemetedInterfaces(srcTypeDeclartion,dstTypeDeclartion,classdiff,mappingStore);
+        processClassAttributes(srcTypeDeclartion,dstTypeDeclartion,classdiff,mappingStore);
+        processClassJavaDocs(srcTypeDeclartion,dstTypeDeclartion,classdiff,mappingStore);
+        processClassAnnotations(srcTypeDeclartion,dstTypeDeclartion,classdiff.getAnnotationListDiff(),mappingStore);
+
     }
 
-    private List<Pair<Tree, Tree>> matchModifier(Tree srcTypeDeclartion, Tree dstTypeDeclartion, String modifier) {
-        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
+    private void matchModifier(Tree srcTypeDeclartion, Tree dstTypeDeclartion, String modifier, MappingStore mappingStore) {
         String type = "Modifier";
         Tree srcTree = findChildByTypeAndLabel(srcTypeDeclartion,type,modifier);
         Tree dstTree = findChildByTypeAndLabel(dstTypeDeclartion,type,modifier);
         if (srcTree != null && dstTree != null){
-            pairlist.add(new Pair<>(srcTree,dstTree));
+            mappingStore.addMapping(srcTree,dstTree);
         }
-        return pairlist;
     }
-
-
-    private List<Pair<Tree, Tree>> firstlevelChildren(Tree srcOperationNode, Tree dstOperationNode) {
-        List<Pair<Tree,Tree>> pairList = new ArrayList<>();
-        List<Tree> srcChildren =  srcOperationNode.getChildren();
-        List<Tree> dstChildren = dstOperationNode.getChildren();
-        for (int i = 0; i < srcChildren.size(); i++) {
-            pairList.add(new Pair<>(srcChildren.get(i),dstChildren.get(i)));
-        }
-        return pairList;
-    }
-
 
     private Pair<TreeContext, TreeContext> findTreeContexts(UMLClassDiff classDiff) {
         //TODO: find corresponding comps
