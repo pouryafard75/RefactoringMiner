@@ -127,59 +127,67 @@ public class ProjectASTDiffer
         ArrayList<AbstractCodeMapping> mappings = new ArrayList<>(mappingSet);
         for (AbstractCodeMapping abstractCodeMapping : mappings)
         {
-            Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
-            Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
-
             if (abstractCodeMapping instanceof LeafMapping) {
-//                    if (true) continue;
-                if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString())) {
-                    mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
-                }
-                else {
-                    if (srcStatementNode.isIsoStructuralTo(dstStatementNode))
-                    {
-                        mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
-                    }
-                    else {
-                        mappingStore.addMapping(srcStatementNode, dstStatementNode);
-//                        mappingStore.addListOfMapping(match(srcStatementNode, dstStatementNode));
-                    }
-                }
+                processLeafMapping(srcTree,dstTree,(LeafMapping)abstractCodeMapping,mappingStore);
             }
             else if (abstractCodeMapping instanceof CompositeStatementObjectMapping)
             {
-                if (srcStatementNode.getMetrics().hash == dstStatementNode.getMetrics().hash)
+                processCompositeMapping(srcTree,dstTree,(CompositeStatementObjectMapping)abstractCodeMapping,mappingStore);
+            }
+        }
+    }
+
+    private void processCompositeMapping(Tree srcTree, Tree dstTree, CompositeStatementObjectMapping abstractCodeMapping, MappingStore mappingStore) {
+        Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
+        Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
+        if (srcStatementNode.getMetrics().hash == dstStatementNode.getMetrics().hash)
+        {
+            mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
+        }
+        else {
+            mappingStore.addMapping(srcStatementNode,dstStatementNode);
+            if ( (srcStatementNode.getType().name.equals("TryStatement") && dstStatementNode.getType().name.equals("TryStatement")) ||
+                    (srcStatementNode.getType().name.equals("CatchClause") && dstStatementNode.getType().name.equals("CatchClause")))
+                matchBlocks(srcStatementNode,dstStatementNode,mappingStore);
+            CompositeStatementObject frag1Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment1());
+            CompositeStatementObject frag2Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment2());
+
+            List<AbstractExpression> frag1ExprList = frag1Comp.getExpressions();
+            List<AbstractExpression> frag2ExprList = frag2Comp.getExpressions();
+
+            for (AbstractExpression frag1Expr : frag1ExprList) {
+                for (AbstractExpression frag2Expr : frag2ExprList)
                 {
-                    mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
-                }
-                else {
-                    mappingStore.addMapping(srcStatementNode,dstStatementNode);
-                    if ( (srcStatementNode.getType().name.equals("TryStatement") && dstStatementNode.getType().name.equals("TryStatement")) ||
-                            (srcStatementNode.getType().name.equals("CatchClause") && dstStatementNode.getType().name.equals("CatchClause")))
-                        matchBlocks(srcStatementNode,dstStatementNode,mappingStore);
-                    CompositeStatementObject frag1Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment1());
-                    CompositeStatementObject frag2Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment2());
-
-                    List<AbstractExpression> frag1ExprList = frag1Comp.getExpressions();
-                    List<AbstractExpression> frag2ExprList = frag2Comp.getExpressions();
-
-                    for (AbstractExpression frag1Expr : frag1ExprList) {
-                        for (AbstractExpression frag2Expr : frag2ExprList)
-                        {
-                            if (frag1Expr.getExpression().equals(frag2Expr.getExpression()))
-                            {
-                                Tree frag1Node = findByLocationInfo(srcTree,frag1Expr.getLocationInfo());
-                                Tree frag2Node = findByLocationInfo(dstTree,frag2Expr.getLocationInfo());
-                                if ((frag1Node.getParent().getType().name.equals("IfStatement") &&
-                                        frag2Node.getParent().getType().name.equals("IfStatement")))
-                                    mappingStore.addMapping(frag1Node.getParent(),frag2Node.getParent());
-                                mappingStore.addMappingRecursively(frag1Node,frag2Node);
-                                break;
-                            }
-                        }
+                    if (frag1Expr.getExpression().equals(frag2Expr.getExpression()))
+                    {
+                        Tree frag1Node = findByLocationInfo(srcTree,frag1Expr.getLocationInfo());
+                        Tree frag2Node = findByLocationInfo(dstTree,frag2Expr.getLocationInfo());
+                        if ((frag1Node.getParent().getType().name.equals("IfStatement") &&
+                                frag2Node.getParent().getType().name.equals("IfStatement")))
+                            mappingStore.addMapping(frag1Node.getParent(),frag2Node.getParent());
+                        mappingStore.addMappingRecursively(frag1Node,frag2Node);
+                        break;
                     }
-
                 }
+            }
+
+        }
+    }
+
+    private void processLeafMapping(Tree srcTree, Tree dstTree, LeafMapping abstractCodeMapping, MappingStore mappingStore) {
+        Tree srcStatementNode = findByLocationInfo(srcTree,abstractCodeMapping.getFragment1().getLocationInfo());
+        Tree dstStatementNode = findByLocationInfo(dstTree,abstractCodeMapping.getFragment2().getLocationInfo());
+        if (abstractCodeMapping.getFragment2().toString().equals(abstractCodeMapping.getFragment1().toString())) {
+            mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
+        }
+        else {
+            if (srcStatementNode.isIsoStructuralTo(dstStatementNode))
+            {
+                mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
+            }
+            else {
+                mappingStore.addMapping(srcStatementNode, dstStatementNode);
+                mappingStore.addListOfMapping(match(srcStatementNode, dstStatementNode));
             }
         }
     }
@@ -362,12 +370,15 @@ public class ProjectASTDiffer
 
     private Tree findTheBest(Tree srcSubTree, List<Tree> candidates) {
         int serachingHeight = srcSubTree.getMetrics().height;
-        for (Tree dstSubTree : candidates)
-        {
-            if (serachingHeight == dstSubTree.getMetrics().height)
-                return dstSubTree;
-        }
-        return candidates.get(0);
+        if (candidates.size() > 1) return null;
+        else
+            return candidates.get(0);
+//        for (Tree dstSubTree : candidates)
+//        {
+//            if (serachingHeight == dstSubTree.getMetrics().height)
+//                return dstSubTree;
+//        }
+//        return candidates.get(0);
         //TODO
     }
 
