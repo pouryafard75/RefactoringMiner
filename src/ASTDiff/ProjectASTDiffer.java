@@ -369,16 +369,14 @@ public class ProjectASTDiffer
     }
 
     private Tree findTheBest(Tree srcSubTree, List<Tree> candidates) {
-        int serachingHeight = srcSubTree.getMetrics().height;
-        if (candidates.size() > 1) return null;
-        else
-            return candidates.get(0);
-//        for (Tree dstSubTree : candidates)
-//        {
-//            if (serachingHeight == dstSubTree.getMetrics().height)
-//                return dstSubTree;
-//        }
-//        return candidates.get(0);
+        int serachingHeight = srcSubTree.getMetrics().depth;
+        if (candidates.size() == 1) return candidates.get(0);
+        for (Tree dstSubTree : candidates)
+        {
+            if (serachingHeight == dstSubTree.getMetrics().depth)
+                return dstSubTree;
+        }
+        return null;
         //TODO
     }
 
@@ -386,10 +384,10 @@ public class ProjectASTDiffer
         List<Tree> srcMatchedList = pairlist.stream().map(pair -> pair.first).collect(Collectors.toList());
         List<Tree> dstMatchedList = pairlist.stream().map(pair -> pair.second).collect(Collectors.toList());
 
-        List<Tree> srcComplement = src.getDescendants();
+        List<Tree> srcComplement = src.getCustomDescendants("Block");
         srcComplement.removeAll(srcMatchedList);
 
-        List<Tree> dstComplement = dst.getDescendants();
+        List<Tree> dstComplement = dst.getCustomDescendants("Block");
         dstComplement.removeAll(dstMatchedList);
         return new Pair<>(srcComplement,dstComplement);
     }

@@ -176,6 +176,19 @@ public interface Tree {
         return trees;
     }
 
+    default List<Tree> getCustomDescendants(String exception) {
+        List<Tree> trees = new ArrayList<>();
+        for (Tree children : getChildren())
+        {
+            if (!children.getType().name.equals(exception))
+            {
+                trees.add(children);
+                trees.addAll(children.getCustomDescendants(exception));
+            }
+        }
+        return trees;
+    }
+
     /**
      * Set the parent of this node. Be careful that the parent node won't have this node in its
      * children list.
