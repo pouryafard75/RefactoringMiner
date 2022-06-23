@@ -2,6 +2,7 @@ package ASTDiff;
 import gr.uom.java.xmi.UMLModel;
 import gr.uom.java.xmi.UMLModelASTReader;
 import gr.uom.java.xmi.diff.UMLModelDiff;
+import org.apache.log4j.BasicConfigurator;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import view.webdiff.WebDiff;
 
@@ -11,6 +12,7 @@ import java.io.IOException;
 
 public class Run {
     public static void main(String[] args) throws RefactoringMinerTimedOutException, IOException {
+        BasicConfigurator.configure();
 //        UMLModel model1 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v1")).getUmlModel();
 //        UMLModel model2 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v2")).getUmlModel();UMLModel model1 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v1")).getUmlModel();
 //        UMLModel model1 = new UMLModelASTReader(new File("D:\\TestCases\\v1")).getUmlModel();
