@@ -23,6 +23,7 @@ import static tree.TreeUtils.findChildByTypeAndLabel;
 
 public class ProjectASTDiffer
 {
+    private static final boolean _POST_PROCESS = false;
     private Map<String, ASTDiff> astDiffMap = new HashMap<>();
     private UMLModelDiff umlModelDiff;
     private String srcPath;
@@ -339,8 +340,10 @@ public class ProjectASTDiffer
                 pair.second.forEach(tree -> dstTrees.open(tree));
             });
         }
-        Pair<List<Tree>, List<Tree>> complementPair = calcComplements(src,dst,pairlist);
-        postProcess(complementPair,pairlist);
+        if (_POST_PROCESS) {
+            Pair<List<Tree>, List<Tree>> complementPair = calcComplements(src, dst, pairlist);
+            postProcess(complementPair, pairlist);
+        }
         return pairlist;
     }
 
