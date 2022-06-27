@@ -44,7 +44,8 @@ public class DefaultPriorityTreeQueue implements PriorityTreeQueue {
     @Override
     public void open(Tree tree) {
         for (Tree c: tree.getChildren())
-            add(c);
+            if (!c.getType().name.equals("Block"))
+                add(c);
     }
 
     @Override

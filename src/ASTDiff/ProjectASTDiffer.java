@@ -24,6 +24,7 @@ import static tree.TreeUtils.findChildByTypeAndLabel;
 public class ProjectASTDiffer
 {
     private static final boolean _POST_PROCESS = false;
+    private static final boolean _TREE_MATCHING = false;
     private Map<String, ASTDiff> astDiffMap = new HashMap<>();
     private UMLModelDiff umlModelDiff;
     private String srcPath;
@@ -321,6 +322,7 @@ public class ProjectASTDiffer
     public List<Pair<Tree, Tree>> match(Tree src, Tree dst) {
 
         List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
+        if (!_TREE_MATCHING) return pairlist;
         Function<Tree, Integer> HEIGHT_PRIORITY_CALCULATOR = (Tree t) -> t.getMetrics().height;
 
         PriorityTreeQueue srcTrees = new DefaultPriorityTreeQueue(src, MIN_ACCEPTABLE_HIGHT, HEIGHT_PRIORITY_CALCULATOR);
