@@ -13,6 +13,13 @@ import java.io.IOException;
 public class Run {
     public static void main(String[] args) throws RefactoringMinerTimedOutException, IOException {
         BasicConfigurator.configure();
+//        java.util.logging.Logger.getLogger("org.apache.http.wire").setLevel(java.util.logging.Level.FINEST);
+//        java.util.logging.Logger.getLogger("org.apache.http.headers").setLevel(java.util.logging.Level.FINEST);
+//        System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
+//        System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
+//        System.setProperty("org.apache.commons.logging.simplelog.log.httpclient.wire", "ERROR");
+//        System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http", "ERROR");
+//        System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.headers", "ERROR");
 //        UMLModel model1 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v1")).getUmlModel();
 //        UMLModel model2 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v2")).getUmlModel();UMLModel model1 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v1")).getUmlModel();
 //        UMLModel model1 = new UMLModelASTReader(new File("D:\\TestCases\\v1")).getUmlModel();

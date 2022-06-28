@@ -23,8 +23,8 @@ import static tree.TreeUtils.findChildByTypeAndLabel;
 
 public class ProjectASTDiffer
 {
-    private static final boolean _POST_PROCESS = false;
-    private static final boolean _TREE_MATCHING = false;
+    private static final boolean _POST_PROCESS = true;
+    private static final boolean _TREE_MATCHING = true;
     private Map<String, ASTDiff> astDiffMap = new HashMap<>();
     private UMLModelDiff umlModelDiff;
     private String srcPath;
@@ -189,7 +189,7 @@ public class ProjectASTDiffer
             }
             else {
                 mappingStore.addMapping(srcStatementNode, dstStatementNode);
-                mappingStore.addListOfMapping(match(srcStatementNode, dstStatementNode));
+                mappingStore.addListOfMapping(match(srcStatementNode, dstStatementNode,mappingStore));
             }
         }
     }
@@ -319,7 +319,7 @@ public class ProjectASTDiffer
         }
     }
 
-    public List<Pair<Tree, Tree>> match(Tree src, Tree dst) {
+    public List<Pair<Tree, Tree>> match(Tree src, Tree dst,MappingStore mappingStore) {
 
         List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
         if (!_TREE_MATCHING) return pairlist;
@@ -335,7 +335,8 @@ public class ProjectASTDiffer
 
 
             localHashMappings.unique().forEach(
-                    (pair) -> MappingStore.recursivePairings(pair.first.stream().findAny().get(), pair.second.stream().findAny().get(), pairlist));
+//                    (pair) -> MappingStore.recursivePairings(pair.first.stream().findAny().get(), pair.second.stream().findAny().get(), pairlist));
+                    (pair) -> mappingStore.addMappingRecursively(pair.first.stream().findAny().get(), pair.second.stream().findAny().get()));
 
             localHashMappings.unmapped().forEach((pair) -> {
                 pair.first.forEach(tree -> srcTrees.open(tree));
@@ -343,8 +344,10 @@ public class ProjectASTDiffer
             });
         }
         if (_POST_PROCESS) {
-            Pair<List<Tree>, List<Tree>> complementPair = calcComplements(src, dst, pairlist);
-            postProcess(complementPair, pairlist);
+//            Pair<List<Tree>, List<Tree>> complementPair = calcComplements(src, dst, pairlist);
+//            Pair<List<Tree>, List<Tree>> childComplementPair = calcTemp(src, dst, pairlist);
+            greedyMatcher(src,dst,mappingStore);
+            //postProcess(complementPair, pairlist);
         }
         return pairlist;
     }
@@ -396,7 +399,6 @@ public class ProjectASTDiffer
         dstComplement.removeAll(dstMatchedList);
         return new Pair<>(srcComplement,dstComplement);
     }
-
     private void processRefactorings(Tree srcTree, Tree dstTree, List<Refactoring> refactoringList, MappingStore mappingStore) throws RefactoringMinerTimedOutException {
         for (Refactoring refactoring : refactoringList)
         {
@@ -684,6 +686,57 @@ public class ProjectASTDiffer
         return new Pair<>
                 (this.umlModelDiff.getParentModel().getTreeContextMap().get(filename),
                  this.umlModelDiff.getChildModel().getTreeContextMap().get(filename));
+    }
+    public MappingStore greedyMatcher(Tree src, Tree dst, MappingStore mappings) {
+        double simThreshold = 0.5;
+//        if (true) return mappings;
+        for (Tree t : src.postOrder()) {
+            if (t.isRoot()) {
+                mappings.addMapping(t, dst);
+//                lastChanceMatch(mappings, t, dst);
+                break;
+            }
+            else if (!(mappings.isSrcMapped(t) || t.isLeaf())) {
+                List<Tree> candidates = getDstCandidates(mappings, t);
+                Tree best = null;
+                double max = -1D;
+                for (Tree cand : candidates) {
+                    double sim = SimilarityMetrics.diceSimilarity(t, cand, mappings);
+                    if (sim > max && sim >= simThreshold) {
+                        max = sim;
+                        best = cand;
+                    }
+                }
+
+                if (best != null) {
+//                    lastChanceMatch(mappings, t, best);
+                    mappings.addMapping(t, best);
+                }
+            }
+        }
+        return mappings;
+    }
+    protected List<Tree> getDstCandidates(MappingStore mappings, Tree src) {
+        List<Tree> seeds = new ArrayList<>();
+        for (Tree c : src.getDescendants()) {
+            if (mappings.isSrcMapped(c))
+                seeds.add(mappings.getDstForSrc(c));
+        }
+        List<Tree> candidates = new ArrayList<>();
+        Set<Tree> visited = new HashSet<>();
+        for (Tree seed : seeds) {
+            while (seed.getParent() != null) {
+                Tree parent = seed.getParent();
+                if (visited.contains(parent))
+                    break;
+                visited.add(parent);
+                if (parent.getType() == src.getType() && !(mappings.isDstMapped(parent) || parent.isRoot()))
+                    candidates.add(parent);
+                seed = parent;
+            }
+        }
+
+        return candidates;
     }
 }
 
