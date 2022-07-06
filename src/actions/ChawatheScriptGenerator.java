@@ -1,9 +1,9 @@
-
 package actions;
 
 import actions.model.*;
 import matchers.Mapping;
 import matchers.MappingStore;
+import matchers.MultiMappingStore;
 import tree.FakeTree;
 import tree.Tree;
 import tree.TreeUtils;
@@ -34,9 +34,12 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
 
     private Map<Tree, Tree> copyToOrig;
 
+    private MultiMappingStore multiMappingStore;
+
     @Override
-    public EditScript computeActions(MappingStore ms) {
-        initWith(ms);
+    public EditScript computeActions(MultiMappingStore ms) {
+        this.multiMappingStore = ms;
+        initWith(ms.getMonoMappingStore());
         generate();
         return actions;
     }
@@ -78,18 +81,33 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
             Tree w;
             Tree y = x.getParent();
             Tree z = cpyMappings.getSrcForDst(y);
+            if (z == null)
+            {
+                System.out.println("ta le vo");
+            }
+
+
 
             if (!cpyMappings.isDstMapped(x)) {
-                int k = findPos(x);
-                // Insertion case : insert new node.
-                w = new FakeTree();
-                // In order to use the real nodes from the second tree, we
-                // furnish x instead of w
-                Action ins = new Insert(x, copyToOrig.get(z), k);
-                actions.add(ins);
-                copyToOrig.put(w, x);
-                cpyMappings.addMapping(w, x);
-                z.insertChild(w, k);
+                if(!multiMappingStore.isDstMultiMapped(x)) {
+
+                    int k = findPos(x);
+                    // Insertion case : insert new node.
+                    w = new FakeTree();
+                    // In order to use the real nodes from the second tree, we
+                    // furnish x instead of w
+                    Action ins = new Insert(x, copyToOrig.get(z), k);
+                    actions.add(ins);
+                    copyToOrig.put(w, x);
+                    cpyMappings.addMapping(w, x);
+                    if(z != null)
+                        z.insertChild(w, k);
+                }
+                else
+                {
+                    System.out.println("7");
+                    continue;
+                }
             } else {
                 w = cpyMappings.getSrcForDst(x);
                 if (!x.equals(origDst)) { // TODO => x != origDst // Case of the root
@@ -115,7 +133,7 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
         }
 
         for (Tree w : cpySrc.postOrder())
-            if (!cpyMappings.isSrcMapped(w))
+            if (!cpyMappings.isSrcMapped(w) && !multiMappingStore.isSrcMultiMapped(copyToOrig.get(w)))
                 actions.add(new Delete(copyToOrig.get(w)));
 
         return actions;

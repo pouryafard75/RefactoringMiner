@@ -78,7 +78,7 @@ public class TextDiffView implements Renderable {
                      .head()
                         .meta(charset("utf8"))
                         .meta(name("viewport").content("width=device-width, initial-scale=1.0"))
-                        .title().content("GumTree")
+                        .title().content("RefactoringMiner")
                         .macros().stylesheet(WebDiff.BOOTSTRAP_CSS_URL)
                         .macros().javascript(WebDiff.BOOTSTRAP_JS_URL)
                         .macros().javascript("/dist/shortcuts.js")

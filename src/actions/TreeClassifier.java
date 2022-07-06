@@ -1,8 +1,11 @@
 
 package actions;
 
+import actions.model.Action;
+import actions.model.MultiMove;
 import tree.Tree;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -40,4 +43,9 @@ public interface TreeClassifier {
      * Return the set of moved nodes in the destination AST.
      */
     Set<Tree> getMovedDsts();
+
+
+    Map<Tree, Action> getMultiMapSrc();
+
+    Map<Tree, Action> getMultiMapDst();
 }

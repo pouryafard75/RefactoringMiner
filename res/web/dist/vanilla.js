@@ -36,18 +36,19 @@ function getMappedElement(eltId) {
 }
 
 function nextMapping() {
+    console.log(currentMapping);
 	if (currentMapping == 0) {
 		currentMapping = 1;
 		return "#mapping-" + currentMapping.toString();
 	} else {
 		currentMapping++;
-		
+
 		if ($("#mapping-" + currentMapping.toString()).length > 0) {
 			return "#mapping-" + currentMapping.toString();
 		} else {
 			currentMapping = 1;
-			return "#mapping-" + currentMapping.toString();		
-		}		
+			return "#mapping-" + currentMapping.toString();
+		}
 	}
 }
 
@@ -56,15 +57,6 @@ function isSrc(eltId) {
 }
 
 $(function() {
-    $("body").keypress(function (event) {
-        switch(event.which) {
-            case 110:
-                var mapping = nextMapping();
-                $('html, body').animate({scrollTop: $(mapping).offset().top - 200}, 100);
-                break;
-        }
-    });
-
     // highlight
     $("span.mv.token, span.token.upd").click(function(event) {
         if ($(this).hasClass("selected")) {
@@ -75,14 +67,30 @@ $(function() {
             var refEltId = getMappedElement(eltId);
             $("#" + refEltId).addClass("selected");
             $(this).addClass("selected");
-            var sel = "#dst";
-            if (isSrc(refEltId))
-                var sel = "#src";
-            $div = $(sel);
-            $span = $("#" + refEltId);
+            // var sel = "#dst";
+            // if (isSrc(refEltId))
+            //     var sel = "#src";
+            // $div = $(sel);
+            // $span = $("#" + refEltId);
+
         }
         event.stopPropagation();
     });
+
+    $("span.mm.token").click(function(event) {
+        if ($(this).hasClass("selected")) {
+            $("span.mm.token").removeClass("selected");
+        } else {
+            $("span.mv.token, span.token.upd, span.mm.token").removeClass("selected");
+            var gid = $(this).attr("gid");
+            $('span[gid=' + gid + ']').each(function() {
+                $(this).addClass("selected");
+            })
+        }
+        event.stopPropagation();
+    });
+
+
 
     $("span.add.token, span.token.del").click(function(event) {
         $("span.mv.token, span.token.upd").removeClass("selected");

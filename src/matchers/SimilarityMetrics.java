@@ -22,6 +22,10 @@ public class SimilarityMetrics {
         return diceCoefficient(numberOfMappedDescendants(src, dst, mappings),
                 src.getDescendants().size(), dst.getDescendants().size());
     }
+    public static double diceSimilarity(Tree src, Tree dst, MultiMappingStore mappings) {
+        return diceCoefficient(numberOfMappedDescendants(src, dst, mappings),
+                src.getDescendants().size(), dst.getDescendants().size());
+    }
 
     public static double jaccardSimilarity(Tree src, Tree dst, MappingStore mappings) {
         return jaccardIndex(numberOfMappedDescendants(src, dst, mappings),
@@ -46,6 +50,26 @@ public class SimilarityMetrics {
             if (mappings.isSrcMapped(srcDescendant)) {
                 var dstForSrcDescendant = mappings.getDstForSrc(srcDescendant);
                 if (dstDescendants.contains(dstForSrcDescendant))
+                    mappedDescendants++;
+            }
+        }
+
+        return mappedDescendants;
+    }
+    private static int numberOfMappedDescendants(Tree src, Tree dst, MultiMappingStore mappings) {
+        Set<Tree> dstDescendants = new HashSet<>(dst.getDescendants());
+        int mappedDescendants = 0;
+
+        for (var srcDescendant : src.getDescendants()) {
+            if (mappings.isSrcMapped(srcDescendant)) {
+                var dstForSrcDescendantList = mappings.getDstForSrc(srcDescendant);
+                Tree dstDescendantsTree;
+                if (dstForSrcDescendantList.size() > 1)
+                {
+                    throw new RuntimeException();
+                }
+                dstDescendantsTree = mappings.getDstForSrc(srcDescendant).stream().toList().get(0);
+                if (dstDescendants.contains(dstDescendantsTree))
                     mappedDescendants++;
             }
         }

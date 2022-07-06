@@ -1,7 +1,16 @@
 
 package actions;
-import matchers.MappingStore;
+import actions.model.Action;
+import actions.model.MultiMove;
+import actions.model.MultiMoveActionGenerator;
+import matchers.MultiMappingStore;
+import org.eclipse.jgit.diff.Edit;
+import tree.Tree;
 import tree.TreeContext;
+
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Class to facilitate the computation of diffs between ASTs.
@@ -15,7 +24,7 @@ public class ASTDiff {
 
     public TreeContext dstTC;
 
-    public MappingStore mappings;
+    public MultiMappingStore mappings;
 
     /**
      * The edit script between the two ASTs.
@@ -30,8 +39,7 @@ public class ASTDiff {
      * Instantiate a diff object with the provided source and destination
      * ASTs, the provided mappings, and the provided editScript.
      */
-    public ASTDiff(TreeContext src, TreeContext dst,
-                MappingStore mappings) {
+    public ASTDiff(TreeContext src, TreeContext dst, MultiMappingStore mappings) {
 //        this.srcPath = srcPath;
 //        this.dstPath = dstPath;
         this.srcTC = src;
@@ -41,13 +49,21 @@ public class ASTDiff {
     public void computeEditScript()
     {
         this.editScript = new SimplifiedChawatheScriptGenerator().computeActions(this.mappings);
+        processMultiMaps(this.editScript);
+        System.out.println("ola");
     }
-    /**
-     * Compute and return a all node classifier that indicates which node have
-     * been added/deleted/updated/moved.
-     */
-    public TreeClassifier createAllNodeClassifier() {
-        return new AllNodesClassifier(this);
+
+    private void processMultiMaps(EditScript editScript) {
+//        ArrayList<Action> multiMoves = new ArrayList<>();
+        Map<Tree, Set<Tree>> dstToSrcMultis = mappings.dstToSrcMultis();
+        MultiMoveActionGenerator multiMoveActionGenerator = new MultiMoveActionGenerator();
+        for(Map.Entry<Tree, Set<Tree>> entry : dstToSrcMultis.entrySet())
+        {
+            Set<Tree> srcTrees = entry.getValue();
+            Set<Tree> dstTrees = mappings.getDstForSrc(srcTrees.stream().toList().get(0));
+            multiMoveActionGenerator.addMapping(srcTrees,dstTrees);
+        }
+        editScript.addAll(multiMoveActionGenerator.generate());
     }
 
     /**

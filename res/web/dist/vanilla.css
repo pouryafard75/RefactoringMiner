@@ -38,6 +38,10 @@
 	background-color: Plum;
 	font-weight: bold;
 }
+.mm {
+	border: 1px solid black;
+	background-color: #b364cc;
+}
 
 .cupd {
 	font-weight: normal;

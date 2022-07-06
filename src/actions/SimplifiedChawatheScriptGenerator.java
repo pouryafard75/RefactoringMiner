@@ -3,6 +3,7 @@ package actions;
 
 import actions.model.*;
 import matchers.MappingStore;
+import matchers.MultiMappingStore;
 import tree.Tree;
 
 import java.util.HashMap;
@@ -16,8 +17,10 @@ import java.util.Map;
  */
 public class SimplifiedChawatheScriptGenerator implements EditScriptGenerator {
     @Override
-    public EditScript computeActions(MappingStore ms) {
+    public EditScript computeActions(MultiMappingStore ms) {
         EditScript actions = new ChawatheScriptGenerator().computeActions(ms);
+//        return actions;
+//        TODO :
         return simplify(actions);
     }
 

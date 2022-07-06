@@ -33,6 +33,10 @@ public class EditScript implements Iterable<Action> {
     public void add(Action action) {
         actions.add(action);
     }
+    public void addAll(List<Action> actions){
+        for (Action action : actions)
+            add(action);
+    }
 
     /**
      * Add an action in the script at the provided index.

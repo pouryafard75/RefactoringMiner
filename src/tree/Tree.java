@@ -175,6 +175,10 @@ public interface Tree {
         trees.remove(0);
         return trees;
     }
+    default List<Tree> getDescendantsAndItself() {
+        List<Tree> trees = TreeUtils.preOrder(this);
+        return trees;
+    }
 
     default List<Tree> getCustomDescendants(String exception) {
         List<Tree> trees = new ArrayList<>();

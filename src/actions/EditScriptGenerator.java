@@ -2,6 +2,7 @@
 package actions;
 
 import matchers.MappingStore;
+import matchers.MultiMappingStore;
 
 /**
  * Interface for script generators that compute edit scripts from mappings.
@@ -13,5 +14,5 @@ public interface EditScriptGenerator {
     /**
      * Compute and return the edit script for the provided mappings.
      */
-    EditScript computeActions(MappingStore mappings);
+    EditScript computeActions(MultiMappingStore mappings);
 }

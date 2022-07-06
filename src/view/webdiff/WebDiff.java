@@ -67,17 +67,6 @@ public class WebDiff  {
             Renderable view = new MonacoDiffView(pair.first, pair.second, diff, id);
             return render(view);
         });
-        get("/monaco-native-diff/:id", (request, response) -> {
-            int id = Integer.parseInt(request.params(":id"));
-            Pair<File, File> pair = comparator.getModifiedFiles().get(id);
-            Renderable view = new MonacoNativeDiffView(pair.first, pair.second, id);
-            return render(view);
-        });
-        get("/mergely-diff/:id", (request, response) -> {
-            int id = Integer.parseInt(request.params(":id"));
-            Renderable view = new MergelyDiffView(id);
-            return render(view);
-        });
         get("/raw-diff/:id", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
             Pair<File, File> pair = comparator.getModifiedFiles().get(id);

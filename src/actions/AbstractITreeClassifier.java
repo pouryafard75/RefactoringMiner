@@ -1,10 +1,14 @@
 
 package actions;
 
+import actions.model.Action;
+import actions.model.MultiMove;
 import tree.Tree;
 
+import java.util.HashMap;
 import java.util.HashSet;
 
+import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractITreeClassifier implements TreeClassifier {
@@ -22,9 +26,14 @@ public abstract class AbstractITreeClassifier implements TreeClassifier {
 
     protected final Set<Tree> dstAddTrees = new HashSet<>();
 
+    protected final Map<Tree,Action> dstMmTrees = new HashMap<>();
+
+    protected final Map<Tree, Action> srcMmTrees = new HashMap<>();
+
     public AbstractITreeClassifier(ASTDiff diff) {
         this.diff = diff;
         classify();
+        System.out.println("ola");
     }
 
     protected abstract void classify();
@@ -52,4 +61,9 @@ public abstract class AbstractITreeClassifier implements TreeClassifier {
     public Set<Tree> getInsertedDsts() {
         return dstAddTrees;
     }
+
+    public Map<Tree, Action> getMultiMapSrc() { return srcMmTrees;}
+
+    public Map<Tree, Action> getMultiMapDst() { return dstMmTrees;}
+
 }

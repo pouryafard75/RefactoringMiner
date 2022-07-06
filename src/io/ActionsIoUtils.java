@@ -7,6 +7,7 @@ import actions.model.*;
 import io.TreeIoUtils.AbstractSerializer;
 import matchers.Mapping;
 import matchers.MappingStore;
+import matchers.MultiMappingStore;
 import tree.Tree;
 import tree.TreeContext;
 
@@ -22,7 +23,7 @@ public final class ActionsIoUtils {
     }
 
     public static ActionSerializer toText(TreeContext sctx, EditScript actions,
-                                          MappingStore mappings) throws IOException {
+                                          MultiMappingStore mappings) throws IOException {
         return new ActionSerializer(sctx, mappings, actions) {
 
             @Override
@@ -33,7 +34,7 @@ public final class ActionsIoUtils {
     }
 
     public static ActionSerializer toXml(TreeContext sctx, EditScript actions,
-                                         MappingStore mappings) throws IOException {
+                                         MultiMappingStore mappings) throws IOException {
         return new ActionSerializer(sctx, mappings, actions) {
 
             @Override
@@ -45,10 +46,10 @@ public final class ActionsIoUtils {
 
     public abstract static class ActionSerializer extends AbstractSerializer {
         final TreeContext context;
-        final MappingStore mappings;
+        final MultiMappingStore mappings;
         final EditScript actions;
 
-        ActionSerializer(TreeContext context, MappingStore mappings, EditScript actions) {
+        ActionSerializer(TreeContext context, MultiMappingStore mappings, EditScript actions) {
             this.context = context;
             this.mappings = mappings;
             this.actions = actions;
@@ -74,10 +75,12 @@ public final class ActionsIoUtils {
             for (Action a : actions) {
                 Tree src = a.getNode();
                 if (a instanceof Move) {
-                    Tree dst = mappings.getDstForSrc(src);
+                    Tree dst = mappings.getDstForSrc(src,0);
+                    //TODO
                     fmt.moveAction((Move) a, src, dst.getParent(), ((Move) a).getPosition());
                 } else if (a instanceof Update) {
-                    Tree dst = mappings.getDstForSrc(src);
+                    Tree dst = mappings.getDstForSrc(src,0);
+                    //TODO
                     fmt.updateAction((Update) a, src, dst);
                 } else if (a instanceof Insert) {
                     Tree dst = a.getNode();
