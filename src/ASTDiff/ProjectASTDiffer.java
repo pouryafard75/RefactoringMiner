@@ -435,6 +435,27 @@ public class ProjectASTDiffer
             else if (refactoring instanceof ExtractVariableRefactoring) {
                 ExtractVariableRefactoring extractVariableRefactoring = (ExtractVariableRefactoring)refactoring;
             }
+            else if (refactoring instanceof MergeVariableRefactoring)
+            {
+                MergeVariableRefactoring mergeVariableRefactoring = (MergeVariableRefactoring)(refactoring);
+                Set<VariableDeclaration> mergedVariables = mergeVariableRefactoring.getMergedVariables();
+                VariableDeclaration newVariable = mergeVariableRefactoring.getNewVariable();
+                Tree dstVariableType = findByLocationInfo(dstTree,newVariable.getType().getLocationInfo());
+                Tree dstVariableDeclaration = findByLocationInfo(dstTree,newVariable.getLocationInfo());
+                List<Tree> dstChildrenList = dstVariableDeclaration.getChildren().stream().toList();
+                Tree dstVarName = dstChildrenList.get(dstChildrenList.size() - 1);
+                for (VariableDeclaration variableDeclaration : mergedVariables)
+                {
+                    Tree srcVariableDeclaration = findByLocationInfo(srcTree,variableDeclaration.getLocationInfo());
+                    Tree srcVariableType = findByLocationInfo(srcTree,variableDeclaration.getType().getLocationInfo());
+                    List<Tree> srcChildrenList = srcVariableDeclaration.getChildren().stream().toList();
+                    Tree srcVarName = srcChildrenList.get(srcChildrenList.size() - 1);
+//                    mappingStore.addMapping(srcVariableDeclaration,dstVariableDeclaration);
+                    mappingStore.addMapping(srcVariableType,dstVariableType.getChild(0));
+                    mappingStore.addMapping(srcVarName,dstVarName);
+
+                }
+            }
         }
     }
 
