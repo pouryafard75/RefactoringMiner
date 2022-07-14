@@ -65,8 +65,25 @@ $(function() {
             $("span.mv.token, span.token.upd").removeClass("selected");
             var eltId = $(this).attr("id");
             var refEltId = getMappedElement(eltId);
+            console.log(refEltId);
+            console.log($("#" + refEltId).position());
             $("#" + refEltId).addClass("selected");
             $(this).addClass("selected");
+            var elmntToView = document.getElementById(refEltId);
+            elmntToView.scrollIntoView({ alignToTop : false, behavior: 'smooth'});
+
+            // if (isSrc(eltId))
+            // {
+            //     $("#right").animate({scrollTo: $("#" + refEltId).position().top - 200}, 500)
+            //     console.log("right position")
+            //     console.log($("#" + refEltId).position().top - 200);
+            // }
+            // else
+            // {
+            //     $("#left").animate({scrollTo: $("#" + refEltId).position().top - 200}, 500);
+            //     console.log("left position");
+            //     console.log($("#" + refEltId).position.top - 200);
+            // }
             // var sel = "#dst";
             // if (isSrc(refEltId))
             //     var sel = "#src";
