@@ -83,7 +83,7 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
             Tree z = cpyMappings.getSrcForDst(y);
             if (z == null)
             {
-                System.out.println("ta le vo");
+//                System.out.println("ta le vo");
             }
 
 
@@ -105,10 +105,11 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
                 }
                 else
                 {
-                    System.out.println("7");
+//                    System.out.println("7");
                     continue;
                 }
             } else {
+
                 w = cpyMappings.getSrcForDst(x);
                 if (!x.equals(origDst)) { // TODO => x != origDst // Case of the root
                     Tree v = w.getParent();
@@ -116,6 +117,7 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
                         actions.add(new Update(copyToOrig.get(w), x.getLabel()));
                         w.setLabel(x.getLabel());
                     }
+                    if (z != null)
                     if (!z.equals(v)) {
                         int k = findPos(x);
                         Action mv = new Move(copyToOrig.get(w), copyToOrig.get(z), k);

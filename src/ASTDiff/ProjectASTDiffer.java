@@ -154,12 +154,24 @@ public class ProjectASTDiffer
             CompositeStatementObject frag1Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment1());
             CompositeStatementObject frag2Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment2());
 
-            List<AbstractExpression> frag1ExprList = frag1Comp.getExpressions();
-            List<AbstractExpression> frag2ExprList = frag2Comp.getExpressions();
+            List<AbstractExpression> frag1ExprList = new ArrayList<>(frag1Comp.getExpressions());
+            List<AbstractExpression> frag2ExprList = new ArrayList<>(frag2Comp.getExpressions());
 
-            for (AbstractExpression frag1Expr : frag1ExprList) {
-                for (AbstractExpression frag2Expr : frag2ExprList)
+            if (srcStatementNode.getType().name.equals("ForStatement")
+                &&
+                dstStatementNode.getType().name.equals("ForStatement"))
+            {
+
+            }
+            ListIterator<AbstractExpression> iter1 = frag1ExprList.listIterator();
+            ListIterator<AbstractExpression> iter2 = frag2ExprList.listIterator();
+
+            while (iter1.hasNext())
+            {
+                AbstractExpression frag1Expr = iter1.next();
+                while (iter2.hasNext())
                 {
+                    AbstractExpression frag2Expr = iter2.next();
                     if (frag1Expr.getExpression().equals(frag2Expr.getExpression()))
                     {
                         Tree frag1Node = findByLocationInfo(srcTree,frag1Expr.getLocationInfo());
@@ -168,6 +180,8 @@ public class ProjectASTDiffer
                                 frag2Node.getParent().getType().name.equals("IfStatement")))
                             mappingStore.addMapping(frag1Node.getParent(),frag2Node.getParent());
                         mappingStore.addMappingRecursively(frag1Node,frag2Node);
+                        iter1.remove();
+                        iter2.remove();
                         break;
                     }
                 }
@@ -321,7 +335,7 @@ public class ProjectASTDiffer
     }
 
     public List<Pair<Tree, Tree>> match(Tree src, Tree dst,MultiMappingStore mappingStore) {
-
+        System.out.println("abcd");
         List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
         if (!_TREE_MATCHING) return pairlist;
         Function<Tree, Integer> HEIGHT_PRIORITY_CALCULATOR = (Tree t) -> t.getMetrics().height;
