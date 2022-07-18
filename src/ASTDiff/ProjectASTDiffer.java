@@ -420,6 +420,11 @@ public class ProjectASTDiffer
                 UMLOperationBodyMapper bodyMapper = extractOperationRefactoring.getBodyMapper();
                 fromRefMiner(srcTree,dstTree,bodyMapper.getMappings(),mappingStore);
             }
+            if (refactoring instanceof InlineOperationRefactoring) {
+                InlineOperationRefactoring inlineOperationRefactoring = (InlineOperationRefactoring) (refactoring);
+                UMLOperationBodyMapper bodyMapper = inlineOperationRefactoring.getBodyMapper();
+                fromRefMiner(srcTree,dstTree,bodyMapper.getMappings(),mappingStore);
+            }
             else if (refactoring instanceof RenameAttributeRefactoring) {
                 RenameAttributeRefactoring renameAttributeRefactoring = (RenameAttributeRefactoring) (refactoring);
 
