@@ -20,7 +20,7 @@ public class UMLModel {
 
 	private Map<String, TreeContext> treeContextMap = new LinkedHashMap<>();
 
-	public Map<String, TreeContext> getCompilationUnitMap() {
+	public Map<String, TreeContext> getTreeContextMap() {
 		return treeContextMap;
 	}
 	public void addCompilationUnit(String fname, TreeContext treeContext){

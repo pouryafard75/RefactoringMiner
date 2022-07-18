@@ -1,21 +1,4 @@
-/*
- * This file is part of GumTree.
- *
- * GumTree is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * GumTree is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with GumTree.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright 2020 Jean-Rémy Falleri <jr.falleri@gmail.com>
- */
+
 
 package view.webdiff;
 
@@ -106,7 +89,7 @@ public class MonacoNativeDiffView implements Renderable {
                 .head()
                     .meta(charset("utf8"))
                     .meta(name("viewport").content("width=device-width, initial-scale=1.0"))
-                    .title().content("GumTree")
+                    .title().content("RefactoringMiner")
                     .macros().stylesheet(WebDiff.BOOTSTRAP_CSS_URL)
                     .macros().javascript(WebDiff.JQUERY_JS_URL)
                     .macros().javascript(WebDiff.BOOTSTRAP_JS_URL)

@@ -1,22 +1,4 @@
-/*
- * This file is part of GumTree.
- *
- * GumTree is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * GumTree is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with GumTree.  If not, see <http://www.gnu.org/licenses/>.
- *
- * Copyright 2011-2015 Jean-Rémy Falleri <jr.falleri@gmail.com>
- * Copyright 2011-2015 Floréal Morandat <florealm@gmail.com>
- */
+
 
 package view.webdiff;
 
@@ -32,6 +14,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import ASTDiff.ProjectASTDiffer;
 
 import static spark.Spark.*;
 
@@ -39,18 +22,17 @@ public class WebDiff  {
     public static final String JQUERY_JS_URL = "https://code.jquery.com/jquery-3.4.1.min.js";
     public static final String BOOTSTRAP_CSS_URL = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css";
     public static final String BOOTSTRAP_JS_URL = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js";
-    public static final int port = 4567;
-    public String srcPath;
-    public String dstPath;
+    public static final int port = 5678;
+
+    public ProjectASTDiffer projectASTDiffer;
 
 
-    public WebDiff(String srcPath, String dstPath) {
-        this.srcPath = srcPath;
-        this.dstPath = dstPath;
+    public WebDiff(ProjectASTDiffer projectASTDiffer) {
+        this.projectASTDiffer = projectASTDiffer;
     }
 
     public void run() {
-        DirectoryComparator comparator = new DirectoryComparator(this.srcPath, this.dstPath);
+        DirectoryComparator comparator = new DirectoryComparator(this.projectASTDiffer.getSrcPath(), this.projectASTDiffer.getDstPath());
         comparator.compare();
         configureSpark(comparator, this.port);
         Spark.awaitInitialization();
@@ -74,14 +56,14 @@ public class WebDiff  {
         get("/vanilla-diff/:id", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
             Pair<File, File> pair = comparator.getModifiedFiles().get(id);
-            ASTDiff diff = getDiff(pair.first.getAbsolutePath(), pair.second.getAbsolutePath());
+            ASTDiff diff = projectASTDiffer.getASTDiffbyFileName(pair.first.getAbsolutePath());
             Renderable view = new VanillaDiffView(pair.first, pair.second, diff, false);
             return render(view);
         });
         get("/monaco-diff/:id", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
             Pair<File, File> pair = comparator.getModifiedFiles().get(id);
-            ASTDiff diff = getDiff(pair.first.getAbsolutePath(), pair.second.getAbsolutePath());
+            ASTDiff diff = projectASTDiffer.getASTDiffbyFileName(pair.first.getAbsolutePath());
             Renderable view = new MonacoDiffView(pair.first, pair.second, diff, id);
             return render(view);
         });

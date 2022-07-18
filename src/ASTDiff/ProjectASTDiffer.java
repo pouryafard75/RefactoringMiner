@@ -13,34 +13,51 @@ import tree.TreeContext;
 import utils.Pair;
 
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ProjectASTDiffer
 {
-    public Map<String, ASTDiff> astDiffMap = new HashMap<>();
+    private Map<String, ASTDiff> astDiffMap = new HashMap<>();
     private UMLModelDiff umlModelDiff;
-    String rootpath;
+    private String srcPath;
+    private String dstPath;
+
+    public String getSrcPath(){
+        return srcPath;
+    }
+    public String getDstPath(){
+        return dstPath;
+    }
+
+    public UMLModelDiff getUmlModelDiff() {
+        return umlModelDiff;
+    }
 
     public ProjectASTDiffer(UMLModelDiff umlModelDiff)
     {
         this.umlModelDiff = umlModelDiff;
-        this.rootpath = this.umlModelDiff.getParentModel().rootFolder.getAbsolutePath();
+        this.srcPath = this.umlModelDiff.getParentModel().rootFolder.getAbsolutePath();
+        this.dstPath = this.umlModelDiff.getChildModel().rootFolder.getAbsolutePath();
 
     }
 
-    public ASTDiff diff()
+    public void diff()
     {
         this.commonClasses();
-        return null;
+    }
+    public ASTDiff getASTDiffbyFileName(String filename)
+    {
+        return this.astDiffMap.get(filename);
     }
 
     private void commonClasses() {
         List<UMLClassDiff> commons = this.umlModelDiff.getCommonClassDiffList();
 
         for (UMLClassDiff classdiff : commons) {
-            this.astDiffMap.put(rootpath + classdiff.getOriginalClassName(), process(classdiff,findTreeContexts(classdiff)));
+            this.astDiffMap.put(getSrcPath() + File.separator +  classdiff.getOriginalClass().getSourceFile(), process(classdiff,findTreeContexts(classdiff)));
         }
 
     }
@@ -54,6 +71,10 @@ public class ProjectASTDiffer
         LocationInfo locationInChild  =  temp.getContainer2().getLocationInfo();
         Tree childNode = childTreeCTX.getRoot().getTreeBetweenPositions(locationInChild.getStartOffset(), locationInChild.getEndOffset());
         Tree parentNode = parentTreeCTX.getRoot().getTreeBetweenPositions(locationInParent.getStartOffset(), locationInParent.getEndOffset());
+
+        Tree test = childTreeCTX.getRoot().getTreeBetweenPositions(90,93);
+//        Tree test = childTreeCTX.getRoot().getTreeBetweenPositions(94,
+
         MappingStore m = new MappingStore(parentTreeCTX.getRoot(),childTreeCTX.getRoot());
         m.addMapping(parentNode,childNode);
         m.addMapping(parentTreeCTX.getRoot(),childTreeCTX.getRoot());
@@ -65,10 +86,12 @@ public class ProjectASTDiffer
 
     private Pair<TreeContext, TreeContext> findTreeContexts(UMLClassDiff classDiff) {
         //TODO: find corresponding comps
-        String filename = "example.java";
+
+//        String filename = rootpath + File.separator + classDiff.getOriginalClass().getSourceFile();
+        String filename = classDiff.getOriginalClass().getSourceFile();
         return new Pair<TreeContext,TreeContext>
-                (this.umlModelDiff.getParentModel().getCompilationUnitMap().get(filename),
-                 this.umlModelDiff.getChildModel().getCompilationUnitMap().get(filename));
+                (this.umlModelDiff.getParentModel().getTreeContextMap().get(filename),
+                 this.umlModelDiff.getChildModel().getTreeContextMap().get(filename));
     }
 }
 

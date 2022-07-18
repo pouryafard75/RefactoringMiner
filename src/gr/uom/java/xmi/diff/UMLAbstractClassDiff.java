@@ -131,6 +131,7 @@ public abstract class UMLAbstractClassDiff {
 		this.operationBodyMapperList.add(operationBodyMapper);
 	}
 
+
 	public UMLModelDiff getModelDiff() {
 		return modelDiff;
 	}
