@@ -15,6 +15,9 @@ public class Run {
     public static void main(String[] args) throws RefactoringMinerTimedOutException, IOException {
         BasicConfigurator.configure();
 
+        String path1 = "/Users/Pouria/Desktop/DebugCases/Requested/Lambda/v2";
+        String path2 = "/Users/Pouria/Desktop/DebugCases/Requested/Lambda/v1";
+
 //        UMLModel model1 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v1")).getUmlModel();
 //        UMLModel model2 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v2")).getUmlModel();UMLModel model1 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\IdeaProjects\\TestCases\\NewCases\\RenameMethod\\v1")).getUmlModel();
 //        UMLModel model1 = new UMLModelASTReader(new File("D:\\TestCases\\MultiMapping\\v1")).getUmlModel();
@@ -29,8 +32,8 @@ public class Run {
 //          UMLModel model2 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\Desktop\\TestCases\\Requested\\PostProcess\\v2")).getUmlModel();
 //          UMLModel model1 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\Desktop\\TestCases\\Requested\\DistributedCacheStream\\v1")).getUmlModel();
 //          UMLModel model2 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\Desktop\\TestCases\\Requested\\DistributedCacheStream\\v2")).getUmlModel();
-          UMLModel model1 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\OneDrive\\Desktop\\TestCases\\Requested\\Test\\v1")).getUmlModel();
-          UMLModel model2 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\OneDrive\\Desktop\\TestCases\\Requested\\Test\\v2")).getUmlModel();
+//          UMLModel model1 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\OneDrive\\Desktop\\TestCases\\Requested\\Test\\v1")).getUmlModel();
+//          UMLModel model2 = new UMLModelASTReader(new File("C:\\Users\\Pouria\\OneDrive\\Desktop\\TestCases\\Requested\\Test\\v2")).getUmlModel();
 //        UMLModel model1 = new UMLModelASTReader(new File("D:\\DebugCases\\sa\\cases\\v1")).getUmlModel();
 //        UMLModel model2 = new UMLModelASTReader(new File("D:\\DebugCases\\sa\\cases\\v2")).getUmlModel();
 //        UMLModel model1 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/SimpleCase/v1/")).getUmlModel();
@@ -38,6 +41,10 @@ public class Run {
 //        UMLModel model2 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/DebugCases/Examples/cases/v2/")).getUmlModel();
 //        UMLModel model1 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/DebugCases/Examples/working/v1/")).getUmlModel();
 //        UMLModel model2 = new UMLModelASTReader(new File("/Users/Pouria/Desktop/DebugCases/Examples/working/v2/")).getUmlModel();
+          UMLModel model1 = new UMLModelASTReader(new File(path1)).getUmlModel();
+          UMLModel model2 = new UMLModelASTReader(new File(path2)).getUmlModel();
+
+
         UMLModelDiff modelDiff = model1.diff(model2);
         ProjectASTDiffer projectASTDiffer = new ProjectASTDiffer(modelDiff);
         projectASTDiffer.diff();
