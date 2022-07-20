@@ -114,15 +114,18 @@ $(function() {
         event.stopPropagation();
     });
 
-    // tooltip
-    $("span.token").hover(
-    	function (event) {
-    		$(this).tooltip('show');
-    		event.stopPropagation();
-    	},
-    	function (event) {
-    		$(this).tooltip('hide');
-    		event.stopPropagation();
-    	}
-    );
+//    // tooltip
+//    $("span.token").hover(
+//    	function (event) {
+//    	    console.log("yay")
+//    		$(this).tooltip('show');
+//    		event.stopPropagation();
+//    	},
+//    	function (event) {
+//    		$(this).tooltip('hide');
+//    		event.stopPropagation();
+//    	}
+//    );
+    $("body").tooltip({ selector: '[data-toggle=tooltip]' });
+
 });

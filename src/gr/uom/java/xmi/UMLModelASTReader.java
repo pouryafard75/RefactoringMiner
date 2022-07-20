@@ -22,8 +22,6 @@ import java.util.stream.Stream;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import jdt.CommentVisitor;
 import jdt.JdtVisitor;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.JavaCore;
@@ -64,9 +62,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import gr.uom.java.xmi.LocationInfo.CodeElementType;
 import gr.uom.java.xmi.decomposition.OperationBody;
 import gr.uom.java.xmi.decomposition.VariableDeclaration;
-import tree.Tree;
 import tree.TreeContext;
-import tree.TypeSet;
 
 public class UMLModelASTReader {
 	private static final String FREE_MARKER_GENERATED = "generated using freemarker";
@@ -104,10 +100,11 @@ public class UMLModelASTReader {
 				JdtVisitor visitor = new JdtVisitor(scanner);
 				compilationUnit.accept(visitor);
 
+				processCompilationUnit(filePath, compilationUnit, javaFileContent);
 				TreeContext treeContext = visitor.getTreeContext();
 				treeContext.setUmlCommentList(extractInternalComments(compilationUnit, filePath, javaFileContent));
-				this.getUmlModel().addCompilationUnit(filePath,treeContext); //TODO:  Use fullpath to avoid errors while two files have the same name
-				processCompilationUnit(filePath, compilationUnit, javaFileContent);
+				treeContext.setFilename(filePath);
+				this.getUmlModel().addTreeContext(filePath,treeContext); //TODO:  Use fullpath to avoid errors while two files have the same name
 			}
 			catch(Exception e) {
 				//e.printStackTrace();

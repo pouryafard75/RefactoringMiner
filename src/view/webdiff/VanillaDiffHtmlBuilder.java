@@ -26,6 +26,10 @@ public final class VanillaDiffHtmlBuilder {
     private static final String DST_MV_SPAN = "<span class=\"%s\" id=\"move-dst-%d\" data-title=\"%s\">";
     private static final String ADD_DEL_SPAN = "<span class=\"%s\" data-title=\"%s\">";
 
+    private static final String MoveIn_SPAN = "<span class=\"%s\" data-toggle=\"tooltip\" title=\"%s\">";
+
+    private static final String MoveOut_SPAN = "<span class=\"%s\" data-toggle=\"tooltip\" title=\"%s\">";
+
     private static final String MM_SPAN = "<span class=\"%s\" gid=\"%x\" data-title=\"%s\">";
     private static final String UPD_SPAN = "<span class=\"cupd\">";
     private static final String ID_SPAN = "<span class=\"marker\" id=\"mapping-%d\"></span>";
@@ -89,6 +93,12 @@ public final class VanillaDiffHtmlBuilder {
                     srcMM.add(t);
                 }
             }
+            if (c.getSrcMoveOutTreeMap().containsKey(t))
+            {
+                ltags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
+                ltags.addTags(t.getPos(), String.format(
+                        MoveOut_SPAN, "token moveOut",c.getSrcMoveOutTreeMap().get(t).toString()), t.getEndPos(), END_SPAN);
+            }
         }
 
         TagIndex rtags = new TagIndex();
@@ -121,6 +131,12 @@ public final class VanillaDiffHtmlBuilder {
                             MM_SPAN, "token mm", gid,  tooltip(diff.srcTC, t)), t.getEndPos(), END_SPAN);
                     dstMM.add(t);
                 }
+            }
+            if (c.getDstMoveInTreeMap().containsKey(t))
+            {
+                rtags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
+                rtags.addTags(t.getPos(), String.format(
+                        MoveIn_SPAN, "token moveIn",c.getDstMoveInTreeMap().get(t).toString()), t.getEndPos(), END_SPAN);
             }
         }
 

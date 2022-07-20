@@ -43,6 +43,15 @@
 	background-color: #d2bada;
 }
 
+.moveIn {
+	border: 2px solid #d2bada;
+	background-color: #8ceb34;
+}
+.moveOut {
+	border: 2px solid #d2bada;
+	background-color: #d0113e;
+}
+
 .cupd {
 	font-weight: normal;
 	color: DimGray;

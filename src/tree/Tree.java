@@ -219,6 +219,14 @@ public interface Tree {
      */
     Tree getParent();
 
+
+    default Tree getFinalRoot()
+    {
+        if (this.isRoot())
+            return this;
+        return this.getParent().getFinalRoot();
+    }
+
     /**
      * @return the list of all parents of the node (parent, parent of parent, etc.)
      */
@@ -232,6 +240,7 @@ public interface Tree {
         }
         return parents;
     }
+
 
     /**
      * @return the position of the node in its parent children list
@@ -394,6 +403,4 @@ public interface Tree {
      * Returns an iterator for all metadata of this node.
      */
     Iterator<Entry<String, Object>> getMetadata();
-
-    default void addComments(List<UMLComment> commentsList){}
 }

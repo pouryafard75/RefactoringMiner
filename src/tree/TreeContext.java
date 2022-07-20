@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
  * @see Tree
  */
 public class TreeContext {
+    private String filename;
     private List<UMLComment> umlCommentList;
     private final Map<String, Object> metadata = new HashMap<>();
 
@@ -94,6 +95,15 @@ public class TreeContext {
 
     public List<UMLComment> getUmlCommentList() {
         return umlCommentList;
+    }
+
+
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
+
+    public String getFilename() {
+        return filename;
     }
 
     /**

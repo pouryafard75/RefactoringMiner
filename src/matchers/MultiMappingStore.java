@@ -24,6 +24,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import tree.Tree;
+import tree.TreeContext;
 import utils.Pair;
 
 public class MultiMappingStore implements Iterable<Mapping> {
@@ -31,12 +32,17 @@ public class MultiMappingStore implements Iterable<Mapping> {
     private Map<Tree, Set<Tree>> dstToSrcs_all;
 
 
+    public final TreeContext srcTC;
+    public final TreeContext dstTC;
+
     public final Tree src;
     public final Tree dst;
 
-    public MultiMappingStore(Tree src, Tree dst) {
-        this.src = src;
-        this.dst = dst;
+    public MultiMappingStore(TreeContext srcTC, TreeContext dstTC) {
+        this.srcTC = srcTC;
+        this.dstTC = dstTC;
+        this.src = srcTC.getRoot();
+        this.dst = dstTC.getRoot();
         srcToDsts_all = new LinkedHashMap<>();
         dstToSrcs_all = new LinkedHashMap<>();
     }
@@ -104,7 +110,7 @@ public class MultiMappingStore implements Iterable<Mapping> {
         return mappings;
     }
     public MappingStore getMonoMappingStore(){
-        MappingStore monoStore = new MappingStore(this.src,this.dst);
+        MappingStore monoStore = new MappingStore(this.srcTC,this.dstTC);
         for (Map.Entry<Tree,Tree> entry : getSrcToDstMono().entrySet())
             monoStore.addMapping(entry.getKey(),entry.getValue());
         return monoStore;

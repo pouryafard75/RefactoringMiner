@@ -1,14 +1,10 @@
 
 package actions;
-import actions.model.Action;
-import actions.model.MultiMove;
 import actions.model.MultiMoveActionGenerator;
 import matchers.MultiMappingStore;
-import org.eclipse.jgit.diff.Edit;
 import tree.Tree;
 import tree.TreeContext;
 
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,9 +42,9 @@ public class ASTDiff {
         this.dstTC = dst;
         this.mappings = mappings;
     }
-    public void computeEditScript()
+    public void computeEditScript(Map<String, TreeContext> parentContextMap, Map<String, TreeContext> childContextMap)
     {
-        this.editScript = new SimplifiedChawatheScriptGenerator().computeActions(this.mappings);
+        this.editScript = new SimplifiedChawatheScriptGenerator().computeActions(this.mappings,parentContextMap,childContextMap);
         processMultiMaps(this.editScript);
         System.out.println("ola");
     }

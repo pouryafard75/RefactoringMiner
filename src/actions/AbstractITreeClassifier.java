@@ -2,7 +2,6 @@
 package actions;
 
 import actions.model.Action;
-import actions.model.MultiMove;
 import tree.Tree;
 
 import java.util.HashMap;
@@ -29,6 +28,10 @@ public abstract class AbstractITreeClassifier implements TreeClassifier {
     protected final Map<Tree,Action> dstMmTrees = new HashMap<>();
 
     protected final Map<Tree, Action> srcMmTrees = new HashMap<>();
+
+    protected final Map<Tree, Action> dstMoveInTreeMap = new HashMap<>();
+
+    protected final Map<Tree, Action> srcMoveOutTreeMap = new HashMap<>();
 
     public AbstractITreeClassifier(ASTDiff diff) {
         this.diff = diff;
@@ -66,4 +69,6 @@ public abstract class AbstractITreeClassifier implements TreeClassifier {
 
     public Map<Tree, Action> getMultiMapDst() { return dstMmTrees;}
 
+    public Map<Tree, Action> getDstMoveInTreeMap() { return dstMoveInTreeMap; }
+    public Map<Tree, Action> getSrcMoveOutTreeMap() { return srcMoveOutTreeMap; }
 }

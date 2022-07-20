@@ -6,6 +6,7 @@ import matchers.MappingStore;
 import matchers.MultiMappingStore;
 import tree.FakeTree;
 import tree.Tree;
+import tree.TreeContext;
 import tree.TreeUtils;
 
 import java.util.*;
@@ -35,9 +36,13 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
     private Map<Tree, Tree> copyToOrig;
 
     private MultiMappingStore multiMappingStore;
+    private Map<String, TreeContext> childContextMap;
+    private Map<String, TreeContext> parentContextMap;
 
     @Override
-    public EditScript computeActions(MultiMappingStore ms) {
+    public EditScript computeActions(MultiMappingStore ms, Map<String, TreeContext> parentContextMap, Map<String, TreeContext> childContextMap) {
+        this.parentContextMap = parentContextMap;
+        this.childContextMap = childContextMap;
         this.multiMappingStore = ms;
         initWith(ms.getMonoMappingStore());
         generate();
@@ -59,7 +64,7 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
             copyToOrig.put(cpyTree, origTree);
         }
 
-        cpyMappings = new MappingStore(ms.src, ms.dst);
+        cpyMappings = new MappingStore(ms.srcTC, ms.dstTC);
         for (Mapping m: origMappings)
             cpyMappings.addMapping(origToCopy.get(m.first), m.second);
     }
@@ -83,7 +88,7 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
             Tree z = cpyMappings.getSrcForDst(y);
             if (z == null)
             {
-//                System.out.println("ta le vo");
+
             }
 
 
@@ -105,13 +110,17 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
                 }
                 else
                 {
-//                    System.out.println("7");
                     continue;
                 }
             } else {
 
                 w = cpyMappings.getSrcForDst(x);
-                if (!x.equals(origDst)) { // TODO => x != origDst // Case of the root
+                if (w == null)
+                {
+                    origMappings.getSrcForDst(x).getFinalRoot();
+                    actions.add(new MoveIn(origMappings.getSrcForDst(x),x,findNameByTree(parentContextMap,origMappings.getSrcForDst(x)),+1));
+                }
+                else if (!x.equals(origDst)) { // TODO => x != origDst // Case of the root
                     Tree v = w.getParent();
                     if (!w.getLabel().equals(x.getLabel())) {
                         actions.add(new Update(copyToOrig.get(w), x.getLabel()));
@@ -129,15 +138,25 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
                 }
             }
 
-            srcInOrder.add(w);
-            dstInOrder.add(x);
-            alignChildren(w, x);
+            if (w != null) {
+                srcInOrder.add(w);
+                dstInOrder.add(x);
+                alignChildren(w, x);
+            }
         }
 
-        for (Tree w : cpySrc.postOrder())
-            if (!cpyMappings.isSrcMapped(w) && !multiMappingStore.isSrcMultiMapped(copyToOrig.get(w)))
-                actions.add(new Delete(copyToOrig.get(w)));
+        for (Tree w : cpySrc.postOrder()) {
+            if (!cpyMappings.isSrcMapped(w) && !multiMappingStore.isSrcMultiMapped(copyToOrig.get(w))) {
+                    actions.add(new Delete(copyToOrig.get(w)));
+            }
+            else if(!origDst.getDescendantsAndItself().contains(cpyMappings.getDstForSrc(w))) {
+                System.out.println(w.getType().name);
+                Tree a = cpyMappings.getDstForSrc(w);
+                actions.add(new MoveOut(w,origMappings.getDstForSrc(w),findNameByTree(childContextMap,a),+1));
+                System.out.println("");
 
+            }
+        }
         return actions;
     }
 
@@ -237,5 +256,15 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
         }
 
         return lcs;
+    }
+    public String findNameByTree(Map<String, TreeContext> contextMap, Tree t)
+    {
+        for (Map.Entry<String, TreeContext> stringTreeContextEntry : contextMap.entrySet()) {
+            if (stringTreeContextEntry.getValue().getRoot() == t.getFinalRoot())
+            {
+                return stringTreeContextEntry.getKey();
+            }
+        }
+        return "";
     }
 }

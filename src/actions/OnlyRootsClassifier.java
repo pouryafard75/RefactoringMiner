@@ -60,6 +60,14 @@ public class OnlyRootsClassifier extends AbstractITreeClassifier {
                 for (Tree tree : diff.mappings.getDstForSrc(a.getNode()))
                     dstMmTrees.put(tree,a);
             }
+            else if (a instanceof MoveIn)
+            {
+                dstMoveInTreeMap.put(((MoveIn) a).getParent(),a);
+            }
+            else if (a instanceof MoveOut)
+            {
+                srcMoveOutTreeMap.put(((MoveOut) a).getParent(),a);
+            }
         }
     }
 }

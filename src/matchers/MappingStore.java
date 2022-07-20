@@ -3,17 +3,20 @@ package matchers;
 import java.util.*;
 
 import tree.Tree;
+import tree.TreeContext;
 import utils.Pair;
 
 public class MappingStore implements Iterable<Mapping> {
     /**
      * The immutable root of the source AST
      */
+    public final TreeContext srcTC;
     public final Tree src;
 
     /**
      * The immutable root of the destination AST
      */
+    public final TreeContext dstTC;
     public final Tree dst;
 
     private Map<Tree, Tree> srcToDst;
@@ -43,7 +46,7 @@ public class MappingStore implements Iterable<Mapping> {
      * from the provided mapping store.
      */
     public MappingStore(MappingStore ms) {
-        this(ms.src, ms.dst);
+        this(ms.srcTC, ms.dstTC);
         for (Mapping m : ms)
             addMapping(m.first, m.second);
     }
@@ -52,9 +55,11 @@ public class MappingStore implements Iterable<Mapping> {
      * Instantiate a new empty mapping store between the provided
      * source and destination AST.
      */
-    public MappingStore(Tree src, Tree dst) {
-        this.src = src;
-        this.dst = dst;
+    public MappingStore(TreeContext srcTC, TreeContext dstTC) {
+        this.srcTC = srcTC;
+        this.dstTC = dstTC;
+        this.src = srcTC.getRoot();
+        this.dst = dstTC.getRoot();
         srcToDst = new HashMap<>();
         dstToSrc = new HashMap<>();
     }

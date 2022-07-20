@@ -6,16 +6,20 @@ import gr.uom.java.xmi.decomposition.*;
 import gr.uom.java.xmi.diff.*;
 import jdt.CommentVisitor;
 import matchers.*;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
+import org.refactoringminer.api.RefactoringType;
 import tree.Tree;
 import tree.TreeContext;
 import tree.TreeUtils;
 import utils.Pair;
 
 
+import javax.servlet.ServletOutputStream;
 import java.io.File;
 import java.lang.reflect.Array;
+import java.sql.Ref;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -28,6 +32,7 @@ public class ProjectASTDiffer
     private static final boolean _TREE_MATCHING = true;
     private Map<String, ASTDiff> astDiffMap = new HashMap<>();
     private UMLModelDiff umlModelDiff;
+
     private String srcPath;
     private String dstPath;
 
@@ -45,7 +50,6 @@ public class ProjectASTDiffer
         umlModelDiff.getRefactorings();
         this.srcPath = this.umlModelDiff.getParentModel().rootFolder.getAbsolutePath();
         this.dstPath = this.umlModelDiff.getChildModel().rootFolder.getAbsolutePath();
-
     }
 
     public void diff() throws RefactoringMinerTimedOutException {
@@ -76,22 +80,60 @@ public class ProjectASTDiffer
 
         for (Map.Entry<String,ASTDiff> entry : this.astDiffMap.entrySet())
         {
-            entry.getValue().computeEditScript();
+            entry.getValue().computeEditScript(
+                    this.umlModelDiff.getParentModel().getTreeContextMap(),
+                    this.umlModelDiff.getChildModel().getTreeContextMap()
+            );
         }
     }
 
     private ASTDiff process(UMLClassDiff classdiff, Pair<TreeContext, TreeContext> treeContextPair) throws RefactoringMinerTimedOutException {
-        Tree srcTree = treeContextPair.first.getRoot();
-        Tree dstTree = treeContextPair.second.getRoot();
-        MultiMappingStore mappingStore = new MultiMappingStore(srcTree,dstTree);
+        TreeContext srcTreeContext = treeContextPair.first;
+        TreeContext dstTreeContext = treeContextPair.second;
+        Tree srcTree = srcTreeContext.getRoot();
+        Tree dstTree = dstTreeContext.getRoot();
+
+        MultiMappingStore mappingStore = new MultiMappingStore(srcTreeContext,dstTreeContext);
         mappingStore.addMapping(srcTree,dstTree);
         processRefactorings(srcTree,dstTree,classdiff.getRefactorings(),mappingStore);
         processPackageDeclaration(srcTree,dstTree,classdiff,mappingStore);
         processImports(srcTree,dstTree,classdiff.getImportDiffList(),mappingStore);
         processClassDeclarationMapping(srcTree,dstTree,classdiff,mappingStore);
         processAllMethods(srcTree,dstTree,classdiff.getOperationBodyMapperList(),mappingStore);
+        processModelDiffRefactorings(srcTree,dstTree,classdiff,umlModelDiff.getRefactorings(),mappingStore);
         addAndProcessComments(treeContextPair.first, treeContextPair.second,mappingStore);
         return new ASTDiff(treeContextPair.first, treeContextPair.second, mappingStore);
+    }
+
+    private void processModelDiffRefactorings(Tree srcTree, Tree dstTree, UMLClassDiff classDiff, List<Refactoring> refactorings, MultiMappingStore mappingStore) {
+
+            for(Refactoring refactoring : refactorings)
+            {
+                System.out.println("");
+                List<String> beforeRefactoringClasses = refactoring.getInvolvedClassesBeforeRefactoring().stream().map(ImmutablePair::getRight).toList();
+                List<String> afterRefactoringClasses = refactoring.getInvolvedClassesAfterRefactoring().stream().map(ImmutablePair::getRight).toList();
+                if (afterRefactoringClasses.contains(classDiff.getNextClass().getName()))
+                {
+
+                    if (refactoring.getRefactoringType().equals(RefactoringType.PUSH_DOWN_OPERATION))
+                    {
+                        PushDownOperationRefactoring pushDownOperationRefactoring = (PushDownOperationRefactoring) refactoring;
+                        String otherFileName = pushDownOperationRefactoring.getOriginalOperation().getLocationInfo().getFilePath();
+                        Tree otherFileTree = this.umlModelDiff.getParentModel().getTreeContextMap().get(otherFileName).getRoot();
+                        processMethod(otherFileTree,dstTree,pushDownOperationRefactoring.getBodyMapper(),mappingStore);
+                    }
+                }
+                else if (beforeRefactoringClasses.contains(classDiff.getOriginalClass().getName()))
+                {
+                    if (refactoring.getRefactoringType().equals(RefactoringType.PUSH_DOWN_OPERATION))
+                    {
+                        PushDownOperationRefactoring pushDownOperationRefactoring = (PushDownOperationRefactoring) refactoring;
+                        String otherFileName = pushDownOperationRefactoring.getMovedOperation().getLocationInfo().getFilePath();
+                        Tree otherFileTree = this.umlModelDiff.getChildModel().getTreeContextMap().get(otherFileName).getRoot();
+                        processMethod(srcTree,otherFileTree,pushDownOperationRefactoring.getBodyMapper(),mappingStore);
+                    }
+                }
+            }
     }
 
     private void addAndProcessComments(TreeContext firstTC, TreeContext secondTC, MultiMappingStore mappingStore) {
@@ -101,16 +143,18 @@ public class ProjectASTDiffer
 
     private void processAllMethods(Tree srcTree, Tree dstTree, List<UMLOperationBodyMapper> operationBodyMapperList, MultiMappingStore mappingStore) {
         for(UMLOperationBodyMapper umlOperationBodyMapper : new ArrayList<>(operationBodyMapperList))
-        {
-            processOperationDiff(srcTree,dstTree,umlOperationBodyMapper,mappingStore);
-            processMethodParameters(srcTree,dstTree,umlOperationBodyMapper.getMatchedVariables(),mappingStore);
-            processMethodJavaDoc(srcTree, dstTree, umlOperationBodyMapper.getOperation1().getJavadoc(),umlOperationBodyMapper.getOperation2().getJavadoc(),mappingStore);
-            Tree srcOperationNode = findByLocationInfo(srcTree,umlOperationBodyMapper.getOperation1().getLocationInfo());
-            Tree dstOperationNode = findByLocationInfo(dstTree,umlOperationBodyMapper.getOperation2().getLocationInfo());
-            mappingStore.addMapping(srcOperationNode,dstOperationNode);
-            processMethodSignature(srcOperationNode,dstOperationNode,mappingStore);
-            fromRefMiner(srcTree,dstTree,umlOperationBodyMapper.getMappings(),mappingStore);
-        }
+            processMethod(srcTree,dstTree,umlOperationBodyMapper,mappingStore);
+    }
+    private void processMethod(Tree srcTree, Tree dstTree, UMLOperationBodyMapper umlOperationBodyMapper, MultiMappingStore mappingStore)
+    {
+        processOperationDiff(srcTree,dstTree,umlOperationBodyMapper,mappingStore);
+        processMethodParameters(srcTree,dstTree,umlOperationBodyMapper.getMatchedVariables(),mappingStore);
+        processMethodJavaDoc(srcTree, dstTree, umlOperationBodyMapper.getOperation1().getJavadoc(),umlOperationBodyMapper.getOperation2().getJavadoc(),mappingStore);
+        Tree srcOperationNode = findByLocationInfo(srcTree,umlOperationBodyMapper.getOperation1().getLocationInfo());
+        Tree dstOperationNode = findByLocationInfo(dstTree,umlOperationBodyMapper.getOperation2().getLocationInfo());
+        mappingStore.addMapping(srcOperationNode,dstOperationNode);
+        processMethodSignature(srcOperationNode,dstOperationNode,mappingStore);
+        fromRefMiner(srcTree,dstTree,umlOperationBodyMapper.getMappings(),mappingStore);
     }
 
     private void processMethodParameters(Tree srcTree, Tree dstTree, Set<org.apache.commons.lang3.tuple.Pair<VariableDeclaration, VariableDeclaration>> matchedVariables, MultiMappingStore mappingStore) {

@@ -6,7 +6,6 @@ import gr.uom.java.xmi.diff.UMLModelDiff;
 import java.io.File;
 import java.util.*;
 
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import tree.TreeContext;
 
@@ -23,7 +22,7 @@ public class UMLModel {
 	public Map<String, TreeContext> getTreeContextMap() {
 		return treeContextMap;
 	}
-	public void addCompilationUnit(String fname, TreeContext treeContext){
+	public void addTreeContext(String fname, TreeContext treeContext){
 		treeContextMap.put(fname,treeContext);
 	}
 

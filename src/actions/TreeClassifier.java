@@ -48,4 +48,9 @@ public interface TreeClassifier {
     Map<Tree, Action> getMultiMapSrc();
 
     Map<Tree, Action> getMultiMapDst();
+
+    Map<Tree, Action> getDstMoveInTreeMap();
+
+    Map<Tree, Action> getSrcMoveOutTreeMap();
+
 }
