@@ -224,6 +224,8 @@ public interface Tree {
     {
         if (this.isRoot())
             return this;
+        if (this.getParent() instanceof FakeTree)
+            return this;
         return this.getParent().getFinalRoot();
     }
 

@@ -66,7 +66,7 @@ public class OnlyRootsClassifier extends AbstractITreeClassifier {
             }
             else if (a instanceof MoveOut)
             {
-                srcMoveOutTreeMap.put(((MoveOut) a).getParent(),a);
+                srcMoveOutTreeMap.put(((MoveOut) a).getNode(),a);
             }
         }
     }

@@ -36,6 +36,7 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
     private Map<Tree, Tree> copyToOrig;
 
     private MultiMappingStore multiMappingStore;
+
     private Map<String, TreeContext> childContextMap;
     private Map<String, TreeContext> parentContextMap;
 
@@ -149,10 +150,10 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
             if (!cpyMappings.isSrcMapped(w) && !multiMappingStore.isSrcMultiMapped(copyToOrig.get(w))) {
                     actions.add(new Delete(copyToOrig.get(w)));
             }
-            else if(!origDst.getDescendantsAndItself().contains(cpyMappings.getDstForSrc(w))) {
+            else if(!origDst.getDescendantsAndItself().contains(cpyMappings.getDstForSrc(w)) && !multiMappingStore.isSrcMultiMapped(copyToOrig.get(w))) {
                 System.out.println(w.getType().name);
                 Tree a = cpyMappings.getDstForSrc(w);
-                actions.add(new MoveOut(w,origMappings.getDstForSrc(w),findNameByTree(childContextMap,a),+1));
+                actions.add(new MoveOut(copyToOrig.get(w),cpyMappings.getDstForSrc(w),findNameByTree(childContextMap,a),+1));
                 System.out.println("");
 
             }
