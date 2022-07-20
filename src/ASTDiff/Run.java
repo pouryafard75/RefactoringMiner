@@ -7,24 +7,25 @@ import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import view.webdiff.WebDiff;
 //import view.webdiff.WebDiff;
 
+import javax.sound.midi.Soundbank;
 import java.io.File;
 import java.io.IOException;
 
 
 public class Run {
     public static void main(String[] args) throws RefactoringMinerTimedOutException, IOException {
-        BasicConfigurator.configure();
-
-        String path1 = "D:\\TestCases\\Requested\\Pullup\\v2";
-        String path2 = "D:\\TestCases\\Requested\\Pullup\\v1";
+        String path1 = "D:\\TestCases\\v1";
+        String path2 = "D:\\TestCases\\v2";
+        long start = System.currentTimeMillis();
         UMLModel model1 = new UMLModelASTReader(new File(path1)).getUmlModel();
         UMLModel model2 = new UMLModelASTReader(new File(path2)).getUmlModel();
-
-
         UMLModelDiff modelDiff = model1.diff(model2);
+        long refminer_execution_end = System.currentTimeMillis();
+        System.out.println("RefactoringMiner executed in " + (refminer_execution_end - start) / 1000 + "s");
         ProjectASTDiffer projectASTDiffer = new ProjectASTDiffer(modelDiff);
         projectASTDiffer.diff();
-
+        long astdiffer_execution_end = System.currentTimeMillis();
+        System.out.println("ProjectASTDiffer executed in " + (astdiffer_execution_end - refminer_execution_end) / 1000 + "s");
 //
         WebDiff webDiff = new WebDiff(projectASTDiffer);
         webDiff.run();
