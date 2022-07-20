@@ -109,7 +109,7 @@ public class ProjectASTDiffer
 
             for(Refactoring refactoring : refactorings)
             {
-                System.out.println("");
+//                System.out.println("");
                 List<String> beforeRefactoringClasses = refactoring.getInvolvedClassesBeforeRefactoring().stream().map(ImmutablePair::getRight).toList();
                 List<String> afterRefactoringClasses = refactoring.getInvolvedClassesAfterRefactoring().stream().map(ImmutablePair::getRight).toList();
                 if (afterRefactoringClasses.contains(classDiff.getNextClass().getName()))
@@ -422,7 +422,6 @@ public class ProjectASTDiffer
     }
 
     public List<Pair<Tree, Tree>> match(Tree src, Tree dst,MultiMappingStore mappingStore) {
-        System.out.println("abcd");
         List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
         if (!_TREE_MATCHING) return pairlist;
         Function<Tree, Integer> HEIGHT_PRIORITY_CALCULATOR = (Tree t) -> t.getMetrics().height;
@@ -445,7 +444,7 @@ public class ProjectASTDiffer
                 pair.second.forEach(tree -> dstTrees.open(tree));
             });
         }
-        System.out.println("");
+//        System.out.println("");
         if (_POST_PROCESS) {
             greedyMatcher(src,dst,mappingStore);
         }

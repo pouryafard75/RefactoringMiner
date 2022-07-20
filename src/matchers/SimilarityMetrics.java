@@ -57,16 +57,23 @@ public class SimilarityMetrics {
         return mappedDescendants;
     }
     private static int numberOfMappedDescendants(Tree src, Tree dst, MultiMappingStore mappings) {
+//        Set<Tree> dstDescendants = new HashSet<>(dst.getCustomDescendants("Block"));
         Set<Tree> dstDescendants = new HashSet<>(dst.getDescendants());
         int mappedDescendants = 0;
 
         for (var srcDescendant : src.getDescendants()) {
             if (mappings.isSrcMapped(srcDescendant)) {
-                var dstForSrcDescendantList = mappings.getDstForSrc(srcDescendant);
+                Set<Tree> dstForSrcDescendantList = mappings.getDstForSrc(srcDescendant);
+
                 Tree dstDescendantsTree;
                 if (dstForSrcDescendantList.size() > 1)
                 {
-                    throw new RuntimeException();
+//                    throw new RuntimeException("here");
+                    for(Tree d : dstForSrcDescendantList)
+                       if (dstDescendants.contains(d)) {
+                           mappedDescendants++;
+                           break;
+                       }
                 }
                 dstDescendantsTree = mappings.getDstForSrc(srcDescendant).stream().toList().get(0);
                 if (dstDescendants.contains(dstDescendantsTree))

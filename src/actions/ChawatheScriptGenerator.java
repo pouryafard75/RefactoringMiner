@@ -87,13 +87,6 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
             Tree w;
             Tree y = x.getParent();
             Tree z = cpyMappings.getSrcForDst(y);
-            if (z == null)
-            {
-
-            }
-
-
-
             if (!cpyMappings.isDstMapped(x)) {
                 if(!multiMappingStore.isDstMultiMapped(x)) {
 
@@ -127,14 +120,23 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
                         actions.add(new Update(copyToOrig.get(w), x.getLabel()));
                         w.setLabel(x.getLabel());
                     }
-                    if (z != null)
-                    if (!z.equals(v)) {
-                        int k = findPos(x);
-                        Action mv = new Move(copyToOrig.get(w), copyToOrig.get(z), k);
-                        actions.add(mv);
-                        int oldk = w.positionInParent();
-                        w.getParent().getChildren().remove(oldk);
-                        z.insertChild(w, k);
+                    if (z != null) {
+                        if (!z.equals(v)) {
+                            int k = findPos(x);
+                            Action mv = new Move(copyToOrig.get(w), copyToOrig.get(z), k);
+                            actions.add(mv);
+                            int oldk = w.positionInParent();
+                            w.getParent().getChildren().remove(oldk);
+                            z.insertChild(w, k);
+                        }
+                    }
+                    else {
+                        if (multiMappingStore.isDstMultiMapped(y))
+                        {
+                            int k = findPos(x);
+                            Action mv = new Move(copyToOrig.get(w), null, k);
+                            actions.add(mv);
+                        }
                     }
                 }
             }
@@ -258,6 +260,7 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
     }
     public String findNameByTree(Map<String, TreeContext> contextMap, Tree t)
     {
+//        if (true) return "temp";
         for (Map.Entry<String, TreeContext> stringTreeContextEntry : contextMap.entrySet()) {
             if (stringTreeContextEntry.getValue().getRoot() == t.getFinalRoot())
             {

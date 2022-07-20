@@ -36,7 +36,6 @@ public abstract class AbstractITreeClassifier implements TreeClassifier {
     public AbstractITreeClassifier(ASTDiff diff) {
         this.diff = diff;
         classify();
-        System.out.println("ola");
     }
 
     protected abstract void classify();

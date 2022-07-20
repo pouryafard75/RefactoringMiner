@@ -46,7 +46,6 @@ public class ASTDiff {
     {
         this.editScript = new SimplifiedChawatheScriptGenerator().computeActions(this.mappings,parentContextMap,childContextMap);
         processMultiMaps(this.editScript);
-        System.out.println("ola");
     }
 
     private void processMultiMaps(EditScript editScript) {
