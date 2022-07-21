@@ -20,14 +20,14 @@
 
 .add {
 	border: 1px solid black;
-	/*background-color: MediumSeaGreen;*/
-	background-color: #8ceb34;;
+	background-color: MediumSeaGreen;
+	/*background-color: #8ceb34;;*/
 }
 
 .del {
 	border: 1px solid black;
-	/*background-color: IndianRed;*/
-	background-color: #f37998;
+	background-color: IndianRed;
+	/*background-color: #f37998;*/
 }
 
 .mv {
@@ -47,11 +47,13 @@
 
 .moveIn {
 	border: 4px solid #d2bada;
-	background-color: #8ceb34;
+	/*background-color: #8ceb34;*/
+	background-color: MediumSeaGreen;
 }
 .moveOut {
 	border: 4px solid #d2bada;
-	background-color: #f37998;
+	background-color: IndianRed;
+	/*background-color: #f37998;*/
 }
 
 .cupd {

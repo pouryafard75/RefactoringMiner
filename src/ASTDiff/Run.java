@@ -14,8 +14,13 @@ import java.io.IOException;
 
 public class Run {
     public static void main(String[] args) throws RefactoringMinerTimedOutException, IOException {
-        String path1 = "D:\\TestCases\\v1";
-        String path2 = "D:\\TestCases\\v2";
+//        String path1 = "D:\\TestCases\\v1";
+//        String path2 = "D:\\TestCases\\v2";
+        String path1 = "/Users/Pouria/Desktop/DebugCases/v1";
+        String path2 = "/Users/Pouria/Desktop/DebugCases/v2";
+//        String path1 = "/Users/Pouria/Desktop/DebugCases/distributed/v2";
+//        String path2 = "/Users/Pouria/Desktop/DebugCases/distributed/v1";
+
         long start = System.currentTimeMillis();
         UMLModel model1 = new UMLModelASTReader(new File(path1)).getUmlModel();
         UMLModel model2 = new UMLModelASTReader(new File(path2)).getUmlModel();
