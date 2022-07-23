@@ -33,6 +33,7 @@ public class ProjectASTDiffer
 {
     private static final boolean _POST_PROCESS = true;
     private static final boolean _TREE_MATCHING = true;
+    private boolean _CHECK_COMMENTS = false;
 
     private ProjectASTDiff projectASTDiff;
     private UMLModelDiff umlModelDiff;
@@ -101,7 +102,7 @@ public class ProjectASTDiffer
         processClassDeclarationMapping(srcTree,dstTree,classdiff,mappingStore);
         processAllMethods(srcTree,dstTree,classdiff.getOperationBodyMapperList(),mappingStore);
         processModelDiffRefactorings(srcTree,dstTree,classdiff,umlModelDiff.getRefactorings(),mappingStore);
-        addAndProcessComments(treeContextPair.first, treeContextPair.second,mappingStore);
+        if (_CHECK_COMMENTS) addAndProcessComments(treeContextPair.first, treeContextPair.second,mappingStore);
         return new ASTDiff(treeContextPair.first, treeContextPair.second, mappingStore);
     }
 
@@ -830,8 +831,10 @@ public class ProjectASTDiffer
     }
 
     private void processClassDeclarationMapping(Tree srcTree, Tree dstTree, UMLClassDiff classdiff, MultiMappingStore mappingStore) {
-        Tree srcTypeDeclartion = findByLocationInfo(srcTree,classdiff.getOriginalClass().getLocationInfo(),"TypeDeclaration");
-        Tree dstTypeDeclartion = findByLocationInfo(dstTree,classdiff.getNextClass().getLocationInfo(),"TypeDeclaration");
+        String AST_type = "TypeDeclaration";
+        if (classdiff.getOriginalClass().isEnum()) AST_type = "EnumDeclaration";
+        Tree srcTypeDeclartion = findByLocationInfo(srcTree,classdiff.getOriginalClass().getLocationInfo(),AST_type);
+        Tree dstTypeDeclartion = findByLocationInfo(dstTree,classdiff.getNextClass().getLocationInfo(),AST_type);
         mappingStore.addMapping(srcTypeDeclartion,dstTypeDeclartion);
         List<String> searchingTypes = new ArrayList<>();
         searchingTypes.add("AccessModifier");

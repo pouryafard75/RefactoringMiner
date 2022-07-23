@@ -50,8 +50,8 @@ public class Run {
 ////
 //        WebDiff webDiff = new WebDiff(projectASTDiffer);
 //        webDiff.run();
-        String repo = "https://github.com/pouryafard75/TestCases.git";
-        String commitId = "0ae8f723a59722694e394300656128f9136ef466";
+        String repo = "https://github.com/infinispan/infinispan.git";
+        String commitId = "043030723632627b0908dca6b24dae91d3dfd938";
         ProjectASTDiff projectASTDiff = new ProjectASTDiffer(repo, commitId).diff();
         WebDiff webDiff = new WebDiff(projectASTDiff);
         webDiff.run();
