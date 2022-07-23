@@ -51,6 +51,10 @@ public class DirectoryComparator {
             this.dirMode = false;
         }
     }
+    public DirectoryComparator()
+    {
+
+    }
 
     public void compare() {
         if (!dirMode)

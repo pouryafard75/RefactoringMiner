@@ -42,15 +42,15 @@ public final class VanillaDiffHtmlBuilder {
     private ArrayList<Tree> srcMM = new ArrayList<>();
     private ArrayList<Tree> dstMM = new ArrayList<>();
 
-    private File fSrc;
+    private String srcContent;
 
-    private File fDst;
+    private String dstContent;
 
     private ASTDiff diff;
 
-    public VanillaDiffHtmlBuilder(File fSrc, File fDst, ASTDiff diff) {
-        this.fSrc = fSrc;
-        this.fDst = fDst;
+    public VanillaDiffHtmlBuilder(String srcContent, String dstContent, ASTDiff diff) {
+        this.srcContent = srcContent;
+        this.dstContent = dstContent;
         this.diff = diff;
     }
 
@@ -141,11 +141,12 @@ public final class VanillaDiffHtmlBuilder {
         }
 
         StringWriter w1 = new StringWriter();
-        BufferedReader r = Files.newBufferedReader(fSrc.toPath(), Charset.forName("UTF-8"));
+//        BufferedReader r = Files.newBufferedReader(fSrc.toPath(), Charset.forName("UTF-8"));
+        Reader inputString = new StringReader(srcContent);
+        BufferedReader r = new BufferedReader(inputString);
         int cursor = 0;
-
-        while (r.ready()) {
-            char cr = (char) r.read();
+        for (char cr : srcContent.toCharArray())
+        {
             w1.append(ltags.getEndTags(cursor));
             w1.append(ltags.getStartTags(cursor));
             append(cr, w1);
@@ -156,11 +157,13 @@ public final class VanillaDiffHtmlBuilder {
         srcDiff = w1.toString();
 
         StringWriter w2 = new StringWriter();
-        r = Files.newBufferedReader(fDst.toPath(), Charset.forName("UTF-8"));
+//        r = Files.newBufferedReader(fDst.toPath(), Charset.forName("UTF-8"));
+        inputString = new StringReader(dstContent);
+        r = new BufferedReader(inputString);
         cursor = 0;
 
-        while (r.ready()) {
-            char cr = (char) r.read();
+        for (char cr : dstContent.toCharArray())
+        {
             w2.append(rtags.getEndTags(cursor));
             w2.append(rtags.getStartTags(cursor));
             append(cr, w2);

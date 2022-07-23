@@ -19,19 +19,21 @@ import static org.rendersnake.HtmlAttributesFactory.*;
 public class VanillaDiffView implements Renderable {
     private VanillaDiffHtmlBuilder rawHtmlDiff;
 
-    private File srcFile;
-    private File dstFile;
-
+    private String srcFileContent;
+    private String dstFileContent;
+    private String srcFileName;
+    private String dstFileName;
     private ASTDiff diff;
-
     private boolean dump;
 
-    public VanillaDiffView(File srcFile, File dstFile, ASTDiff diff, boolean dump) throws IOException {
-        this.srcFile = srcFile;
-        this.dstFile = dstFile;
+    public VanillaDiffView(String srcFileName, String dstFileName, String srcFileContent, String dstFileContent, ASTDiff diff, boolean dump) throws IOException {
+        this.srcFileName = srcFileName;
+        this.dstFileName = dstFileName;
+        this.srcFileContent = srcFileContent;
+        this.dstFileContent = dstFileContent;
         this.diff = diff;
         this.dump = dump;
-        rawHtmlDiff = new VanillaDiffHtmlBuilder(srcFile, dstFile, diff);
+        rawHtmlDiff = new VanillaDiffHtmlBuilder(srcFileContent, dstFileContent, diff);
         rawHtmlDiff.produce();
     }
 
@@ -48,11 +50,11 @@ public class VanillaDiffView implements Renderable {
                     ._div()
                     .div(class_("row"))
                         .div(class_("col-6"))
-                            .h5().content(srcFile.getName())
+                            .h5().content(srcFileName)
                             .pre(class_("pre-scrollable").id("left")).content(rawHtmlDiff.getSrcDiff(), false)
                         ._div()
                         .div(class_("col-6"))
-                            .h5().content(dstFile.getName())
+                            .h5().content(dstFileName)
                             .pre(class_("pre-scrollable").id("right")).content(rawHtmlDiff.getDstDiff(), false)
                         ._div()
                     ._div()

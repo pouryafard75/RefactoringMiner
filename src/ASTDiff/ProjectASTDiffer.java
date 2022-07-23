@@ -7,9 +7,12 @@ import gr.uom.java.xmi.diff.*;
 import jdt.CommentVisitor;
 import matchers.*;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.refactoringminer.api.GitHistoryRefactoringMiner;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import org.refactoringminer.api.RefactoringType;
+import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
+import org.refactoringminer.rm1.ProjectData;
 import tree.Tree;
 import tree.TreeContext;
 import tree.TreeUtils;
@@ -30,55 +33,38 @@ public class ProjectASTDiffer
 {
     private static final boolean _POST_PROCESS = true;
     private static final boolean _TREE_MATCHING = true;
-    private Map<String, ASTDiff> astDiffMap = new HashMap<>();
-    private UMLModelDiff umlModelDiff;
 
-    private String srcPath;
-    private String dstPath;
+    private ProjectASTDiff projectASTDiff;
+    private UMLModelDiff umlModelDiff;
 
     private static final int MIN_ACCEPTABLE_HIGHT = 0;
 
-    public String getSrcPath(){
-        return srcPath;
-    }
-    public String getDstPath(){
-        return dstPath;
-    }
 
     public ProjectASTDiffer(UMLModelDiff umlModelDiff) throws RefactoringMinerTimedOutException {
         this.umlModelDiff = umlModelDiff;
         umlModelDiff.getRefactorings();
-        this.srcPath = this.umlModelDiff.getParentModel().rootFolder.getAbsolutePath();
-        this.dstPath = this.umlModelDiff.getChildModel().rootFolder.getAbsolutePath();
+        //TODO
+//        this.srcPath = this.umlModelDiff.getParentModel().rootFolder.getAbsolutePath();
+//        this.dstPath = this.umlModelDiff.getChildModel().rootFolder.getAbsolutePath();
+    }
+    public ProjectASTDiffer(String repo, String commitId)
+    {
+        GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
+        projectASTDiff = new ProjectASTDiff();
+        this.projectASTDiff.setProjectData(miner.getProjectData(repo,commitId));
+        this.umlModelDiff = projectASTDiff.getProjectData().getUmlModelDiff();
+
     }
 
-    public void diff() throws RefactoringMinerTimedOutException {
+    public ProjectASTDiff diff() throws RefactoringMinerTimedOutException {
         this.commonClasses();
         computeAllEditScripts();
-    }
-    public ASTDiff getASTDiffbyFileName(String filename)
-    {
-        return this.astDiffMap.get(filename);
-    }
-
-    private void commonClasses() throws RefactoringMinerTimedOutException {
-        List<UMLClassDiff> commons = this.umlModelDiff.getCommonClassDiffList();
-        for (UMLClassDiff classdiff : commons) {
-            ASTDiff classASTDiff = process(classdiff, findTreeContexts(classdiff));
-            String fullPath = getSrcPath() + File.separator + classdiff.getOriginalClass().getSourceFile();
-
-            if (this.astDiffMap.containsKey(fullPath))
-            {
-                this.astDiffMap.get(fullPath).mappings.mergeMappings(classASTDiff.mappings);
-            }
-            else
-                this.astDiffMap.put(fullPath, classASTDiff);
-        }
+        return projectASTDiff;
     }
 
     public void computeAllEditScripts() {
 
-        for (Map.Entry<String,ASTDiff> entry : this.astDiffMap.entrySet())
+        for (Map.Entry<String,ASTDiff> entry : projectASTDiff.getAstDiffMap().entrySet())
         {
             entry.getValue().computeEditScript(
                     this.umlModelDiff.getParentModel().getTreeContextMap(),
@@ -86,6 +72,20 @@ public class ProjectASTDiffer
             );
         }
     }
+    private void commonClasses() throws RefactoringMinerTimedOutException {
+        List<UMLClassDiff> commons = this.umlModelDiff.getCommonClassDiffList();
+        for (UMLClassDiff classdiff : commons) {
+            ASTDiff classASTDiff = process(classdiff, findTreeContexts(classdiff));
+//            String fullPath = getSrcPath() + File.separator + classdiff.getOriginalClass().getSourceFile();
+            String fullPath = classdiff.getOriginalClass().getSourceFile();
+
+            if (projectASTDiff.isASTDiffAvailable(fullPath))
+                projectASTDiff.astDiffByName(fullPath).mappings.mergeMappings(classASTDiff.mappings);
+            else
+                projectASTDiff.addASTDiff(fullPath, classASTDiff);
+        }
+    }
+
 
     private ASTDiff process(UMLClassDiff classdiff, Pair<TreeContext, TreeContext> treeContextPair) throws RefactoringMinerTimedOutException {
         TreeContext srcTreeContext = treeContextPair.first;

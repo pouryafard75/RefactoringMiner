@@ -359,6 +359,53 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 		return refactoringsAtRevision;
 	}
 
+	public ProjectData getProjectData(String gitURL, String commitId)
+	{
+		ProjectData projectData = new ProjectData();
+		Set<String> repositoryDirectoriesBefore = ConcurrentHashMap.newKeySet();
+		Set<String> repositoryDirectoriesCurrent = ConcurrentHashMap.newKeySet();
+		Map<String, String> fileContentsBefore = new ConcurrentHashMap<String, String>();
+		Map<String, String> fileContentsCurrent = new ConcurrentHashMap<String, String>();
+		Map<String, String> renamedFilesHint = new ConcurrentHashMap<String, String>();
+		try {
+			populateWithGitHubAPI(gitURL, commitId, fileContentsBefore, fileContentsCurrent, renamedFilesHint, repositoryDirectoriesBefore, repositoryDirectoriesCurrent);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
+		try {
+			List<MoveSourceFolderRefactoring> moveSourceFolderRefactorings = processIdenticalFiles(fileContentsBefore, fileContentsCurrent, renamedFilesHint);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		UMLModel currentUMLModel = null;
+		try {
+			currentUMLModel = createModel(fileContentsCurrent, repositoryDirectoriesCurrent);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		UMLModel parentUMLModel = null;
+		try {
+			parentUMLModel = createModel(fileContentsBefore, repositoryDirectoriesBefore);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		UMLModelDiff modelDiff = null;
+		try {
+			modelDiff = parentUMLModel.diff(currentUMLModel);
+		} catch (RefactoringMinerTimedOutException e) {
+			throw new RuntimeException(e);
+		}
+		projectData.setFileContentsBefore(fileContentsBefore);
+		projectData.setFileContentsCurrent(fileContentsCurrent);
+		projectData.setRepositoryDirectoriesBefore(repositoryDirectoriesBefore);
+		projectData.setRepositoryDirectoriesCurrent(repositoryDirectoriesCurrent);
+		projectData.setRenamedFilesHint(renamedFilesHint);
+		projectData.setUmlModelDiff(modelDiff);
+		return projectData;
+	}
+
 	private void populateFileContents(File projectFolder, List<String> filePaths, Map<String, String> fileContents,	Set<String> repositoryDirectories) throws IOException {
 		for(String path : filePaths) {
 			String fullPath = projectFolder + File.separator + path.replaceAll("/", systemFileSeparator);
