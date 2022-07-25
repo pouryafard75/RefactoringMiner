@@ -56,6 +56,36 @@ public class ProjectASTDiffer
         this.umlModelDiff = projectASTDiff.getProjectData().getUmlModelDiff();
 
     }
+    public static int nthIndexOf(String text, char needle, int n)
+    {
+        for (int i = 0; i < text.length(); i++)
+        {
+            if (text.charAt(i) == needle)
+            {
+                n--;
+                if (n == 0)
+                {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+    public ProjectASTDiffer(String url)
+    {
+        this(getRepo(url),getCommit(url));
+    }
+
+    private static String getRepo(String url) {
+        int index = nthIndexOf(url,'/',5);
+        return url.substring(0,index) + ".git";
+    }
+
+    private static String getCommit(String url) {
+        int index = nthIndexOf(url,'/',6);
+        return url.substring(index+1);
+    }
+
 
     public ProjectASTDiff diff() throws RefactoringMinerTimedOutException {
         this.commonClasses();
@@ -239,6 +269,9 @@ public class ProjectASTDiffer
             if ( (srcStatementNode.getType().name.equals("TryStatement") && dstStatementNode.getType().name.equals("TryStatement")) ||
                     (srcStatementNode.getType().name.equals("CatchClause") && dstStatementNode.getType().name.equals("CatchClause")))
                 matchBlocks(srcStatementNode,dstStatementNode,mappingStore);
+
+
+
             CompositeStatementObject frag1Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment1());
             CompositeStatementObject frag2Comp = (CompositeStatementObject) (abstractCodeMapping.getFragment2());
 

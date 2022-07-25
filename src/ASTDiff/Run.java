@@ -50,9 +50,10 @@ public class Run {
 ////
 //        WebDiff webDiff = new WebDiff(projectASTDiffer);
 //        webDiff.run();
-        String repo = "https://github.com/infinispan/infinispan.git";
-        String commitId = "043030723632627b0908dca6b24dae91d3dfd938";
-        ProjectASTDiff projectASTDiff = new ProjectASTDiffer(repo, commitId).diff();
+        String url = null;
+//        url = "https://github.com/pedramnoori/RefactoringMiner/commit/13406bfa53f6b312981ae1086f51f7fd5d0208da";
+        url = "https://github.com/pouryafard75/TestCases/commit/9463e3067c44e7ed170d8cf159c1a7211c3993ff";
+        ProjectASTDiff projectASTDiff = new ProjectASTDiffer(url).diff();
         WebDiff webDiff = new WebDiff(projectASTDiff);
         webDiff.run();
 
