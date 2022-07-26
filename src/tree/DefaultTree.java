@@ -4,6 +4,8 @@ package tree;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 public class DefaultTree extends AbstractTree implements Tree {
@@ -44,7 +46,7 @@ public class DefaultTree extends AbstractTree implements Tree {
      * the local attributes of the given node, and not its parent and children.
      * @param other the model node, must be not null.
      */
-    protected DefaultTree(Tree other) {
+    public DefaultTree(Tree other) {
         this.type = other.getType();
         this.label = other.getLabel();
         this.pos = other.getPos();
@@ -57,6 +59,19 @@ public class DefaultTree extends AbstractTree implements Tree {
         Tree copy = new DefaultTree(this);
         for (Tree child : getChildren())
             copy.addChild(child.deepCopy());
+        return copy;
+    }
+
+    @Override
+    public Tree deepCustomCopy() {
+        Tree copy = new DefaultTree(this);
+        for (Tree child : getChildren()) {
+            if (
+                    !child.getType().name.equals("Block")
+//                    && !child.getType().name.equals("LambdaExpression")
+            )
+                copy.addChild(child.deepCustomCopy());
+        }
         return copy;
     }
 

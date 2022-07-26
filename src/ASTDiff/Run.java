@@ -51,8 +51,8 @@ public class Run {
 //        WebDiff webDiff = new WebDiff(projectASTDiffer);
 //        webDiff.run();
         String url = null;
-//        url = "https://github.com/pedramnoori/RefactoringMiner/commit/13406bfa53f6b312981ae1086f51f7fd5d0208da";
-        url = "https://github.com/pouryafard75/TestCases/commit/9463e3067c44e7ed170d8cf159c1a7211c3993ff";
+        url = "https://github.com/pouryafard75/TestCases/commit/e47272d6e1390b6366f577b84c58eae50f8f0a69";
+        url = "https://github.com/pouryafard75/TestCases/commit/0ae8f723a59722694e394300656128f9136ef466";
         ProjectASTDiff projectASTDiff = new ProjectASTDiffer(url).diff();
         WebDiff webDiff = new WebDiff(projectASTDiff);
         webDiff.run();

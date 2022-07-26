@@ -35,14 +35,16 @@ public class MultiMappingStore implements Iterable<Mapping> {
     public final TreeContext srcTC;
     public final TreeContext dstTC;
 
-    public final Tree src;
-    public final Tree dst;
+    public Tree src;
+    public Tree dst;
 
     public MultiMappingStore(TreeContext srcTC, TreeContext dstTC) {
         this.srcTC = srcTC;
         this.dstTC = dstTC;
-        this.src = srcTC.getRoot();
-        this.dst = dstTC.getRoot();
+        if (srcTC != null && dstTC != null) {
+            this.src = srcTC.getRoot();
+            this.dst = dstTC.getRoot();
+        }
         srcToDsts_all = new LinkedHashMap<>();
         dstToSrcs_all = new LinkedHashMap<>();
     }

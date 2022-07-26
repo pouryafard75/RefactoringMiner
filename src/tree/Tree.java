@@ -2,6 +2,7 @@
 
 package tree;
 
+import gr.uom.java.xmi.LocationInfo;
 import gr.uom.java.xmi.UMLComment;
 
 import java.util.*;
@@ -260,6 +261,17 @@ public interface Tree {
      */
     Tree deepCopy();
 
+
+    default Tree deepCustomCopy() { return null;}
+
+    static Tree deepCopyWithMap(Tree tree,Map<Tree,Tree> cpyMap) {
+        Tree copy = new DefaultTree(tree);
+        cpyMap.put(copy,tree);
+        for (Tree child : tree.getChildren())
+            copy.addChild(deepCopyWithMap(child,cpyMap));
+        return copy;
+    }
+
     /**
      * Indicates whether the node has a label or not.
      */
@@ -405,4 +417,15 @@ public interface Tree {
      * Returns an iterator for all metadata of this node.
      */
     Iterator<Entry<String, Object>> getMetadata();
+
+    static Tree findByLocationInfo(Tree tree, LocationInfo locationInfo){
+        int startoffset = locationInfo.getStartOffset();
+        int endoffset = locationInfo.getEndOffset();
+        return tree.getTreeBetweenPositions(startoffset, endoffset);
+    }
+    static Tree findByLocationInfo(Tree tree, LocationInfo locationInfo, String type){
+        int startoffset = locationInfo.getStartOffset();
+        int endoffset = locationInfo.getEndOffset();
+        return tree.getTreeBetweenPositions(startoffset, endoffset,type);
+    }
 }
