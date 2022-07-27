@@ -6,8 +6,8 @@ import java.util.*;
 
 public class MultiMoveActionGenerator{
     private Map<Set<Tree>, Set<Tree>> fullMap;
-    private Map<Tree,List<Action>> actionMapSrc = new HashMap<>();
-    private Map<Tree,List<Action>> actionMapDst = new HashMap<>();
+    private Map<Tree,List<MultiMove>> actionMapSrc = new HashMap<>();
+    private Map<Tree,List<MultiMove>> actionMapDst = new HashMap<>();
 
     ArrayList<Action> actions;
     private static int counter = 0;
@@ -45,14 +45,18 @@ public class MultiMoveActionGenerator{
         return actions;
     }
     private void removeActionsForThisTreeFromSrc(Tree t){
-        List<Action> mappedDst = actionMapSrc.get(t);
-        for(Action action : mappedDst)
-            actions.remove(action);
+        List<MultiMove> mappedDst = actionMapSrc.get(t);
+        for(MultiMove action : mappedDst) {
+            if (!action.isUpdated())
+                actions.remove(action);
+
+        }
     }
     private void removeActionsForThisTreeFromDst(Tree t){
-        List<Action> mappedDst = actionMapDst.get(t);
-        for(Action action : mappedDst)
-            actions.remove(action);
+        List<MultiMove> mappedDst = actionMapDst.get(t);
+        for(MultiMove action : mappedDst)
+            if (!action.isUpdated())
+                actions.remove(action);
     }
 
 
@@ -62,7 +66,10 @@ public class MultiMoveActionGenerator{
         {
             for (Tree dstTree : dstTrees)
             {
-                Action action = new MultiMove(srcTree,dstTree,-1, counter + 1);
+                boolean updated = false;
+                if (srcTree.isLeaf() && dstTree.isLeaf())
+                    updated = (srcTree.getMetrics().hash != dstTree.getMetrics().hash);
+                MultiMove action = new MultiMove(srcTree,dstTree,-1, counter + 1,updated);
                 actions.add(action);
                 if (!actionMapSrc.containsKey(srcTree))
                     actionMapSrc.put(srcTree,new ArrayList<>());

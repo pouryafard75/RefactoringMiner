@@ -17,41 +17,9 @@ import java.util.List;
 
 public class Run {
     public static void main(String[] args) throws RefactoringMinerTimedOutException, IOException {
-//        String path1 = "D:\\TestCases\\v1";
-//        String path2 = "D:\\TestCases\\v2";
-//        String path1 = "/Users/Pouria/Desktop/DebugCases/v1";
-//        String path2 = "/Users/Pouria/Desktop/DebugCases/v2";
-//        String path1 = "/Users/Pouria/Desktop/DebugCases/distributed/v2";
-//        String path2 = "/Users/Pouria/Desktop/DebugCases/distributed/v1";
-
-//        long start = System.currentTimeMillis();
-//        UMLModel model1 = new UMLModelASTReader(new File(path1)).getUmlModel();
-//        UMLModel model2 = new UMLModelASTReader(new File(path2)).getUmlModel();
-//        UMLModelDiff modelDiff = model1.diff(model2);
-//        long refminer_execution_end = System.currentTimeMillis();
-//        System.out.println("RefactoringMiner executed in " + (refminer_execution_end - start) / 1000 + "s");
-//        ProjectASTDiffer projectASTDiffer = new ProjectASTDiffer(modelDiff);
-//        projectASTDiffer.diff();
-//        long astdiffer_execution_end = System.currentTimeMillis();
-//        System.out.println("ProjectASTDiffer executed in " + (astdiffer_execution_end - refminer_execution_end) / 1000 + "s");
-//
-//        String path1 = "D:\\TestCases\\temp\\v1";
-//        String path2 = "D:\\TestCases\\temp\\v2";
-//        long start = System.currentTimeMillis();
-//        UMLModel model1 = new UMLModelASTReader(new File(path1)).getUmlModel();
-//        UMLModel model2 = new UMLModelASTReader(new File(path2)).getUmlModel();
-//        UMLModelDiff modelDiff = model1.diff(model2);
-//        long refminer_execution_end = System.currentTimeMillis();
-//        System.out.println("RefactoringMiner executed in " + (refminer_execution_end - start) / 1000 + "s");
-//        ProjectASTDiffer projectASTDiffer = new ProjectASTDiffer(modelDiff);
-//        projectASTDiffer.diff();
-//        long astdiffer_execution_end = System.currentTimeMillis();
-//        System.out.println("ProjectASTDiffer executed in " + (astdiffer_execution_end - refminer_execution_end) / 1000 + "s");
-////
-//        WebDiff webDiff = new WebDiff(projectASTDiffer);
-//        webDiff.run();
         String url = null;
-        url = "https://github.com/pouryafard75/TestCases/commit/e47272d6e1390b6366f577b84c58eae50f8f0a69";
+        url = "https://github.com/pouryafard75/TestCases/commit/e6095071d214cd73c05a65ac2d122da54d00db7b";
+        url = "https://github.com/pouryafard75/TestCases/commit/3eedc184815d0618239abe00bb88816d71da3313";
         url = "https://github.com/pouryafard75/TestCases/commit/0ae8f723a59722694e394300656128f9136ef466";
         ProjectASTDiff projectASTDiff = new ProjectASTDiffer(url).diff();
         WebDiff webDiff = new WebDiff(projectASTDiff);

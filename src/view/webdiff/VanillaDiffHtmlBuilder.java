@@ -31,6 +31,7 @@ public final class VanillaDiffHtmlBuilder {
     private static final String MoveOut_SPAN = "<span class=\"%s\" data-toggle=\"tooltip\" title=\"%s\">";
 
     private static final String MM_SPAN = "<span class=\"%s\" gid=\"%x\" data-title=\"%s\">";
+
     private static final String UPD_SPAN = "<span class=\"cupd\">";
     private static final String ID_SPAN = "<span class=\"marker\" id=\"mapping-%d\"></span>";
     private static final String END_SPAN = "</span>";
@@ -88,8 +89,11 @@ public final class VanillaDiffHtmlBuilder {
                 if (!srcMM.contains(t)) {
                     int gid = ((MultiMove) (c.getMultiMapSrc().get(t))).getGroupId();
                     ltags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
+                    boolean updated = ((MultiMove) (c.getMultiMapSrc().get(t))).isUpdated();
+                    String htmlClass = "token mm";
+                    if (updated) htmlClass += " updated";
                     ltags.addTags(t.getPos(), String.format(
-                        MM_SPAN, "token mm", gid,  tooltip(diff.srcTC, t)), t.getEndPos(), END_SPAN);
+                        MM_SPAN, htmlClass, gid,  tooltip(diff.srcTC, t)), t.getEndPos(), END_SPAN);
                     srcMM.add(t);
                 }
             }
@@ -126,9 +130,12 @@ public final class VanillaDiffHtmlBuilder {
             if (c.getMultiMapDst().containsKey(t)) {
                 if (!dstMM.contains(t)) {
                     int gid = ((MultiMove) (c.getMultiMapDst().get(t))).getGroupId();
+                    boolean updated = ((MultiMove) (c.getMultiMapDst().get(t))).isUpdated();
                     rtags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
+                    String htmlClass = "token mm";
+                    if (updated) htmlClass += " updated";
                     rtags.addTags(t.getPos(), String.format(
-                            MM_SPAN, "token mm", gid,  tooltip(diff.srcTC, t)), t.getEndPos(), END_SPAN);
+                            MM_SPAN, htmlClass, gid,  tooltip(diff.srcTC, t)), t.getEndPos(), END_SPAN);
                     dstMM.add(t);
                 }
             }
