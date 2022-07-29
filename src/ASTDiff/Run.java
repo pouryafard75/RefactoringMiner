@@ -18,9 +18,7 @@ import java.util.List;
 public class Run {
     public static void main(String[] args) throws RefactoringMinerTimedOutException, IOException {
         String url = null;
-        url = "https://github.com/pouryafard75/TestCases/commit/e6095071d214cd73c05a65ac2d122da54d00db7b";
-        url = "https://github.com/pouryafard75/TestCases/commit/3eedc184815d0618239abe00bb88816d71da3313";
-        url = "https://github.com/pouryafard75/TestCases/commit/0ae8f723a59722694e394300656128f9136ef466";
+        url =  "https://github.com/pouryafard75/TestCases/commit/794576dfbd289c2ac361882ff22de3ee4aa1a36c";
         ProjectASTDiff projectASTDiff = new ProjectASTDiffer(url).diff();
         WebDiff webDiff = new WebDiff(projectASTDiff);
         webDiff.run();

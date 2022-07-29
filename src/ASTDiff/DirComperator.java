@@ -1,18 +1,17 @@
 package ASTDiff;
-import org.refactoringminer.rm1.ProjectData;
 import utils.Pair;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class DirComperator {
     private final Map<String, String> fileContentsBeforeMap;
     private final Map<String, String> fileContentsAfterMap;
+    private final ProjectASTDiff projectASTDiff;
+
 
     private Set<String> removedFilesName;
     private Set<String> addedFilesName;
-    private Set<String> modifiedFilesName;
+    private List<DiffInfo> diffInfos = new ArrayList<>();
 
     public Set<String> getRemovedFilesName() {
         return removedFilesName;
@@ -22,22 +21,23 @@ public class DirComperator {
         return addedFilesName;
     }
 
-    public Set<String> getModifiedFilesName() {
-        return modifiedFilesName;
+    public List<DiffInfo> getModifiedFilesName() {
+        return diffInfos;
     }
-
-    public Pair<String,String> getFileContentsPair(String id)
+    public Pair<String,String> getFileContentsPair(int id)
     {
+        DiffInfo diffInfo = getDiffInfo(id);
         return new Pair<>(
-                fileContentsBeforeMap.get(id),
-                fileContentsAfterMap.get(id)
+                fileContentsBeforeMap.get(diffInfo.first),
+                fileContentsAfterMap.get(diffInfo.second)
         );
     }
 
-    public DirComperator(ProjectData projectData)
+    public DirComperator(ProjectASTDiff projectASTDiff)
     {
-        this.fileContentsAfterMap = projectData.getFileContentsCurrent();
-        this.fileContentsBeforeMap = projectData.getFileContentsBefore();
+        this.projectASTDiff = projectASTDiff;
+        this.fileContentsAfterMap = projectASTDiff.getProjectData().getFileContentsCurrent();
+        this.fileContentsBeforeMap = projectASTDiff.getProjectData().getFileContentsBefore();
         compare();
     }
 
@@ -46,17 +46,16 @@ public class DirComperator {
         Set<String> afterFiles = fileContentsAfterMap.keySet();
 
         removedFilesName = new HashSet<>(beforeFiles);
-        addedFilesName= new HashSet<>(afterFiles);
+        addedFilesName = new HashSet<>(afterFiles);
 
-        removedFilesName.removeAll(afterFiles);
-        addedFilesName.removeAll(beforeFiles);
-        Set<String> commonFiles = new HashSet<>(beforeFiles);
-        commonFiles.retainAll(afterFiles);
-        modifiedFilesName = new HashSet<>();
+        for (DiffInfo diffInfo : projectASTDiff.getAstDiffMap().keySet()) {
+            diffInfos.add(diffInfo);
+            removedFilesName.remove(diffInfo.first);
+            addedFilesName.remove(diffInfo.second);
+        }
+    }
 
-        //TODO :
-        for (String commonFile : commonFiles)
-            if (!fileContentsBeforeMap.get(commonFile).equals(fileContentsAfterMap.get(commonFile)))
-                modifiedFilesName.add(commonFile);
+    public DiffInfo getDiffInfo(int id) {
+        return diffInfos.get(id);
     }
 }

@@ -1,6 +1,9 @@
 package view.webdiff;
 
 import actions.ASTDiff;
+import io.DirectoryComparator;
+import org.eclipse.jdt.core.dom.AST;
+import org.refactoringminer.rm1.ProjectData;
 import utils.Pair;
 import org.rendersnake.HtmlCanvas;
 import org.rendersnake.Renderable;
@@ -11,8 +14,11 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import ASTDiff.ProjectASTDiff;
+import java.util.Map;
+import ASTDiff.DiffInfo;
 import ASTDiff.DirComperator;
+
+import ASTDiff.ProjectASTDiff;
 
 import static spark.Spark.*;
 
@@ -30,16 +36,13 @@ public class WebDiff  {
     }
 
     public void run() {
-        //TODO:
-//        DirectoryComparator comparator = new DirectoryComparator();
-
-        DirComperator comparator = new DirComperator(projectASTDiff.getProjectData());
-        configureSpark(comparator, this.port);
+        DirComperator comperator = new DirComperator(projectASTDiff);
+        configureSpark(comperator, this.port);
         Spark.awaitInitialization();
         System.out.println(String.format("Starting server: %s:%d.", "http://127.0.0.1", this.port));
     }
 
-    public void configureSpark(final DirComperator comparator, int port) {
+    public void configureSpark(final DirComperator comperator, int port) {
         port(port);
         staticFiles.location("/web/");
         get("/", (request, response) -> {
@@ -50,16 +53,17 @@ public class WebDiff  {
             return "";
         });
         get("/list", (request, response) -> {
-            Renderable view = new DirectoryDiffView(comparator);
+            Renderable view = new DirectoryDiffView(comperator);
             return render(view);
         });
         get("/vanilla-diff/:id", (request, response) -> {
-//            int id = Integer.parseInt(request.params(":id"));
-            String id = (request.params(":id"));
-            String _id = id.replace("*","/");
-            Pair<String, String> pair = comparator.getFileContentsPair(_id);
-            ASTDiff diff = projectASTDiff.astDiffByName(_id);
-            Renderable view = new VanillaDiffView(_id,_id,pair.first, pair.second, diff, false);
+            int id = Integer.parseInt(request.params(":id"));
+//            String id = (request.params(":id"));
+//            String _id = id.replace("*","/");
+            Pair<String, String> pair = comperator.getFileContentsPair(id);
+            DiffInfo diffInfo = comperator.getDiffInfo(id);
+            ASTDiff diff = projectASTDiff.getASTDiff(diffInfo);
+            Renderable view = new VanillaDiffView(diffInfo.first,diffInfo.second,pair.first, pair.second, diff, false);
             return render(view);
         });
 //        get("/monaco-diff/:id", (request, response) -> {
@@ -77,17 +81,17 @@ public class WebDiff  {
 //            return render(view);
 //        });
         get("/left/:id", (request, response) -> {
-//            int id = Integer.parseInt(request.params(":id"));
-            String id = (request.params(":id"));
-            String _id = id.replace("*","/");
-            Pair<String, String> pair = comparator.getFileContentsPair(_id);
+            int id = Integer.parseInt(request.params(":id"));
+//            String id = (request.params(":id"));
+//            String _id = id.replace("*","/");
+            Pair<String, String> pair = comperator.getFileContentsPair(id);
             return pair.first;
         });
         get("/right/:id", (request, response) -> {
-//            int id = Integer.parseInt(request.params(":id"));
-            String id = (request.params(":id"));
-            String _id = id.replace("*","/");
-            Pair<String, String> pair = comparator.getFileContentsPair(_id);
+            int id = Integer.parseInt(request.params(":id"));
+//            String id = (request.params(":id"));
+//            String _id = id.replace("*","/");
+            Pair<String, String> pair = comperator.getFileContentsPair(id);
             return pair.second;
         });
         get("/quit", (request, response) -> {

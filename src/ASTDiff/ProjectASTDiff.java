@@ -4,33 +4,43 @@ package ASTDiff;
 import actions.ASTDiff;
 import org.eclipse.jdt.core.dom.AST;
 import org.refactoringminer.rm1.ProjectData;
+import tree.Tree;
 
 import java.util.HashMap;
 import java.util.Map;
 public class ProjectASTDiff {
 
-    private final Map<String, ASTDiff> astDiffMap;
+    private final Map<DiffInfo, ASTDiff> astDiffMap;
     private ProjectData projectData;
     ProjectASTDiff()
     {
         astDiffMap = new HashMap<>();
     }
 
-    public Map<String, ASTDiff> getAstDiffMap() {
+    public Map<DiffInfo, ASTDiff> getAstDiffMap() {
         return astDiffMap;
     }
 
-    public ASTDiff astDiffByName(String filename)
+    public ASTDiff getASTDiff(DiffInfo diffInfo)
     {
-        return this.astDiffMap.get(filename);
+        for (Map.Entry<DiffInfo,ASTDiff> mapped : astDiffMap.entrySet())
+            if (mapped.getKey().first.equals(diffInfo.first) && mapped.getKey().second.equals(diffInfo.second))
+                return mapped.getValue();
+        return null;
     }
-    public boolean isASTDiffAvailable(String path)
-    {
-        return this.astDiffMap.containsKey(path);
+    public boolean isASTDiffAvailable(DiffInfo diffInfo) {
+        for (DiffInfo dInfo : astDiffMap.keySet())
+            if (dInfo.first.equals(diffInfo.first) && dInfo.second.equals(diffInfo.second))
+                return true;
+        return false;
     }
-    public void addASTDiff(String path, ASTDiff astDiff)
+
+    public void addASTDiff(DiffInfo diffInfo, ASTDiff astDiff)
     {
-        this.astDiffMap.put(path, astDiff);
+        if (this.isASTDiffAvailable(diffInfo))
+            this.getASTDiff(diffInfo).mappings.mergeMappings(astDiff.mappings);
+        else
+            this.astDiffMap.put(diffInfo, astDiff);
     }
 
     public ProjectData getProjectData() {

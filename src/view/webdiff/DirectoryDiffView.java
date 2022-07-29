@@ -3,6 +3,8 @@
 package view.webdiff;
 
 
+import ASTDiff.DiffInfo;
+import ASTDiff.ProjectASTDiff;
 import utils.Pair;
 import io.DirectoryComparator;
 import org.rendersnake.DocType;
@@ -19,10 +21,11 @@ import ASTDiff.DirComperator;
 import static org.rendersnake.HtmlAttributesFactory.*;
 
 public class DirectoryDiffView implements Renderable {
-    private DirComperator comparator;
+    private final DirComperator comperator;
 
-    public DirectoryDiffView(DirComperator comparator) throws IOException {
-        this.comparator = comparator;
+    public DirectoryDiffView(DirComperator comperator) {
+        this.comperator = comperator;
+
     }
 
     @Override
@@ -42,10 +45,10 @@ public class DirectoryDiffView implements Renderable {
                                 .div(class_("card-header"))
                                     .h4(class_("card-title mb-0"))
                                         .write("Modified files ")
-                                        .span(class_("badge badge-secondary")).content(comparator.getModifiedFilesName().size())
+                                        .span(class_("badge badge-secondary")).content(comperator.getModifiedFilesName().size())
                                     ._h4()
                                 ._div()
-                                .render_if(new ModifiedFiles(comparator.getModifiedFilesName()), comparator.getModifiedFilesName().size() > 0)
+                                .render_if(new ModifiedFiles(comperator.getModifiedFilesName()), comperator.getModifiedFilesName().size() > 0)
                             ._div()
                         ._div()
                     ._div()
@@ -55,11 +58,11 @@ public class DirectoryDiffView implements Renderable {
                                 .div(class_("card-header bg-danger"))
                                     .h4(class_("card-title mb-0"))
                                         .write("Deleted files ")
-                                        .span(class_("badge badge-secondary")).content(comparator.getRemovedFilesName().size())
+                                        .span(class_("badge badge-secondary")).content(comperator.getRemovedFilesName().size())
                                     ._h4()
                                 ._div()
-                                .render_if(new AddedOrDeletedFiles(comparator.getRemovedFilesName()),
-                comparator.getRemovedFilesName().size() > 0)
+                                .render_if(new AddedOrDeletedFiles(comperator.getRemovedFilesName()),
+                                        comperator.getRemovedFilesName().size() > 0)
                             ._div()
                         ._div()
                         .div(class_("col"))
@@ -67,11 +70,11 @@ public class DirectoryDiffView implements Renderable {
                                 .div(class_("card-header bg-success"))
                                     .h4(class_("card-title mb-0"))
                                         .write("Added files ")
-                                        .span(class_("badge badge-secondary")).content(comparator.getAddedFilesName().size())
+                                        .span(class_("badge badge-secondary")).content(comperator.getAddedFilesName().size())
                                     ._h4()
                                 ._div()
-                                .render_if(new AddedOrDeletedFiles(comparator.getAddedFilesName()),
-                comparator.getAddedFilesName().size() > 0)
+                                .render_if(new AddedOrDeletedFiles(comperator.getAddedFilesName()),
+                                        comperator.getAddedFilesName().size() > 0)
                             ._div()
                         ._div()
                     ._div()
@@ -83,10 +86,10 @@ public class DirectoryDiffView implements Renderable {
     private static class ModifiedFiles implements Renderable {
 //        private List<Pair<File, File>> files;
 
-        private Set<String> files;
+        private List<DiffInfo> diffInfos;
 
-        private ModifiedFiles(Set<String> files) {
-            this.files = files;
+        private ModifiedFiles(List<DiffInfo> diffInfos) {
+            this.diffInfos = diffInfos;
         }
 
         @Override
@@ -95,22 +98,19 @@ public class DirectoryDiffView implements Renderable {
             .table(class_("table card-table table-striped table-condensed mb-0"))
                 .tbody();
 
-
-
             int id = 0;
-            for (String fileName:  files) {
-                String fileName_ = fileName.replace("/","*");
+            for (DiffInfo diffInfo: diffInfos) {
                 tbody
                 .tr()
 //                    .td().content(comparator.getSrc().toAbsolutePath().relativize(file.first.toPath().toAbsolutePath()).toString())
-                    .td().content(fileName)
+                    .td().content(diffInfo.getInfo())
                     .td()
                         .div(class_("btn-toolbar justify-content-end"))
                             .div(class_("btn-group"))
                                 //TODO: integrate this with the -g option
 //                                .if_(TreeGenerators.getInstance().hasGeneratorForFile(file.first.getAbsolutePath()))
 //                                    .a(class_("btn btn-primary btn-sm").href("/monaco-diff/" + id)).content("monaco")
-                                    .a(class_("btn btn-primary btn-sm").href("/vanilla-diff/" + fileName_)).content("classic")
+                                    .a(class_("btn btn-primary btn-sm").href("/vanilla-diff/" + id)).content("classic")
 //                                ._if()
 //                                .a(class_("btn btn-primary btn-sm").href("/monaco-native-diff/" + id)).content("monaco-native")
 //                                .a(class_("btn btn-primary btn-sm").href("/mergely-diff/" + id)).content("mergely")
