@@ -18,20 +18,13 @@ import static org.rendersnake.HtmlAttributesFactory.*;
 
 public class VanillaDiffView implements Renderable {
     private VanillaDiffHtmlBuilder rawHtmlDiff;
-
-    private String srcFileContent;
-    private String dstFileContent;
     private String srcFileName;
     private String dstFileName;
-    private ASTDiff diff;
     private boolean dump;
 
     public VanillaDiffView(String srcFileName, String dstFileName, String srcFileContent, String dstFileContent, ASTDiff diff, boolean dump) throws IOException {
         this.srcFileName = srcFileName;
         this.dstFileName = dstFileName;
-        this.srcFileContent = srcFileContent;
-        this.dstFileContent = dstFileContent;
-        this.diff = diff;
         this.dump = dump;
         rawHtmlDiff = new VanillaDiffHtmlBuilder(srcFileContent, dstFileContent, diff);
         rawHtmlDiff.produce();

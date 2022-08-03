@@ -14,16 +14,16 @@ import java.io.IOException;
 import static org.rendersnake.HtmlAttributesFactory.*;
 
 public class MonacoDiffView implements Renderable {
-    private File srcFile;
-    private File dstFile;
+    private String srcFileName;
+    private String dstFileName;
 
     private ASTDiff diff;
 
     private int id;
 
-    public MonacoDiffView(File fSrc, File fDst, ASTDiff diff, int id) {
-        this.srcFile = fSrc;
-        this.dstFile = fDst;
+    public MonacoDiffView(String srcFileName, String dstFileName,  String srcFileContent, String dstFileContent, ASTDiff diff, int id, boolean dump) {
+        this.srcFileName = srcFileName;
+        this.dstFileName = dstFileName;
         this.diff = diff;
         this.id = id;
     }
@@ -41,16 +41,16 @@ public class MonacoDiffView implements Renderable {
                     ._div()
                     .div(class_("row h-100"))
                         .div(class_("col-6 h-100"))
-                            .h5().content(srcFile.getName())
+                            .h5().content(srcFileName)
                             .div(id("left-container").style("height: calc(100% - 80px); border:1px solid grey;"))._div()
                         ._div()
                         .div(class_("col-6 h-100"))
-                            .h5().content(dstFile.getName())
+                            .h5().content(dstFileName)
                             .div(id("right-container").style("height: calc(100% - 80px); border:1px solid grey;"))._div()
                         ._div()
                     ._div()
                 ._div()
-                .macros().script("config = { file: \"" + srcFile.getName() + "\", left: " + getLeftJsConfig()
+                .macros().script("config = { file: \"" + srcFileName + "\", left: " + getLeftJsConfig()
                                  + ", right: " + getRightJsConfig()
                                  + ", mappings: " + getMappingsJsConfig() + "};")
                 .macros().javascript("/monaco/min/vs/loader.js")

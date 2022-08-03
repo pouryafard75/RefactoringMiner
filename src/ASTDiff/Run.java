@@ -23,13 +23,10 @@ public class Run {
 //        url =  "https://github.com/belaban/JGroups/commit/f1533756133dec84ce8218202585ac85904da7c9";
 //        url =  "https://github.com/tsantalis/RefactoringMiner/commit/a3160cbac6ec8a0ce1664b07010bbc617f18ad6f";
         url =  "https://github.com/tsantalis/RefactoringMiner/commit/fbd80e76c68558ba58b62311aa1c34fb38baf53a";
-//        url =  "https://github.com/pouryafard75/TestCases/commit/d3c7d0c4f295e2a29e61f9ecdc3721cabdd851df";
+        url = "https://github.com/pouryafard75/TestCases/commit/0ae8f723a59722694e394300656128f9136ef466";
         ProjectASTDiff projectASTDiff = new ProjectASTDiffer(url).diff();
         WebDiff webDiff = new WebDiff(projectASTDiff);
         webDiff.run();
-
-        System.out.println();
-
     }
 }
 

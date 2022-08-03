@@ -58,21 +58,20 @@ public class WebDiff  {
         });
         get("/vanilla-diff/:id", (request, response) -> {
             int id = Integer.parseInt(request.params(":id"));
-//            String id = (request.params(":id"));
-//            String _id = id.replace("*","/");
             Pair<String, String> pair = comperator.getFileContentsPair(id);
             DiffInfo diffInfo = comperator.getDiffInfo(id);
             ASTDiff diff = projectASTDiff.getASTDiff(diffInfo);
             Renderable view = new VanillaDiffView(diffInfo.first,diffInfo.second,pair.first, pair.second, diff, false);
             return render(view);
         });
-//        get("/monaco-diff/:id", (request, response) -> {
-//            int id = Integer.parseInt(request.params(":id"));
-//            Pair<File, File> pair = comparator.getModifiedFiles().get(id);
-//            ASTDiff diff = projectASTDiff.astDiffByName(pair.first.getAbsolutePath());
-//            Renderable view = new MonacoDiffView(pair.first, pair.second, diff, id);
-//            return render(view);
-//        });
+        get("/monaco-diff/:id", (request, response) -> {
+            int id = Integer.parseInt(request.params(":id"));
+            Pair<String, String> pair = comperator.getFileContentsPair(id);
+            DiffInfo diffInfo = comperator.getDiffInfo(id);
+            ASTDiff diff = projectASTDiff.getASTDiff(diffInfo);
+            Renderable view = new MonacoDiffView(diffInfo.first,diffInfo.second,pair.first, pair.second, diff,  id,false);
+            return render(view);
+        });
 //        get("/raw-diff/:id", (request, response) -> {
 //            int id = Integer.parseInt(request.params(":id"));
 //            Pair<File, File> pair = comparator.getModifiedFiles().get(id);

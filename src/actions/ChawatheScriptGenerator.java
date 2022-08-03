@@ -151,11 +151,15 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
         for (Tree w : cpySrc.postOrder()) {
             if (!cpyMappings.isSrcMapped(w) && !multiMappingStore.isSrcMultiMapped(copyToOrig.get(w))) {
                     actions.add(new Delete(copyToOrig.get(w)));
-            }
-            else if(!origDst.getDescendantsAndItself().contains(cpyMappings.getDstForSrc(w)) && !multiMappingStore.isSrcMultiMapped(copyToOrig.get(w))) {
-                Tree a = cpyMappings.getDstForSrc(w);
-                actions.add(new MoveOut(copyToOrig.get(w),cpyMappings.getDstForSrc(w),findNameByTree(childContextMap,a),+1));
 
+            }
+            else if (!multiMappingStore.isSrcMultiMapped(copyToOrig.get(w)))
+            {
+                if (!cpyMappings.getDstForSrc(w).getFinalRoot().equals(origDst))
+                {
+                        Tree a = cpyMappings.getDstForSrc(w);
+                        actions.add(new MoveOut(copyToOrig.get(w),cpyMappings.getDstForSrc(w),findNameByTree(childContextMap,a),+1));
+                }
             }
         }
         return actions;
