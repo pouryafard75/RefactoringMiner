@@ -29,9 +29,12 @@ public class ProjectASTDiffer
 
     public ProjectASTDiffer(String repo, String commitId)
     {
+        long RMiner_started = System.currentTimeMillis();
         GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
         projectASTDiff = new ProjectASTDiff();
         this.projectASTDiff.setProjectData(miner.getProjectData(repo,commitId));
+        long RMiner_finished = System.currentTimeMillis();
+        System.out.println("RefMiner execution: " + (RMiner_finished - RMiner_started) / 1000 + " seconds");
 
     }
     public ProjectASTDiffer(String url)
@@ -66,16 +69,19 @@ public class ProjectASTDiffer
 
 
     public ProjectASTDiff diff() throws RefactoringMinerTimedOutException {
+        long diff_execution_started = System.currentTimeMillis();
         makeASTDiff(this.projectASTDiff.getProjectData().getUmlModelDiff().getCommonClassDiffList());
         makeASTDiff(this.projectASTDiff.getProjectData().getUmlModelDiff().getClassRenameDiffList());
 //        makeASTDiff(this.projectASTDiff.getProjectData().getUmlModelDiff().getClassMoveDiffList());
-
+        long diff_execution_finished =  System.currentTimeMillis();
+        System.out.println("Diff execution: " + (diff_execution_finished - diff_execution_started)/ 1000 + " seconds");
         computeAllEditScripts();
+
         return projectASTDiff;
     }
 
     public void computeAllEditScripts() {
-
+        long editScript_start = System.currentTimeMillis();
         for (Map.Entry<DiffInfo,ASTDiff> entry : projectASTDiff.getAstDiffMap().entrySet())
         {
             entry.getValue().computeEditScript(
@@ -83,6 +89,8 @@ public class ProjectASTDiffer
                     this.projectASTDiff.getProjectData().getUmlModelDiff().getChildModel().getTreeContextMap()
             );
         }
+        long editScript_end = System.currentTimeMillis();
+        System.out.println("EditScirpt execution: " + (editScript_end - editScript_start)/ 1000 + " seconds");
     }
     private void makeASTDiff(List<? extends UMLClassBaseDiff> umlClassBaseDiffList) throws RefactoringMinerTimedOutException {
         for (UMLClassBaseDiff classdiff : umlClassBaseDiffList) {
@@ -94,12 +102,19 @@ public class ProjectASTDiffer
             projectASTDiff.addASTDiff(diffInfo,classASTDiff);
         }
     }
+
+    private Pair<TreeContext, TreeContext> findTreeContexts(UMLClassBaseDiff classDiff) {
+        return new Pair<>
+                (this.projectASTDiff.getProjectData().getUmlModelDiff().getParentModel().getTreeContextMap()
+                        .get(classDiff.getOriginalClass().getSourceFile()),
+                        this.projectASTDiff.getProjectData().getUmlModelDiff().getChildModel().getTreeContextMap().
+                                get(classDiff.getNextClass().getSourceFile()));
+    }
     private ASTDiff process(UMLClassBaseDiff classdiff, Pair<TreeContext, TreeContext> treeContextPair) throws RefactoringMinerTimedOutException {
         TreeContext srcTreeContext = treeContextPair.first;
         TreeContext dstTreeContext = treeContextPair.second;
         Tree srcTree = srcTreeContext.getRoot();
         Tree dstTree = dstTreeContext.getRoot();
-
         MultiMappingStore mappingStore = new MultiMappingStore(srcTreeContext,dstTreeContext);
         mappingStore.addMapping(srcTree,dstTree);
         processRefactorings(srcTree,dstTree,classdiff.getRefactorings(),mappingStore);
@@ -108,7 +123,7 @@ public class ProjectASTDiffer
         processClassDeclarationMapping(srcTree,dstTree,classdiff,mappingStore);
         processAllMethods(srcTree,dstTree,classdiff.getOperationBodyMapperList(),mappingStore);
         processModelDiffRefactorings(srcTree,dstTree,classdiff,this.projectASTDiff.getProjectData().getUmlModelDiff().getRefactorings(),mappingStore);
-        if (_CHECK_COMMENTS) addAndProcessComments(treeContextPair.first, treeContextPair.second,mappingStore);
+//        if (_CHECK_COMMENTS) addAndProcessComments(treeContextPair.first, treeContextPair.second,mappingStore);
         return new ASTDiff(treeContextPair.first, treeContextPair.second, mappingStore);
     }
 
@@ -234,11 +249,14 @@ public class ProjectASTDiffer
         CompositeStatementObjectMapping compositeStatementObjectMapping = (CompositeStatementObjectMapping) abstractCodeMapping;
         Tree srcStatementNode =Tree.findByLocationInfo(srcTree,compositeStatementObjectMapping.getFragment1().getLocationInfo());
         Tree dstStatementNode =Tree.findByLocationInfo(dstTree,compositeStatementObjectMapping.getFragment2().getLocationInfo());
-        if (srcStatementNode.getMetrics().hash == dstStatementNode.getMetrics().hash)
+        // TODO: 8/2/2022 Need to rethink regarding the logic asap, with this logic , we might see a huge drop in performance
+
+//        if (srcStatementNode.getMetrics().hash == dstStatementNode.getMetrics().hash)
+//        {
+//            mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
+//        }
+//        else
         {
-            mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
-        }
-        else {
             mappingStore.addMapping(srcStatementNode,dstStatementNode);
             if ( (srcStatementNode.getType().name.equals("TryStatement") && dstStatementNode.getType().name.equals("TryStatement")) ||
                     (srcStatementNode.getType().name.equals("CatchClause") && dstStatementNode.getType().name.equals("CatchClause")))
@@ -283,6 +301,7 @@ public class ProjectASTDiffer
             if (matched != null)
                 mappingStore.addMapping(matched.first,matched.second);
     }
+
     private void processComments(Pair<List<Tree>, List<Tree>> addedCommentsPair, MultiMappingStore mappingStore) {
         List<Tree> srcComments = addedCommentsPair.first;
         List<Tree> dstComments = addedCommentsPair.second;
@@ -307,17 +326,17 @@ public class ProjectASTDiffer
             }
             else
             {
-                //TODO: ignore so far
+                //TODO: ignore at the moment
             }
         }
     }
 
     private Pair<List<Tree> , List<Tree>> addComments(TreeContext first, TreeContext second) {
-        CommentVisitor firstCommentVisior = new CommentVisitor(first);
-        firstCommentVisior.addCommentToProperSubtree();
+        CommentVisitor firstCommentVisitor = new CommentVisitor(first);
+        firstCommentVisitor.addCommentToProperSubtree();
         CommentVisitor secondCommentVisitor = new CommentVisitor(second);
         secondCommentVisitor.addCommentToProperSubtree();
-        return new Pair<>(firstCommentVisior.getComments(),secondCommentVisitor.getComments());
+        return new Pair<>(firstCommentVisitor.getComments(),secondCommentVisitor.getComments());
     }
 
     private void processClassJavaDocs(Tree srcTree, Tree dstTree, UMLClassBaseDiff classdiff, MultiMappingStore mappingStore) {
@@ -326,7 +345,8 @@ public class ProjectASTDiffer
         if (javadoc1 != null && javadoc2 != null) {
             Tree srcJavaDocNode =Tree.findByLocationInfo(srcTree, javadoc1.getLocationInfo());
             Tree dstJavaDocNode =Tree.findByLocationInfo(dstTree, javadoc2.getLocationInfo());
-            mappingStore.addMappingRecursively(srcJavaDocNode,dstJavaDocNode);
+            if (javadoc1.equalText(javadoc2))
+                mappingStore.addMappingRecursively(srcJavaDocNode,dstJavaDocNode);
         }
     }
 
@@ -339,23 +359,6 @@ public class ProjectASTDiffer
                 Tree dstJavaDocNode =Tree.findByLocationInfo(dstTree,javadoc2.getLocationInfo());
                 mappingStore.addMappingRecursively(srcJavaDocNode,dstJavaDocNode);
             }
-        return pairlist;
-    }
-
-    private List<Pair<Tree, Tree>> processCommentsInsideMethod(Tree srcTree, Tree dstTree ,UMLOperation operation1, UMLOperation operation2) {
-        List<Pair<Tree,Tree>> pairlist = new ArrayList<>();
-        List<UMLComment> operation1Comments = operation1.getComments();
-        List<UMLComment> operation2Comments = operation1.getComments();
-        for(UMLComment umlComment1 : operation1Comments)
-        {
-            for(UMLComment umlComment2 : operation2Comments)
-            {
-                if (umlComment1.getText().equals(umlComment2.getText()))
-                {
-                    pairlist.add(new Pair<>(Tree.findByLocationInfo(srcTree,umlComment1.getLocationInfo()),Tree.findByLocationInfo(dstTree,umlComment2.getLocationInfo())));
-                }
-            }
-        }
         return pairlist;
     }
 
@@ -438,7 +441,7 @@ public class ProjectASTDiffer
         }
     }
 
-    private void processClassImplemetedInterfaces(Tree srcTree, Tree dstTree, UMLClassBaseDiff classdiff, MultiMappingStore mappingStore) {
+    private void processClassImplementedInterfaces(Tree srcTree, Tree dstTree, UMLClassBaseDiff classdiff, MultiMappingStore mappingStore) {
         List<UMLType> srcImplementedInterfaces = classdiff.getOriginalClass().getImplementedInterfaces();
         List<UMLType> dstImplementedInterfaces = classdiff.getNextClass().getImplementedInterfaces();
         List<UMLType> removedOnes = classdiff.getRemovedImplementedInterfaces();
@@ -644,7 +647,7 @@ public class ProjectASTDiffer
             mappingStore.addMappingRecursively(srcTypeParam,dstTypeParam);
         }
         processSuperClass(srcTypeDeclartion,dstTypeDeclartion,classdiff,mappingStore);
-        processClassImplemetedInterfaces(srcTypeDeclartion,dstTypeDeclartion,classdiff,mappingStore);
+        processClassImplementedInterfaces(srcTypeDeclartion,dstTypeDeclartion,classdiff,mappingStore);
         processClassAttributes(srcTree,dstTree,classdiff,mappingStore);
         processClassJavaDocs(srcTypeDeclartion,dstTypeDeclartion,classdiff,mappingStore);
         processClassAnnotations(srcTypeDeclartion,dstTypeDeclartion,classdiff.getAnnotationListDiff(),mappingStore);
@@ -660,13 +663,6 @@ public class ProjectASTDiffer
         }
     }
 
-    private Pair<TreeContext, TreeContext> findTreeContexts(UMLClassBaseDiff classDiff) {
-        return new Pair<>
-                (this.projectASTDiff.getProjectData().getUmlModelDiff().getParentModel().getTreeContextMap()
-                        .get(classDiff.getOriginalClass().getSourceFile()),
-                 this.projectASTDiff.getProjectData().getUmlModelDiff().getChildModel().getTreeContextMap().
-                         get(classDiff.getNextClass().getSourceFile()));
-    }
 }
 
 

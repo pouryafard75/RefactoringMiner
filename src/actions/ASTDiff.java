@@ -25,7 +25,7 @@ public class ASTDiff {
     /**
      * The edit script between the two ASTs.
      */
-    private EditScript editScript;
+    private EditScript editScript = new EditScript();
 
     public EditScript getEditScript() {
         return editScript;
@@ -52,6 +52,7 @@ public class ASTDiff {
 //        ArrayList<Action> multiMoves = new ArrayList<>();
         Map<Tree, Set<Tree>> dstToSrcMultis = mappings.dstToSrcMultis();
         MultiMoveActionGenerator multiMoveActionGenerator = new MultiMoveActionGenerator();
+
         for(Map.Entry<Tree, Set<Tree>> entry : dstToSrcMultis.entrySet())
         {
             Set<Tree> srcTrees = entry.getValue();

@@ -19,8 +19,8 @@ public class BasicTreeMatcher implements TreeMatcher {
     public void match(Tree src, Tree dst, AbstractCodeMapping abstractCodeMapping, MultiMappingStore mappingStore) {
         basicMatcher(src, dst, mappingStore);
     }
-
-    public void basicMatcher(Tree src, Tree dst, MultiMappingStore mappingStore) {
+    public void step1(Tree src,Tree dst, MultiMappingStore mappingStore)
+    {
         Function<Tree, Integer> HEIGHT_PRIORITY_CALCULATOR = (Tree t) -> t.getMetrics().height;
         PriorityTreeQueue srcTrees = new DefaultPriorityTreeQueue(src, MIN_ACCEPTABLE_HIGHT, HEIGHT_PRIORITY_CALCULATOR);
         PriorityTreeQueue dstTrees = new DefaultPriorityTreeQueue(dst, MIN_ACCEPTABLE_HIGHT, HEIGHT_PRIORITY_CALCULATOR);
@@ -35,7 +35,10 @@ public class BasicTreeMatcher implements TreeMatcher {
                 pair.second.forEach(tree -> dstTrees.open(tree));
             });
         }
-        greedyMatcher(src, dst, mappingStore);
+    }
+    public void basicMatcher(Tree src, Tree dst, MultiMappingStore mappingStore) {
+        step1(src,dst,mappingStore);
+        greedyMatcher(src,dst,mappingStore);
     }
 
     public void greedyMatcher(Tree src, Tree dst, MultiMappingStore mappings) {
@@ -67,7 +70,22 @@ public class BasicTreeMatcher implements TreeMatcher {
                 }
 
                 if (best != null) {
-                    mappings.addMapping(t, best);
+                    if (!mappings.isDstMapped(best))
+                        mappings.addMapping(t, best);
+                    else
+                    {
+                        Set<Tree> srcForDst = mappings.getSrcForDst(best);
+                        boolean _check = true;
+                        for (Tree srcMapped : srcForDst)
+                            if (src.getDescendants().contains(srcMapped))
+                            {
+                                _check = false;
+                                break;
+                            }
+                        if (_check)
+                            mappings.addMapping(t, best);
+                    }
+                    // TODO: 8/2/2022 Might be mapped from other trees but it must be discarded
                 }
             }
         }

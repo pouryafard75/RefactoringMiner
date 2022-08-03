@@ -110,7 +110,7 @@ public class DirectoryDiffView implements Renderable {
                                 //TODO: integrate this with the -g option
 //                                .if_(TreeGenerators.getInstance().hasGeneratorForFile(file.first.getAbsolutePath()))
 //                                    .a(class_("btn btn-primary btn-sm").href("/monaco-diff/" + id)).content("monaco")
-                                    .a(class_("btn btn-primary btn-sm").href("/vanilla-diff/" + id)).content("classic")
+                                    .a(class_("btn btn-primary btn-sm").href("/vanilla-diff/" + id)).content("Diff")
 //                                ._if()
 //                                .a(class_("btn btn-primary btn-sm").href("/monaco-native-diff/" + id)).content("monaco-native")
 //                                .a(class_("btn btn-primary btn-sm").href("/mergely-diff/" + id)).content("mergely")
