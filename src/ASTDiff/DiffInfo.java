@@ -18,6 +18,6 @@ public class DiffInfo extends Pair<String,String> {
         if (first.equals(second))
             return first;
         else
-            return first + " ------> " + second;
+            return first + " --> " + second;
     }
 }

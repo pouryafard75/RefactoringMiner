@@ -75,6 +75,8 @@ public class MonacoDiffView implements Renderable {
                 appendRange(b, t, "deleted", null);
             if (c.getSrcMoveOutTreeMap().containsKey(t))
                 appendRange(b,t,"moveOut", c.getSrcMoveOutTreeMap().get(t).toString());
+            if (c.getMultiMapSrc().containsKey(t))
+                appendRange(b,t,"mm",null);
         }
         b.append("]").append(",");
         b.append("}");
@@ -96,7 +98,8 @@ public class MonacoDiffView implements Renderable {
                 appendRange(b, t, "inserted",null);
             if (c.getDstMoveInTreeMap().containsKey(t))
                 appendRange(b,t,"moveIn",c.getDstMoveInTreeMap().get(t).toString());
-//            if (c.getDstMoveInTreeMap().co)
+            if (c.getMultiMapDst().containsKey(t))
+                appendRange(b,t,"mm",null);
         }
         b.append("]").append(",");
         b.append("}");
