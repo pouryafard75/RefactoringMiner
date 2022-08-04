@@ -68,11 +68,13 @@ public class MonacoDiffView implements Renderable {
         b.append("ranges: [");
         for (Tree t: diff.srcTC.getRoot().preOrder()) {
             if (c.getMovedSrcs().contains(t))
-                appendRange(b, t, "moved");
+                appendRange(b, t, "moved", null);
             if (c.getUpdatedSrcs().contains(t))
-                appendRange(b, t, "updated");
+                appendRange(b, t, "updated", null);
             if (c.getDeletedSrcs().contains(t))
-                appendRange(b, t, "deleted");
+                appendRange(b, t, "deleted", null);
+            if (c.getSrcMoveOutTreeMap().containsKey(t))
+                appendRange(b,t,"moveOut", c.getSrcMoveOutTreeMap().get(t).toString());
         }
         b.append("]").append(",");
         b.append("}");
@@ -87,11 +89,14 @@ public class MonacoDiffView implements Renderable {
         b.append("ranges: [");
         for (Tree t: diff.dstTC.getRoot().preOrder()) {
             if (c.getMovedDsts().contains(t))
-                appendRange(b, t, "moved");
+                appendRange(b, t, "moved",null);
             if (c.getUpdatedDsts().contains(t))
-                appendRange(b, t, "updated");
+                appendRange(b, t, "updated",null);
             if (c.getInsertedDsts().contains(t))
-                appendRange(b, t, "inserted");
+                appendRange(b, t, "inserted",null);
+            if (c.getDstMoveInTreeMap().containsKey(t))
+                appendRange(b,t,"moveIn",c.getDstMoveInTreeMap().get(t).toString());
+//            if (c.getDstMoveInTreeMap().co)
         }
         b.append("]").append(",");
         b.append("}");
@@ -112,13 +117,15 @@ public class MonacoDiffView implements Renderable {
         return b.toString();
     }
 
-    private void appendRange(StringBuilder b, Tree t, String kind) {
+    private void appendRange(StringBuilder b, Tree t, String kind, String tip) {
+        String tooltip = tooltip(t);
+        if (tip != null) tooltip = tip;
         b.append("{")
                 .append("from: ").append(t.getPos())
                 .append(",").append("to: ").append(t.getEndPos()).append(",")
                 .append("index: ").append(t.getMetrics().depth).append(",")
                 .append("kind: ").append("\"" + kind + "\"").append(",")
-                .append("tooltip: ").append("\"" + tooltip(t) + "\"").append(",")
+                .append("tooltip: ").append("\"" + tooltip + "\"").append(",")
                 .append("}").append(",");
     }
 
