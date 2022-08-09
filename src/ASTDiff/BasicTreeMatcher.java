@@ -113,7 +113,7 @@ public class BasicTreeMatcher implements TreeMatcher {
                     if (!(mappings.isDstMapped(parent)))
                         candidates.add(parent);
                     else {
-                        List<Tree> mappedParent = mappings.getSrcForDst(parent).stream().toList();
+                        List<Tree> mappedParent = new ArrayList<>(mappings.getSrcForDst(parent));
                         boolean flag = true;
                         for (Tree mp : mappedParent) {
                             if (checkingInsideDst.getDescendantsAndItself().contains(mp)) {

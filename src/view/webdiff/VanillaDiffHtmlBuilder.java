@@ -12,9 +12,6 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 import java.io.*;
-import java.lang.reflect.Array;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,17 +62,17 @@ public final class VanillaDiffHtmlBuilder {
         TagIndex ltags = new TagIndex();
         for (Tree t: diff.srcTC.getRoot().preOrder()) {
             if (c.getMovedSrcs().contains(t)) {
-                mappingIds.put(diff.mappings.getDstForSrc(t,0), mId);
+                mappingIds.put(diff.mappings.getDstForSrc_temp(t), mId);
                 ltags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
                 ltags.addTags(t.getPos(), String.format(
                                 SRC_MV_SPAN, "token mv", mId++, tooltip(diff.srcTC, t)), t.getEndPos(), END_SPAN);
             }
             if (c.getUpdatedSrcs().contains(t)) {
-                mappingIds.put(diff.mappings.getDstForSrc(t,0), mId);
+                mappingIds.put(diff.mappings.getDstForSrc_temp(t), mId);
                 ltags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
                 ltags.addTags(t.getPos(), String.format(
                                 SRC_MV_SPAN, "token upd", mId++, tooltip(diff.srcTC, t)), t.getEndPos(), END_SPAN);
-                List<int[]> hunks = SequenceAlgorithms.hunks(t.getLabel(), diff.mappings.getDstForSrc(t,0).getLabel());
+                List<int[]> hunks = SequenceAlgorithms.hunks(t.getLabel(), diff.mappings.getDstForSrc_temp(t).getLabel());
                 for (int[] hunk: hunks)
                     ltags.addTags(t.getPos() + hunk[0], UPD_SPAN, t.getPos() + hunk[1], END_SPAN);
 
@@ -118,7 +115,7 @@ public final class VanillaDiffHtmlBuilder {
                 rtags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
                 rtags.addTags(t.getPos(), String.format(
                                 DST_MV_SPAN, "token upd", dId, tooltip(diff.dstTC, t)), t.getEndPos(), END_SPAN);
-                List<int[]> hunks = SequenceAlgorithms.hunks(diff.mappings.getSrcForDst(t,0).getLabel(), t.getLabel());
+                List<int[]> hunks = SequenceAlgorithms.hunks(diff.mappings.getSrcForDst_temp(t).getLabel(), t.getLabel());
                 for (int[] hunk: hunks)
                     rtags.addTags(t.getPos() + hunk[2], UPD_SPAN, t.getPos() + hunk[3], END_SPAN);
             }

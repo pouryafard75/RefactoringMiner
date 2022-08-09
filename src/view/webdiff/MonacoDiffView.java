@@ -8,7 +8,6 @@ import org.rendersnake.DocType;
 import org.rendersnake.HtmlCanvas;
 import org.rendersnake.Renderable;
 
-import java.io.File;
 import java.io.IOException;
 
 import static org.rendersnake.HtmlAttributesFactory.*;
@@ -112,7 +111,7 @@ public class MonacoDiffView implements Renderable {
         b.append("[");
         for (Tree t: diff.srcTC.getRoot().preOrder()) {
             if (c.getMovedSrcs().contains(t) || c.getUpdatedSrcs().contains(t)) {
-                Tree d = diff.mappings.getDstForSrc(t,0);
+                Tree d = diff.mappings.getDstForSrc_temp(t);
                 b.append(String.format("[%s, %s, %s, %s], ", t.getPos(), t.getEndPos(), d.getPos(), d.getEndPos()));
             }
         }

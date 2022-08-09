@@ -56,7 +56,7 @@ public class ASTDiff {
         for(Map.Entry<Tree, Set<Tree>> entry : dstToSrcMultis.entrySet())
         {
             Set<Tree> srcTrees = entry.getValue();
-            Set<Tree> dstTrees = mappings.getDstForSrc(srcTrees.stream().toList().get(0));
+            Set<Tree> dstTrees = mappings.getDstForSrc(srcTrees.iterator().next());
             multiMoveActionGenerator.addMapping(srcTrees,dstTrees);
         }
         editScript.addAll(multiMoveActionGenerator.generate());

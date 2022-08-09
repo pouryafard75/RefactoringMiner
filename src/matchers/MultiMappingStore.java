@@ -53,7 +53,7 @@ public class MultiMappingStore implements Iterable<Mapping> {
             return false;
         if (dstToSrcs_all.get(dstTree).size() > 1)
             return true;
-        Tree mappedSrc = dstToSrcs_all.get(dstTree).stream().toList().get(0);
+        Tree mappedSrc = dstToSrcs_all.get(dstTree).iterator().next();
         if (!srcToDsts_all.containsKey(mappedSrc))
             return false;
         return srcToDsts_all.get(mappedSrc).size() > 1;
@@ -63,7 +63,7 @@ public class MultiMappingStore implements Iterable<Mapping> {
             return false;
         if (srcToDsts_all.get(srcTree).size() > 1)
             return true;
-        Tree mappedSrc = srcToDsts_all.get(srcTree).stream().toList().get(0);
+        Tree mappedSrc = srcToDsts_all.get(srcTree).iterator().next();
         if (!dstToSrcs_all.containsKey(mappedSrc))
             return false;
         return dstToSrcs_all.get(mappedSrc).size() > 1;
@@ -74,8 +74,8 @@ public class MultiMappingStore implements Iterable<Mapping> {
         {
             if (srcToDsts_all.get(_src).size() > 1)
                 continue;
-            Tree _dst = srcToDsts_all.get(_src).stream().toList().get(0);
-            if (dstToSrcs_all.get(_dst).stream().toList().size() > 1)
+            Tree _dst = srcToDsts_all.get(_src).iterator().next();
+            if (dstToSrcs_all.get(_dst).size() > 1)
                 continue;
             monos.put(_src,_dst);
         }
@@ -87,8 +87,8 @@ public class MultiMappingStore implements Iterable<Mapping> {
         {
             if (dstToSrcs_all.get(_dst).size() > 1)
                 continue;
-            Tree _src = dstToSrcs_all.get(_dst).stream().toList().get(0);
-            if (srcToDsts_all.get(_src).stream().toList().size() > 1)
+            Tree _src = dstToSrcs_all.get(_dst).iterator().next();
+            if (srcToDsts_all.get(_src).size() > 1)
                 continue;
             monos.put(_dst,_src);
         }
@@ -126,7 +126,7 @@ public class MultiMappingStore implements Iterable<Mapping> {
                 multis.put(_dst,dstToSrcs_all.get(_dst));
             else
             {
-                Tree mappedSrc = dstToSrcs_all.get(_dst).stream().toList().get(0);
+                Tree mappedSrc = dstToSrcs_all.get(_dst).iterator().next();
                 if (srcToDsts_all.get(mappedSrc).size() > 1)
                     multis.put(_dst,dstToSrcs_all.get(_dst));
             }
@@ -141,7 +141,7 @@ public class MultiMappingStore implements Iterable<Mapping> {
                 multis.put(_src,srcToDsts_all.get(_src));
             else
             {
-                Tree mappedSrc = srcToDsts_all.get(_src).stream().toList().get(0);
+                Tree mappedSrc = srcToDsts_all.get(_src).iterator().next();
                 if (dstToSrcs_all.get(mappedSrc).size() > 1)
                     multis.put(_src,srcToDsts_all.get(_src));
             }
@@ -179,17 +179,18 @@ public class MultiMappingStore implements Iterable<Mapping> {
         return srcToDsts_all.get(src);
     }
 
-    public Tree getDstForSrc(Tree src,int idx) {
+    public Tree getDstForSrc_temp(Tree src) {
         //TODO:
-        return srcToDsts_all.get(src).stream().toList().get(idx);
+        return srcToDsts_all.get(src).iterator().next();
     }
 
     public Set<Tree> getSrcForDst(Tree dst) {
         return dstToSrcs_all.get(dst);
     }
-    public Tree getSrcForDst(Tree dst,int idx) {
+
+    public Tree getSrcForDst_temp(Tree dst) {
         //TODO:
-        return dstToSrcs_all.get(dst).stream().toList().get(idx);
+        return dstToSrcs_all.get(dst).iterator().next();
     }
 
     public Set<Tree> allMappedSrcs() {

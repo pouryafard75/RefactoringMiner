@@ -75,7 +75,7 @@ public class SimilarityMetrics {
                            break;
                        }
                 }
-                dstDescendantsTree = mappings.getDstForSrc(srcDescendant).stream().toList().get(0);
+                dstDescendantsTree = mappings.getDstForSrc(srcDescendant).iterator().next();
                 if (dstDescendants.contains(dstDescendantsTree))
                     mappedDescendants++;
             }

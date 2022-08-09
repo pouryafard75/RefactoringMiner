@@ -19,6 +19,7 @@ import utils.Pair;
 
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static tree.TreeUtils.findChildByTypeAndLabel;
 
@@ -131,8 +132,8 @@ public class ProjectASTDiffer
             UMLModelDiff umlModelDiff = this.projectASTDiff.getProjectData().getUmlModelDiff();
             for(Refactoring refactoring : refactorings)
             {
-                List<String> beforeRefactoringClasses = refactoring.getInvolvedClassesBeforeRefactoring().stream().map(ImmutablePair::getRight).toList();
-                List<String> afterRefactoringClasses = refactoring.getInvolvedClassesAfterRefactoring().stream().map(ImmutablePair::getRight).toList();
+                List<String> beforeRefactoringClasses = refactoring.getInvolvedClassesBeforeRefactoring().stream().map(ImmutablePair::getRight).collect(Collectors.toList());
+                List<String> afterRefactoringClasses = refactoring.getInvolvedClassesAfterRefactoring().stream().map(ImmutablePair::getRight).collect(Collectors.toList());
                 if (afterRefactoringClasses.contains(classDiff.getNextClass().getName()))
                 {
                     if (refactoring.getRefactoringType().equals(RefactoringType.PUSH_DOWN_OPERATION))
@@ -437,13 +438,13 @@ public class ProjectASTDiffer
                 VariableDeclaration newVariable = mergeVariableRefactoring.getNewVariable();
                 Tree dstVariableType =Tree.findByLocationInfo(dstTree,newVariable.getType().getLocationInfo());
                 Tree dstVariableDeclaration =Tree.findByLocationInfo(dstTree,newVariable.getLocationInfo());
-                List<Tree> dstChildrenList = dstVariableDeclaration.getChildren().stream().toList();
+                List<Tree> dstChildrenList = dstVariableDeclaration.getChildren();
                 Tree dstVarName = dstChildrenList.get(dstChildrenList.size() - 1);
                 for (VariableDeclaration variableDeclaration : mergedVariables)
                 {
                     Tree srcVariableDeclaration =Tree.findByLocationInfo(srcTree,variableDeclaration.getLocationInfo());
                     Tree srcVariableType =Tree.findByLocationInfo(srcTree,variableDeclaration.getType().getLocationInfo());
-                    List<Tree> srcChildrenList = srcVariableDeclaration.getChildren().stream().toList();
+                    List<Tree> srcChildrenList = srcVariableDeclaration.getChildren();
                     Tree srcVarName = srcChildrenList.get(srcChildrenList.size() - 1);
 //                    mappingStore.addMapping(srcVariableDeclaration,dstVariableDeclaration);
                     mappingStore.addMapping(srcVariableType,dstVariableType.getChild(0));
