@@ -12,12 +12,15 @@ import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import org.refactoringminer.api.RefactoringType;
 import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
+import org.refactoringminer.rm1.ProjectData;
 import tree.Tree;
 import tree.TreeContext;
 import tree.TreeUtils;
 import utils.Pair;
 
 
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,21 +29,32 @@ import static tree.TreeUtils.findChildByTypeAndLabel;
 public class ProjectASTDiffer
 {
     private final boolean _CHECK_COMMENTS = false;
-    private final ProjectASTDiff projectASTDiff;
+    private ProjectASTDiff projectASTDiff;
 
-    public ProjectASTDiffer(String repo, String commitId)
-    {
-        long RMiner_started = System.currentTimeMillis();
-        GitHistoryRefactoringMiner miner = new GitHistoryRefactoringMinerImpl();
-        projectASTDiff = new ProjectASTDiff();
-        this.projectASTDiff.setProjectData(miner.getProjectData(repo,commitId));
-        long RMiner_finished = System.currentTimeMillis();
-        System.out.println("RefMiner execution: " + (RMiner_finished - RMiner_started) / 1000 + " seconds");
-
+    public ProjectASTDiff getProjectASTDiff() {
+        return projectASTDiff;
     }
-    public ProjectASTDiffer(String url)
+
+    private static ProjectASTDiffer fromRepoCommit(String repo, String commitId)
     {
-        this(getRepo(url),getCommit(url));
+        return new ProjectASTDiffer(new GitHistoryRefactoringMinerImpl().getProjectData(repo,commitId));
+    }
+    public static ProjectASTDiffer fromLocalDirectories(String dir1path, String dir2path) throws IOException, RefactoringMinerTimedOutException
+    {
+        return new ProjectASTDiffer(UMLModelASTReader.makeProjectData(dir1path,dir2path));
+    }
+    public static ProjectASTDiffer fromLocalFiles(String file1, String file2) throws IOException, RefactoringMinerTimedOutException {
+        //TODO: RefactoringMiner doesnt support pair of files at the moment.
+//        return null;
+        return new ProjectASTDiffer(UMLModelASTReader.makeProjectData_fromFiles(file1,file2));
+    }
+    public static ProjectASTDiffer fromURL(String url)
+    {
+        return ProjectASTDiffer.fromRepoCommit(getRepo(url),getCommit(url));
+    }
+    private ProjectASTDiffer(ProjectData projectData){
+        this.projectASTDiff = new ProjectASTDiff();
+        this.getProjectASTDiff().setProjectData(projectData);
     }
 
     private static String getRepo(String url) {
@@ -52,7 +66,7 @@ public class ProjectASTDiffer
         int index = nthIndexOf(url,'/',6);
         return url.substring(index+1);
     }
-    public static int nthIndexOf(String text, char needle, int n)
+    private static int nthIndexOf(String text, char needle, int n)
     {
         for (int i = 0; i < text.length(); i++)
         {
@@ -81,7 +95,7 @@ public class ProjectASTDiffer
         return projectASTDiff;
     }
 
-    public void computeAllEditScripts() {
+    private void computeAllEditScripts() {
         long editScript_start = System.currentTimeMillis();
         for (Map.Entry<DiffInfo,ASTDiff> entry : projectASTDiff.getAstDiffMap().entrySet())
         {

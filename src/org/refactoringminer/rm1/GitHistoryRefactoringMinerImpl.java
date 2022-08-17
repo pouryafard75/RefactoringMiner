@@ -399,10 +399,10 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 		}
 		projectData.setFileContentsBefore(fileContentsBefore);
 		projectData.setFileContentsCurrent(fileContentsCurrent);
-		projectData.setRepositoryDirectoriesBefore(repositoryDirectoriesBefore);
-		projectData.setRepositoryDirectoriesCurrent(repositoryDirectoriesCurrent);
-		projectData.setRenamedFilesHint(renamedFilesHint);
 		projectData.setUmlModelDiff(modelDiff);
+//		projectData.setRepositoryDirectoriesBefore(repositoryDirectoriesBefore);
+//		projectData.setRepositoryDirectoriesCurrent(repositoryDirectoriesCurrent);
+//		projectData.setRenamedFilesHint(renamedFilesHint);
 		return projectData;
 	}
 
