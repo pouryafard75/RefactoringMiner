@@ -12,9 +12,10 @@ public class ProjectASTDiff {
 
     private final Map<DiffInfo, ASTDiff> astDiffMap;
     private ProjectData projectData;
-    ProjectASTDiff()
+    ProjectASTDiff(ProjectData projectData)
     {
-        astDiffMap = new HashMap<>();
+        this.astDiffMap = new HashMap<>();
+        this.projectData = projectData;
     }
 
     public Map<DiffInfo, ASTDiff> getAstDiffMap() {
@@ -38,7 +39,7 @@ public class ProjectASTDiff {
     public void addASTDiff(DiffInfo diffInfo, ASTDiff astDiff)
     {
         if (this.isASTDiffAvailable(diffInfo))
-            this.getASTDiff(diffInfo).mappings.mergeMappings(astDiff.mappings);
+            this.getASTDiff(diffInfo).getMappings().mergeMappings(astDiff.getMappings());
         else
             this.astDiffMap.put(diffInfo, astDiff);
     }
@@ -47,7 +48,7 @@ public class ProjectASTDiff {
         return projectData;
     }
 
-    public void setProjectData(ProjectData projectData) {
+    private void setProjectData(ProjectData projectData) {
         this.projectData = projectData;
     }
 }

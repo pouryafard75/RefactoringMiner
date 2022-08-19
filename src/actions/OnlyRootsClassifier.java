@@ -47,17 +47,17 @@ public class OnlyRootsClassifier extends AbstractITreeClassifier {
             //TODO:
             else if (a instanceof Update) {
                 srcUpdTrees.add(a.getNode());
-                dstUpdTrees.addAll(diff.mappings.getDstForSrc(a.getNode()));
+                dstUpdTrees.addAll(diff.getMappings().getDstForSrc(a.getNode()));
             }
             else if (a instanceof Move) {
                 srcMvTrees.add(a.getNode());
-                dstMvTrees.addAll(diff.mappings.getDstForSrc(a.getNode()));
+                dstMvTrees.addAll(diff.getMappings().getDstForSrc(a.getNode()));
             }
             //TODO: Important
             else if (a instanceof MultiMove)
             {
                 srcMmTrees.put(a.getNode(),a);
-                for (Tree tree : diff.mappings.getDstForSrc(a.getNode()))
+                for (Tree tree : diff.getMappings().getDstForSrc(a.getNode()))
                     dstMmTrees.put(tree,a);
             }
             else if (a instanceof MoveIn)

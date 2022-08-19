@@ -16,16 +16,28 @@ public class ASTDiff {
 //    public String srcPath;
 //    public String dstPath;
 
-    public TreeContext srcTC;
+    private TreeContext srcTC;
 
-    public TreeContext dstTC;
+    private TreeContext dstTC;
 
-    public MultiMappingStore mappings;
+    private MultiMappingStore mappings;
 
     /**
      * The edit script between the two ASTs.
      */
     private EditScript editScript = new EditScript();
+
+    public TreeContext getDstTC() {
+        return dstTC;
+    }
+
+    public TreeContext getSrcTC() {
+        return srcTC;
+    }
+
+    public MultiMappingStore getMappings() {
+        return mappings;
+    }
 
     public EditScript getEditScript() {
         return editScript;

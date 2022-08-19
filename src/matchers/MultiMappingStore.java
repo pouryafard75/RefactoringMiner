@@ -32,19 +32,12 @@ public class MultiMappingStore implements Iterable<Mapping> {
     private Map<Tree, Set<Tree>> dstToSrcs_all;
 
 
-    public final TreeContext srcTC;
-    public final TreeContext dstTC;
-
-    public Tree src;
-    public Tree dst;
+    private final TreeContext srcTC;
+    private final TreeContext dstTC;
 
     public MultiMappingStore(TreeContext srcTC, TreeContext dstTC) {
         this.srcTC = srcTC;
         this.dstTC = dstTC;
-        if (srcTC != null && dstTC != null) {
-            this.src = srcTC.getRoot();
-            this.dst = dstTC.getRoot();
-        }
         srcToDsts_all = new LinkedHashMap<>();
         dstToSrcs_all = new LinkedHashMap<>();
     }
@@ -179,25 +172,15 @@ public class MultiMappingStore implements Iterable<Mapping> {
         return srcToDsts_all.get(src);
     }
 
-    public Tree getDstForSrc_temp(Tree src) {
-        //TODO:
-        return srcToDsts_all.get(src).iterator().next();
-    }
-
     public Set<Tree> getSrcForDst(Tree dst) {
         return dstToSrcs_all.get(dst);
     }
 
-    public Tree getSrcForDst_temp(Tree dst) {
-        //TODO:
-        return dstToSrcs_all.get(dst).iterator().next();
-    }
-
-    public Set<Tree> allMappedSrcs() {
+    private Set<Tree> allMappedSrcs() {
         return srcToDsts_all.keySet();
     }
 
-    public Set<Tree> allMappedDsts() {
+    private Set<Tree> allMappedDsts() {
         return dstToSrcs_all.keySet();
     }
 

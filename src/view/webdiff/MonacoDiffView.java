@@ -65,7 +65,7 @@ public class MonacoDiffView implements Renderable {
         b.append("{");
         b.append("url:").append("\"/left/" + id + "\"").append(",");
         b.append("ranges: [");
-        for (Tree t: diff.srcTC.getRoot().preOrder()) {
+        for (Tree t: diff.getSrcTC().getRoot().preOrder()) {
             if (c.getMovedSrcs().contains(t))
                 appendRange(b, t, "moved", null);
             if (c.getUpdatedSrcs().contains(t))
@@ -88,7 +88,7 @@ public class MonacoDiffView implements Renderable {
         b.append("{");
         b.append("url:").append("\"/right/" + id + "\"").append(",");
         b.append("ranges: [");
-        for (Tree t: diff.dstTC.getRoot().preOrder()) {
+        for (Tree t: diff.getDstTC().getRoot().preOrder()) {
             if (c.getMovedDsts().contains(t))
                 appendRange(b, t, "moved",null);
             if (c.getUpdatedDsts().contains(t))
@@ -109,9 +109,9 @@ public class MonacoDiffView implements Renderable {
         TreeClassifier c = diff.createRootNodesClassifier();
         StringBuilder b = new StringBuilder();
         b.append("[");
-        for (Tree t: diff.srcTC.getRoot().preOrder()) {
+        for (Tree t: diff.getSrcTC().getRoot().preOrder()) {
             if (c.getMovedSrcs().contains(t) || c.getUpdatedSrcs().contains(t)) {
-                Tree d = diff.mappings.getDstForSrc_temp(t);
+                Tree d = diff.getMappings().getDstForSrc(t).iterator().next();
                 b.append(String.format("[%s, %s, %s, %s], ", t.getPos(), t.getEndPos(), d.getPos(), d.getEndPos()));
             }
         }

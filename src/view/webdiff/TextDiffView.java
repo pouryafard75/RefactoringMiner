@@ -63,7 +63,7 @@ public class TextDiffView implements Renderable {
                                     .write("Raw edit script ")
                                     .small().content(String.format("%s -> %s", srcFile.getName(), dstFile.getName()))
                                 ._h3()
-                                .pre(class_("border p-2")).content(ActionsIoUtils.toText(diff.srcTC, diff.getEditScript(), diff.mappings).toString())
+                                .pre(class_("border p-2")).content(ActionsIoUtils.toText(diff.getSrcTC(), diff.getEditScript(), diff.getMappings()).toString())
                             ._div()
                         ._div()
                     ._div()

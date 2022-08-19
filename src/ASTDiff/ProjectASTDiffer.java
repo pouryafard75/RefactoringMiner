@@ -53,8 +53,7 @@ public class ProjectASTDiffer
         return ProjectASTDiffer.fromRepoCommit(getRepo(url),getCommit(url));
     }
     private ProjectASTDiffer(ProjectData projectData){
-        this.projectASTDiff = new ProjectASTDiff();
-        this.getProjectASTDiff().setProjectData(projectData);
+        this.projectASTDiff = new ProjectASTDiff(projectData);
     }
 
     private static String getRepo(String url) {

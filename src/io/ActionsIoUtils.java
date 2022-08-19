@@ -74,11 +74,11 @@ public final class ActionsIoUtils {
             for (Action a : actions) {
                 Tree src = a.getNode();
                 if (a instanceof Move) {
-                    Tree dst = mappings.getDstForSrc_temp(src);
+                    Tree dst = mappings.getDstForSrc(src).iterator().next();
                     //TODO
                     fmt.moveAction((Move) a, src, dst.getParent(), ((Move) a).getPosition());
                 } else if (a instanceof Update) {
-                    Tree dst = mappings.getDstForSrc_temp(src);
+                    Tree dst = mappings.getDstForSrc(src).iterator().next();
                     //TODO
                     fmt.updateAction((Update) a, src, dst);
                 } else if (a instanceof Insert) {
