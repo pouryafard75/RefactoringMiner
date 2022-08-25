@@ -367,7 +367,9 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 		Map<String, String> fileContentsBefore = new ConcurrentHashMap<String, String>();
 		Map<String, String> fileContentsCurrent = new ConcurrentHashMap<String, String>();
 		Map<String, String> renamedFilesHint = new ConcurrentHashMap<String, String>();
+		long populating_started =  System.currentTimeMillis();
 		try {
+
 			populateWithGitHubAPI(gitURL, commitId, fileContentsBefore, fileContentsCurrent, renamedFilesHint, repositoryDirectoriesBefore, repositoryDirectoriesCurrent);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
@@ -391,12 +393,19 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		long populating_finished =  System.currentTimeMillis();
+		System.out.println("Population From GitHub execution: " + (populating_finished - populating_started)/ 1000 + " seconds");
+
+		long RM_started =  System.currentTimeMillis();
+
 		UMLModelDiff modelDiff = null;
 		try {
 			modelDiff = parentUMLModel.diff(currentUMLModel);
 		} catch (RefactoringMinerTimedOutException e) {
 			throw new RuntimeException(e);
 		}
+		long RM_finished =  System.currentTimeMillis();
+		System.out.println("RefactoringMiner ModelDiff execution: " + (RM_finished - RM_started)/ 1000 + " seconds");
 		projectData.setFileContentsBefore(fileContentsBefore);
 		projectData.setFileContentsCurrent(fileContentsCurrent);
 		projectData.setUmlModelDiff(modelDiff);

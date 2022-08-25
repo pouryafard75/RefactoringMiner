@@ -90,7 +90,6 @@ public class ProjectASTDiffer
         long diff_execution_finished =  System.currentTimeMillis();
         System.out.println("Diff execution: " + (diff_execution_finished - diff_execution_started)/ 1000 + " seconds");
         computeAllEditScripts();
-
         return projectASTDiff;
     }
 
@@ -540,6 +539,7 @@ public class ProjectASTDiffer
     }
 
     private void processAttributeJavaDoc(Tree srcTree,Tree dstTree, UMLJavadoc srcJavaDoc, UMLJavadoc dstJavaDoc, MultiMappingStore mappingStore) {
+        if (srcJavaDoc == null || dstJavaDoc == null) return;
         Tree srcJavaDocTree = Tree.findByLocationInfo(srcTree,srcJavaDoc.getLocationInfo());
         Tree dstJavaDocTree = Tree.findByLocationInfo(dstTree,dstJavaDoc.getLocationInfo());
         if (srcJavaDocTree != null && dstJavaDocTree != null)
