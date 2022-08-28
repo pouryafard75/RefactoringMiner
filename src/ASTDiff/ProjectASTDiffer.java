@@ -231,14 +231,14 @@ public class ProjectASTDiffer
             Tree srcOperationNode = Tree.findByLocationInfo(srcTree, umlOperationBodyMapper.getOperation1().getLocationInfo());
             Tree dstOperationNode = Tree.findByLocationInfo(dstTree, umlOperationBodyMapper.getOperation2().getLocationInfo());
             mappingStore.addMapping(srcOperationNode, dstOperationNode);
-            processMethodSignature(srcOperationNode, dstOperationNode, mappingStore);
+            processMethodSignature(srcOperationNode, dstOperationNode, umlOperationBodyMapper, mappingStore);
             fromRefMiner(srcTree, dstTree, umlOperationBodyMapper.getMappings(), mappingStore);
         }
         else {
             Tree srcOperationNode = Tree.findByLocationInfo(srcTree, umlOperationBodyMapper.getContainer1().getLocationInfo());
             Tree dstOperationNode = Tree.findByLocationInfo(dstTree, umlOperationBodyMapper.getContainer2().getLocationInfo());
             mappingStore.addMapping(srcOperationNode, dstOperationNode);
-            processMethodSignature(srcOperationNode, dstOperationNode, mappingStore);
+            processMethodSignature(srcOperationNode, dstOperationNode,umlOperationBodyMapper,  mappingStore);
             fromRefMiner(srcTree, dstTree, umlOperationBodyMapper.getMappings(), mappingStore);
         }
     }
@@ -421,6 +421,7 @@ public class ProjectASTDiffer
         }
     }
     private void processRefactorings(Tree srcTree, Tree dstTree, List<Refactoring> refactoringList, MultiMappingStore mappingStore){
+//        if (true) return;
         for (Refactoring refactoring : refactoringList)
         {
             if (refactoring instanceof ExtractOperationRefactoring) {
@@ -436,9 +437,11 @@ public class ProjectASTDiffer
             else if (refactoring instanceof RenameAttributeRefactoring) {
                 RenameAttributeRefactoring renameAttributeRefactoring = (RenameAttributeRefactoring) (refactoring);
 
-                Tree srcAttrTree =Tree.findByLocationInfo(srcTree,renameAttributeRefactoring.getOriginalAttribute().getLocationInfo());
-                Tree dstAttrTree =Tree.findByLocationInfo(dstTree,renameAttributeRefactoring.getRenamedAttribute().getLocationInfo());
-                mappingStore.addMappingRecursively(srcAttrTree.getParent(),dstAttrTree.getParent());
+                Tree srcAttrTree =Tree.findByLocationInfo(srcTree,renameAttributeRefactoring.getOriginalAttribute().getLocationInfo()).getParent(); //Super Risky
+                Tree dstAttrTree =Tree.findByLocationInfo(dstTree,renameAttributeRefactoring.getRenamedAttribute().getLocationInfo()).getParent(); //Super Risky
+//                if (dstAttrTree.isIsomorphicTo(srcAttrTree))
+//                    mappingStore.addMappingRecursively(srcAttrTree.getParent(),dstAttrTree.getParent());
+                processFieldDeclaration(srcAttrTree,dstAttrTree,renameAttributeRefactoring.getOriginalAttribute(),renameAttributeRefactoring.getRenamedAttribute(),mappingStore);
             }
             else if (refactoring instanceof ExtractVariableRefactoring) {
                 ExtractVariableRefactoring extractVariableRefactoring = (ExtractVariableRefactoring)refactoring;
@@ -535,6 +538,7 @@ public class ProjectASTDiffer
         mappingStore.addMapping(srcVarDeclaration,dstVarDeclaration);
         new LeafMatcher().match(srcVarDeclaration,dstVarDeclaration,null,mappingStore);
         processAttributeJavaDoc(srcTree,dstTree,srcUMLAttribute.getJavadoc(),dstUMLAttribute.getJavadoc(),mappingStore);
+        mappingStore.addMapping(srcVarDeclaration.getChild(0),dstVarDeclaration.getChild(0));
 
     }
 
@@ -678,16 +682,10 @@ public class ProjectASTDiffer
     }
 
 
-    private void processMethodSignature(Tree srcOperationNode, Tree dstOperationNode, MultiMappingStore mappingStore) {
-        //TODO: static and ... are also considered as Modifier for method declaration
-        //TODO: (cont.) probably, I have to change ASTVisitor to modify those types
-        //
-        //
+    private void processMethodSignature(Tree srcOperationNode, Tree dstOperationNode, UMLOperationBodyMapper umlOperationBodyMapper, MultiMappingStore mappingStore) {
 
-        // TODO: 8/3/2022  Multiple modifiers not working now (synchronized)
         List<String> searchingTypes = new ArrayList<>();
         searchingTypes.add("AccessModifier");
-        searchingTypes.add("Modifier");
         searchingTypes.add("SimpleName");
         searchingTypes.add("PrimitiveType");
         searchingTypes.add("Block");
@@ -696,6 +694,12 @@ public class ProjectASTDiffer
             if (matched != null)
                 mappingStore.addMapping(matched.first,matched.second);
         }
+        if (umlOperationBodyMapper.getOperation1().isStatic() && umlOperationBodyMapper.getOperation2().isStatic())
+                matchModifier(srcOperationNode,dstOperationNode,"static",mappingStore);
+        if (umlOperationBodyMapper.getOperation1().isFinal() && umlOperationBodyMapper.getOperation2().isFinal())
+            matchModifier(srcOperationNode,dstOperationNode,"final",mappingStore);
+        if (umlOperationBodyMapper.getOperation1().isAbstract() && umlOperationBodyMapper.getOperation2().isAbstract())
+            matchModifier(srcOperationNode,dstOperationNode,"abstract",mappingStore);
     }
 
     private Pair<Tree, Tree> matchBasedOnType(Tree srcOperationNode, Tree dstOperationNode, String searchingType) {

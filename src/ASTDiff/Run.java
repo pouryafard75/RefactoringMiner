@@ -13,9 +13,9 @@ public class Run {
         //Commit-level execution by url:
 
         String url;
-//        String myCommit =  "https://github.com/pouryafard75/TestCases/commit/0ae8f723a59722694e394300656128f9136ef466";
-        String myCommit =  "https://github.com/phishman3579/java-algorithms-implementation/commit/ab98bcacf6e5bf1c3a06f6bcca68f178f880ffc9";
-        url = myCommit;
+        String myCommit =  "https://github.com/pouryafard75/TestCases/commit/0ae8f723a59722694e394300656128f9136ef466";
+        String reqCommit =  "https://github.com/phishman3579/java-algorithms-implementation/commit/ab98bcacf6e5bf1c3a06f6bcca68f178f880ffc9";
+        url = reqCommit;
         ProjectASTDiff projectASTDiff = ProjectASTDiffer.fromURL(url).diff();
 
         //-----------------------------------------------------------------------------------------------------------------\\

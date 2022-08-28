@@ -16,6 +16,7 @@ public class CompositeMatcher extends BasicTreeMatcher implements TreeMatcher{
     Map<Tree,Tree> cpyToDst;
     @Override
     public void match(Tree src, Tree dst, AbstractCodeMapping abstractCodeMapping, MultiMappingStore mappingStore) {
+//        if (true) return;
         compositeMatcher(src,dst,abstractCodeMapping,mappingStore);
     }
 

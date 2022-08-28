@@ -12,6 +12,7 @@ import java.util.Iterator;
 public class LeafMatcher extends BasicTreeMatcher implements TreeMatcher{
     @Override
     public void match(Tree src, Tree dst, AbstractCodeMapping abstractCodeMapping, MultiMappingStore mappingStore) {
+//        if (true) return;
         super.match(src,dst,abstractCodeMapping,mappingStore);
     }
 
