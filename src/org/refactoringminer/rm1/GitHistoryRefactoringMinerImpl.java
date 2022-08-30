@@ -358,7 +358,64 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 
 		return refactoringsAtRevision;
 	}
+	private static ProjectData calcProjectData(GitService gitService, Repository repository, RevCommit currentCommit) throws Exception {
+		ProjectData projectData = new ProjectData();
+		List<Refactoring> refactoringsAtRevision;
+		String commitId = currentCommit.getId().getName();
+		Set<String> filePathsBefore = new LinkedHashSet<String>();
+		Set<String> filePathsCurrent = new LinkedHashSet<String>();
+		Map<String, String> renamedFilesHint = new HashMap<String, String>();
+		gitService.fileTreeDiff(repository, currentCommit, filePathsBefore, filePathsCurrent, renamedFilesHint);
 
+		Set<String> repositoryDirectoriesBefore = new LinkedHashSet<String>();
+		Set<String> repositoryDirectoriesCurrent = new LinkedHashSet<String>();
+		Map<String, String> fileContentsBefore = new LinkedHashMap<String, String>();
+		Map<String, String> fileContentsCurrent = new LinkedHashMap<String, String>();
+		try (RevWalk walk = new RevWalk(repository)) {
+			// If no java files changed, there is no refactoring. Also, if there are
+			// only ADD's or only REMOVE's there is no refactoring
+			if (!filePathsBefore.isEmpty() && !filePathsCurrent.isEmpty() && currentCommit.getParentCount() > 0) {
+				RevCommit parentCommit = currentCommit.getParent(0);
+				populateFileContents(repository, parentCommit, filePathsBefore, fileContentsBefore, repositoryDirectoriesBefore);
+				populateFileContents(repository, currentCommit, filePathsCurrent, fileContentsCurrent, repositoryDirectoriesCurrent);
+				List<MoveSourceFolderRefactoring> moveSourceFolderRefactorings = processIdenticalFiles(fileContentsBefore, fileContentsCurrent, renamedFilesHint);
+				UMLModel parentUMLModel = createModel(fileContentsBefore, repositoryDirectoriesBefore);
+				UMLModel currentUMLModel = createModel(fileContentsCurrent, repositoryDirectoriesCurrent);
+				UMLModelDiff modelDiff = parentUMLModel.diff(currentUMLModel);
+				projectData.setUmlModelDiff(modelDiff);
+				projectData.setFileContentsCurrent(fileContentsCurrent);
+				projectData.setFileContentsBefore(fileContentsBefore);
+			} else {
+				//logger.info(String.format("Ignored revision %s with no changes in java files", commitId));
+				refactoringsAtRevision = Collections.emptyList();
+			}
+			walk.dispose();
+		}
+		return projectData;
+	}
+	public ProjectData calcProjectData(String dir, String commitId)
+	{
+		ProjectData projectData = null;
+		GitService gitService = new GitServiceImpl();
+		try {
+			Repository repository = gitService.cloneIfNotExists(dir, null);
+			RevWalk walk = new RevWalk(repository);
+			try {
+				RevCommit commit = walk.parseCommit(repository.resolve(commitId));
+				if (commit.getParentCount() > 0) {
+					walk.parseCommit(commit.getParent(0));
+					projectData = calcProjectData(gitService, repository, commit);
+				} else {
+					logger.warn(String.format("Ignored revision %s because it has no parent", commitId));
+				}
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return projectData;
+	}
 	public ProjectData getProjectData(String gitURL, String commitId)
 	{
 		ProjectData projectData = new ProjectData();

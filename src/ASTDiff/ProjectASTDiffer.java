@@ -39,6 +39,10 @@ public class ProjectASTDiffer
     {
         return new ProjectASTDiffer(new GitHistoryRefactoringMinerImpl().getProjectData(repo,commitId));
     }
+    public static ProjectASTDiffer fromLocalRepo(String dirPath, String commitId)
+    {
+        return new ProjectASTDiffer(new GitHistoryRefactoringMinerImpl().calcProjectData(dirPath, commitId));
+    }
     public static ProjectASTDiffer fromLocalDirectories(String dir1path, String dir2path) throws IOException, RefactoringMinerTimedOutException
     {
         return new ProjectASTDiffer(UMLModelASTReader.makeProjectData(dir1path,dir2path));

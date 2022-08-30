@@ -20,6 +20,18 @@ public class Run {
 
         //-----------------------------------------------------------------------------------------------------------------\\
 
+        //Local-repo execution:
+
+        /*String localDir = "D:\\TestCases\\";
+        String commitID = "e47272d6e1390b6366f577b84c58eae50f8f0a69";
+        ProjectASTDiff projectASTDiff = ProjectASTDiffer.fromLocalRepo(localDir,commitID).diff();*/
+
+        //-----------------------------------------------------------------------------------------------------------------\\
+
+
+
+        //-----------------------------------------------------------------------------------------------------------------\\
+
         //Directory-level execution:
 
         /*String dir1 = "D:\\TestCases\\v1";
