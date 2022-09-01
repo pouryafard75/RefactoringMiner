@@ -34,7 +34,7 @@ public class Run {
 
         //Directory-level execution:
 
-        /*String dir1 = "D:\\TestCases\\v1";
+       /* String dir1 = "D:\\TestCases\\v1";
         String dir2 = "D:\\TestCases\\v2";
         ProjectASTDiff projectASTDiff = ProjectASTDiffer.fromLocalDirectories(dir1, dir2 ).diff();*/
 

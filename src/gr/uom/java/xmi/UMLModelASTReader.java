@@ -110,9 +110,10 @@ public class UMLModelASTReader {
 		}
 	}
 	public static ProjectData makeProjectData(String dir1, String dir2) throws IOException, RefactoringMinerTimedOutException {
+		System.out.println("RefactoringMiner Started...");
+		long RM_started =  System.currentTimeMillis();
 		UMLModelASTReader umlModelASTReader1 = new UMLModelASTReader(new File(dir1));
 		UMLModelASTReader umlModelASTReader2 = new UMLModelASTReader(new File(dir2));
-		long RM_started =  System.currentTimeMillis();
 		UMLModelDiff modelDiff = umlModelASTReader1.getUmlModel().diff(umlModelASTReader2.getUmlModel());
 		long RM_finished =  System.currentTimeMillis();
 		System.out.println("RefactoringMiner ModelDiff execution: " + (RM_finished - RM_started)/ 1000 + " seconds");
@@ -135,11 +136,15 @@ public class UMLModelASTReader {
 		String contents2 = FileUtils.readFileToString(new File(fullpath2));
 		Map<String,String> dir2info = new HashMap<>();
 		dir2info.put(fullpath2,contents2);
+		System.out.println("RefactoringMiner Started...");
+		long RM_started =  System.currentTimeMillis();
 
 		UMLModelASTReader umlModelASTReader1 = new UMLModelASTReader(dir1info,null);
 		UMLModelASTReader umlModelASTReader2 = new UMLModelASTReader(dir2info,null);
 
 		UMLModelDiff modelDiff = umlModelASTReader1.getUmlModel().diff(umlModelASTReader2.getUmlModel());
+		long RM_finished =  System.currentTimeMillis();
+		System.out.println("RefactoringMiner ModelDiff execution: " + (RM_finished - RM_started)/ 1000 + " seconds");
 		ProjectData projectData = new ProjectData();
 		projectData.setUmlModelDiff(modelDiff);
 		projectData.setFileContentsBefore(umlModelASTReader1.getFileContents());

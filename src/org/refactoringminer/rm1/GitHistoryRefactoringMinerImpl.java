@@ -360,8 +360,6 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 	}
 	private static ProjectData calcProjectData(GitService gitService, Repository repository, RevCommit currentCommit) throws Exception {
 		ProjectData projectData = new ProjectData();
-		List<Refactoring> refactoringsAtRevision;
-		String commitId = currentCommit.getId().getName();
 		Set<String> filePathsBefore = new LinkedHashSet<String>();
 		Set<String> filePathsCurrent = new LinkedHashSet<String>();
 		Map<String, String> renamedFilesHint = new HashMap<String, String>();
@@ -376,18 +374,23 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 			// only ADD's or only REMOVE's there is no refactoring
 			if (!filePathsBefore.isEmpty() && !filePathsCurrent.isEmpty() && currentCommit.getParentCount() > 0) {
 				RevCommit parentCommit = currentCommit.getParent(0);
+				long population_started = System.currentTimeMillis();
 				populateFileContents(repository, parentCommit, filePathsBefore, fileContentsBefore, repositoryDirectoriesBefore);
 				populateFileContents(repository, currentCommit, filePathsCurrent, fileContentsCurrent, repositoryDirectoriesCurrent);
+				long population_ended = System.currentTimeMillis();
+				System.out.println("Populating File execution: " + (population_ended - population_started)/ 1000 + " seconds");
 				List<MoveSourceFolderRefactoring> moveSourceFolderRefactorings = processIdenticalFiles(fileContentsBefore, fileContentsCurrent, renamedFilesHint);
+				long RM_started =  System.currentTimeMillis();
+				System.out.println("RefactoringMiner Started...");
 				UMLModel parentUMLModel = createModel(fileContentsBefore, repositoryDirectoriesBefore);
 				UMLModel currentUMLModel = createModel(fileContentsCurrent, repositoryDirectoriesCurrent);
 				UMLModelDiff modelDiff = parentUMLModel.diff(currentUMLModel);
+				long RM_finished =  System.currentTimeMillis();
+
+				System.out.println("RefactoringMiner ModelDiff execution: " + (RM_finished - RM_started)/ 1000 + " seconds");
 				projectData.setUmlModelDiff(modelDiff);
 				projectData.setFileContentsCurrent(fileContentsCurrent);
 				projectData.setFileContentsBefore(fileContentsBefore);
-			} else {
-				//logger.info(String.format("Ignored revision %s with no changes in java files", commitId));
-				refactoringsAtRevision = Collections.emptyList();
 			}
 			walk.dispose();
 		}
@@ -433,11 +436,15 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
+		long populating_finished =  System.currentTimeMillis();
+		System.out.println("Population From GitHub execution: " + (populating_finished - populating_started)/ 1000 + " seconds");
 		try {
 			List<MoveSourceFolderRefactoring> moveSourceFolderRefactorings = processIdenticalFiles(fileContentsBefore, fileContentsCurrent, renamedFilesHint);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
+		System.out.println("RefactoringMiner Started...");
+		long RM_started =  System.currentTimeMillis();
 		UMLModel currentUMLModel = null;
 		try {
 			currentUMLModel = createModel(fileContentsCurrent, repositoryDirectoriesCurrent);
@@ -450,11 +457,6 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		long populating_finished =  System.currentTimeMillis();
-		System.out.println("Population From GitHub execution: " + (populating_finished - populating_started)/ 1000 + " seconds");
-
-		long RM_started =  System.currentTimeMillis();
-
 		UMLModelDiff modelDiff = null;
 		try {
 			modelDiff = parentUMLModel.diff(currentUMLModel);
