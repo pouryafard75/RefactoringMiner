@@ -19,6 +19,7 @@ public class MultiMoveActionGenerator{
     }
     public ArrayList<Action> generate()
     {
+//        return actions;
         return simplify(actions);
     }
 
@@ -45,8 +46,8 @@ public class MultiMoveActionGenerator{
         return actions;
     }
     private void removeActionsForThisTreeFromSrc(Tree t){
-        List<MultiMove> mappedDst = actionMapSrc.get(t);
-        for(MultiMove action : mappedDst) {
+        List<MultiMove> mappedSrc = actionMapSrc.get(t);
+        for(MultiMove action : mappedSrc) {
             if (!action.isUpdated())
                 actions.remove(action);
 
@@ -70,15 +71,16 @@ public class MultiMoveActionGenerator{
                 if (srcTree.isLeaf() && dstTree.isLeaf())
                     updated = (srcTree.getMetrics().hash != dstTree.getMetrics().hash);
                 MultiMove action = new MultiMove(srcTree,dstTree,-1, counter + 1,updated);
-                actions.add(action);
-                if (!actionMapSrc.containsKey(srcTree))
-                    actionMapSrc.put(srcTree,new ArrayList<>());
-                if (!actionMapDst.containsKey(dstTree))
-                    actionMapDst.put(dstTree,new ArrayList<>());
+                if (!actions.contains(action)) {
+                    actions.add(action);
+                    if (!actionMapSrc.containsKey(srcTree))
+                        actionMapSrc.put(srcTree, new ArrayList<>());
+                    if (!actionMapDst.containsKey(dstTree))
+                        actionMapDst.put(dstTree, new ArrayList<>());
 
-                actionMapSrc.get(srcTree).add(action);
-                actionMapDst.get(dstTree).add(action);
-
+                    actionMapSrc.get(srcTree).add(action);
+                    actionMapDst.get(dstTree).add(action);
+                }
             }
         }
         counter += 1;

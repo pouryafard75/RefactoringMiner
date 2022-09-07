@@ -3,12 +3,11 @@ package ASTDiff;
 import gr.uom.java.xmi.decomposition.AbstractCodeMapping;
 import matchers.*;
 import tree.Tree;
+import tree.TreeUtils;
+import tree.Type;
 import utils.Pair;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 public class BasicTreeMatcher implements TreeMatcher {
@@ -21,6 +20,7 @@ public class BasicTreeMatcher implements TreeMatcher {
     }
     public void step1(Tree src,Tree dst, MultiMappingStore mappingStore)
     {
+        List<Pair<Set<Tree>, Set<Tree>>> ambiguousMappings = new ArrayList<>();
         Function<Tree, Integer> HEIGHT_PRIORITY_CALCULATOR = (Tree t) -> t.getMetrics().height;
         PriorityTreeQueue srcTrees = new DefaultPriorityTreeQueue(src, MIN_ACCEPTABLE_HIGHT, HEIGHT_PRIORITY_CALCULATOR);
         PriorityTreeQueue dstTrees = new DefaultPriorityTreeQueue(dst, MIN_ACCEPTABLE_HIGHT, HEIGHT_PRIORITY_CALCULATOR);
@@ -30,16 +30,122 @@ public class BasicTreeMatcher implements TreeMatcher {
             localHashMappings.addDsts(dstTrees.pop());
             localHashMappings.unique().forEach(
                     (pair) -> mappingStore.addMappingRecursively(pair.first.stream().findAny().get(), pair.second.stream().findAny().get()));
+            localHashMappings.ambiguous().forEach(
+                    (pair) -> ambiguousMappings.add(pair));
             localHashMappings.unmapped().forEach((pair) -> {
                 pair.first.forEach(tree -> srcTrees.open(tree));
                 pair.second.forEach(tree -> dstTrees.open(tree));
             });
+//            handleAmbiguousMappings(ambiguousMappings);
         }
     }
     public void basicMatcher(Tree src, Tree dst, MultiMappingStore mappingStore) {
         step1(src,dst,mappingStore);
         greedyMatcher(src,dst,mappingStore);
+        lastChanceMatch(src,dst,mappingStore);
+
     }
+
+    protected void lastChanceMatch(Tree src, Tree dst,MultiMappingStore mappings) {
+//        lcsEqualMatching(mappings, src, dst);
+//        lcsStructureMatching(mappings, src, dst);
+        histogramMatching(src, dst, mappings);
+    }
+
+//    protected void lcsEqualMatching(MultiMappingStore mappings, Tree src, Tree dst) {
+//        List<Tree> unmappedSrcChildren = new ArrayList<>();
+//        for (Tree c : src.getChildren())
+//            if (!mappings.isSrcMapped(c))
+//                unmappedSrcChildren.add(c);
+//
+//        List<Tree> unmappedDstChildren = new ArrayList<>();
+//        for (Tree c : dst.getChildren())
+//            if (!mappings.isDstMapped(c))
+//                unmappedDstChildren.add(c);
+//
+//        List<int[]> lcs = SequenceAlgorithms.longestCommonSubsequenceWithIsomorphism(
+//                unmappedSrcChildren, unmappedDstChildren);
+//        for (int[] x : lcs) {
+//            var t1 = unmappedSrcChildren.get(x[0]);
+//            var t2 = unmappedDstChildren.get(x[1]);
+//
+//            if (mappings.areSrcsUnmapped(TreeUtils.preOrder(t1)) && mappings.areDstsUnmapped(
+//                    TreeUtils.preOrder(t2)))
+//                mappings.addMappingRecursively(t1, t2);
+//        }
+//    }
+
+//    protected void lcsStructureMatching(MultiMappingStore mappings, Tree src, Tree dst) {
+//        List<Tree> unmappedSrcChildren = new ArrayList<>();
+//        for (Tree c : src.getChildren())
+//            if (!mappings.isSrcMapped(c))
+//                unmappedSrcChildren.add(c);
+//
+//        List<Tree> unmappedDstChildren = new ArrayList<>();
+//        for (Tree c : dst.getChildren())
+//            if (!mappings.isDstMapped(c))
+//                unmappedDstChildren.add(c);
+//
+//        List<int[]> lcs = SequenceAlgorithms.longestCommonSubsequenceWithIsostructure(
+//                unmappedSrcChildren, unmappedDstChildren);
+//        for (int[] x : lcs) {
+//            var t1 = unmappedSrcChildren.get(x[0]);
+//            var t2 = unmappedDstChildren.get(x[1]);
+//            if (mappings.areSrcsUnmapped(
+//                    TreeUtils.preOrder(t1)) && mappings.areDstsUnmapped(TreeUtils.preOrder(t2)))
+//                mappings.addMappingRecursively(t1, t2);
+//        }
+//    }
+
+    protected void histogramMatching(Tree src, Tree dst, MultiMappingStore mappings) {
+        Map<Type, List<Tree>> srcHistogram = new HashMap<>();
+        for (var c :  src.getChildren()) {
+            if (mappings.isSrcMapped(c)) {
+                boolean _flag = false;
+                Set<Tree> dstForSrc = mappings.getDstForSrc(c);
+                for (Tree dstMapped : dstForSrc) {
+                    if (dst.getDescendantsAndItself().contains(dstMapped))
+                    {
+                        _flag = true;
+                        break;
+                    }
+                }
+                if (_flag)
+                    continue;
+            }
+            srcHistogram.putIfAbsent(c.getType(), new ArrayList<>());
+            srcHistogram.get(c.getType()).add(c);
+        }
+
+        Map<Type, List<Tree>> dstHistogram = new HashMap<>();
+        for (var c : dst.getChildren()) {
+            if (mappings.isDstMapped(c)) {
+                boolean _flag = false;
+                Set<Tree> srcForDst = mappings.getSrcForDst(c);
+                for (Tree mappedSrc : srcForDst) {
+                    if (src.getDescendantsAndItself().contains(mappedSrc))
+                    {
+                        _flag = true;
+                        break;
+                    }
+                }
+                if (_flag)
+                    continue;
+            }
+            dstHistogram.putIfAbsent(c.getType(), new ArrayList<>());
+            dstHistogram.get(c.getType()).add(c);
+        }
+
+        for (Type t : srcHistogram.keySet()) {
+            if (dstHistogram.containsKey(t) && srcHistogram.get(t).size() == 1 && dstHistogram.get(t).size() == 1) {
+                var srcChild = srcHistogram.get(t).get(0);
+                var dstChild = dstHistogram.get(t).get(0);
+                mappings.addMapping(srcChild, dstChild);
+                lastChanceMatch(srcChild, dstChild,mappings);
+            }
+        }
+    }
+
 
     public void greedyMatcher(Tree src, Tree dst, MultiMappingStore mappings) {
         double simThreshold = 0.5;

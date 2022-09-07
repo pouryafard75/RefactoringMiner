@@ -6,6 +6,7 @@ import org.eclipse.jdt.core.dom.AST;
 import org.refactoringminer.rm1.ProjectData;
 import tree.Tree;
 
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 public class ProjectASTDiff {
@@ -51,4 +52,5 @@ public class ProjectASTDiff {
     private void setProjectData(ProjectData projectData) {
         this.projectData = projectData;
     }
+
 }

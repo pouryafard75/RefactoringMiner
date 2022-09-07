@@ -431,6 +431,7 @@ public class ProjectASTDiffer
             if (refactoring instanceof ExtractOperationRefactoring) {
                 ExtractOperationRefactoring extractOperationRefactoring = (ExtractOperationRefactoring) (refactoring);
                 UMLOperationBodyMapper bodyMapper = extractOperationRefactoring.getBodyMapper();
+
                 fromRefMiner(srcTree,dstTree,bodyMapper.getMappings(),mappingStore);
             }
             if (refactoring instanceof InlineOperationRefactoring) {

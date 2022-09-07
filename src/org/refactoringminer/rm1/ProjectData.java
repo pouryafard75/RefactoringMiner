@@ -48,6 +48,4 @@ public class ProjectData {
 //    }
 //    public void setRepositoryDirectoriesBefore(Set<String> repositoryDirectoriesBefore) { this.repositoryDirectoriesBefore = repositoryDirectoriesBefore;}
 //    public void setRepositoryDirectoriesCurrent(Set<String> repositoryDirectoriesCurrent) { this.repositoryDirectoriesCurrent = repositoryDirectoriesCurrent;}
-
-
 }
