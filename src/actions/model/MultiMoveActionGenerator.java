@@ -47,17 +47,54 @@ public class MultiMoveActionGenerator{
     }
     private void removeActionsForThisTreeFromSrc(Tree t){
         List<MultiMove> mappedSrc = actionMapSrc.get(t);
+        List<Action> removable = new ArrayList<>();
+        boolean _flag = true;
         for(MultiMove action : mappedSrc) {
-            if (!action.isUpdated())
-                actions.remove(action);
-
+            /*if (action.isUpdated())
+                _flag = false;
+                break;
+            else */{
+                Tree actionSrc = action.getNode();
+                Tree actionDst = action.getParent();
+                if (       actionMapSrc.containsKey(actionSrc.getParent())
+                        && actionMapSrc.keySet().containsAll(actionSrc.getParent().getDescendants())
+                        && actionMapDst.containsKey(actionDst.getParent())
+                        && actionMapDst.keySet().containsAll(actionDst.getParent().getDescendants()))
+                    removable.add(action);
+                else {
+                    _flag = true;
+                    break;
+                }
+            }
         }
+        if (!_flag)
+            actions.removeAll(removable);
     }
     private void removeActionsForThisTreeFromDst(Tree t){
         List<MultiMove> mappedDst = actionMapDst.get(t);
-        for(MultiMove action : mappedDst)
-            if (!action.isUpdated())
-                actions.remove(action);
+        List<Action> removable = new ArrayList<>();
+        boolean _flag = true;
+        for(MultiMove action : mappedDst) {
+            /*if (action.isUpdated()) {
+                _flag = false;
+                break;
+            }
+            else */{
+                Tree actionSrc = action.getNode();
+                Tree actionDst = action.getParent();
+                if (       actionMapSrc.containsKey(actionSrc.getParent())
+                        && actionMapSrc.keySet().containsAll(actionSrc.getParent().getDescendants())
+                        && actionMapDst.containsKey(actionDst.getParent())
+                        && actionMapDst.keySet().containsAll(actionDst.getParent().getDescendants()))
+                    removable.add(action);
+                else {
+                    _flag = false;
+                    break;
+                }
+            }
+        }
+        if (_flag)
+            actions.removeAll(removable);
     }
 
 

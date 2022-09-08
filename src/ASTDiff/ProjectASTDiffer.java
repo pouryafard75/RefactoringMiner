@@ -699,12 +699,14 @@ public class ProjectASTDiffer
             if (matched != null)
                 mappingStore.addMapping(matched.first,matched.second);
         }
-        if (umlOperationBodyMapper.getOperation1().isStatic() && umlOperationBodyMapper.getOperation2().isStatic())
-                matchModifier(srcOperationNode,dstOperationNode,"static",mappingStore);
-        if (umlOperationBodyMapper.getOperation1().isFinal() && umlOperationBodyMapper.getOperation2().isFinal())
-            matchModifier(srcOperationNode,dstOperationNode,"final",mappingStore);
-        if (umlOperationBodyMapper.getOperation1().isAbstract() && umlOperationBodyMapper.getOperation2().isAbstract())
-            matchModifier(srcOperationNode,dstOperationNode,"abstract",mappingStore);
+        if (umlOperationBodyMapper.getOperation1() != null && umlOperationBodyMapper.getOperation2() != null) {
+            if (umlOperationBodyMapper.getOperation1().isStatic() && umlOperationBodyMapper.getOperation2().isStatic())
+                matchModifier(srcOperationNode, dstOperationNode, "static", mappingStore);
+            if (umlOperationBodyMapper.getOperation1().isFinal() && umlOperationBodyMapper.getOperation2().isFinal())
+                matchModifier(srcOperationNode, dstOperationNode, "final", mappingStore);
+            if (umlOperationBodyMapper.getOperation1().isAbstract() && umlOperationBodyMapper.getOperation2().isAbstract())
+                matchModifier(srcOperationNode, dstOperationNode, "abstract", mappingStore);
+        }
     }
 
     private Pair<Tree, Tree> matchBasedOnType(Tree srcOperationNode, Tree dstOperationNode, String searchingType) {
