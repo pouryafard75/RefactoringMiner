@@ -88,7 +88,7 @@ public final class VanillaDiffHtmlBuilder {
                     ltags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
                     boolean updated = ((MultiMove) (c.getMultiMapSrc().get(t))).isUpdated();
                     String htmlClass = "token mm";
-                    if (updated) htmlClass += " updated";
+                    if (updated) htmlClass += " updOnTop";
                     ltags.addTags(t.getPos(), String.format(
                         MM_SPAN, htmlClass, gid,  tooltip(diff.getSrcTC(), t)), t.getEndPos(), END_SPAN);
                     srcMM.add(t);
@@ -130,7 +130,7 @@ public final class VanillaDiffHtmlBuilder {
                     boolean updated = ((MultiMove) (c.getMultiMapDst().get(t))).isUpdated();
                     rtags.addStartTag(t.getPos(), String.format(ID_SPAN, uId++));
                     String htmlClass = "token mm";
-                    if (updated) htmlClass += " updated";
+                    if (updated) htmlClass += " updOnTop";
                     rtags.addTags(t.getPos(), String.format(
                             MM_SPAN, htmlClass, gid,  tooltip(diff.getDstTC(), t)), t.getEndPos(), END_SPAN);
                     dstMM.add(t);

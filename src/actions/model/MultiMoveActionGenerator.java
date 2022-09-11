@@ -19,8 +19,8 @@ public class MultiMoveActionGenerator{
     }
     public ArrayList<Action> generate()
     {
-//        return actions;
-        return simplify(actions);
+        return actions;
+//        return simplify(actions);
     }
 
     private ArrayList<Action> simplify(ArrayList<Action> actions) {
@@ -48,12 +48,14 @@ public class MultiMoveActionGenerator{
     private void removeActionsForThisTreeFromSrc(Tree t){
         List<MultiMove> mappedSrc = actionMapSrc.get(t);
         List<Action> removable = new ArrayList<>();
-        boolean _flag = true;
+        boolean _flag = false;
         for(MultiMove action : mappedSrc) {
-            /*if (action.isUpdated())
-                _flag = false;
+            if (action.isUpdated())
+            {
+                _flag = true;
                 break;
-            else */{
+            }
+            else {
                 Tree actionSrc = action.getNode();
                 Tree actionDst = action.getParent();
                 if (       actionMapSrc.containsKey(actionSrc.getParent())
@@ -73,13 +75,13 @@ public class MultiMoveActionGenerator{
     private void removeActionsForThisTreeFromDst(Tree t){
         List<MultiMove> mappedDst = actionMapDst.get(t);
         List<Action> removable = new ArrayList<>();
-        boolean _flag = true;
+        boolean _flag = false;
         for(MultiMove action : mappedDst) {
-            /*if (action.isUpdated()) {
-                _flag = false;
+            if (action.isUpdated()) {
+                _flag = true;
                 break;
             }
-            else */{
+            else {
                 Tree actionSrc = action.getNode();
                 Tree actionDst = action.getParent();
                 if (       actionMapSrc.containsKey(actionSrc.getParent())
@@ -88,7 +90,7 @@ public class MultiMoveActionGenerator{
                         && actionMapDst.keySet().containsAll(actionDst.getParent().getDescendants()))
                     removable.add(action);
                 else {
-                    _flag = false;
+                    _flag = true;
                     break;
                 }
             }

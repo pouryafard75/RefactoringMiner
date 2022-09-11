@@ -95,6 +95,7 @@ $(function() {
     });
 
     $("span.mm.token").click(function(event) {
+        console.log("asa")
         if ($(this).hasClass("selected")) {
             $("span.mm.token").removeClass("selected");
         } else {

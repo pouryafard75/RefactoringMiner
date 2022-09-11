@@ -44,6 +44,17 @@
 	border: 1px solid black;
 	background-color: #d2bada;
 }
+.mm.updOnTop.selected {
+	background-color: Gold;
+	border: 1px solid black;
+	font-weight: bold;
+}
+.mm.updOnTop
+{
+	background-color: #e57ecc;
+	border: 1px solid black;
+	font-weight: bold;
+}
 
 .moveIn {
 	border: 4px solid #d2bada;
