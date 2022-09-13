@@ -6,6 +6,7 @@ import tree.Tree;
 import tree.TreeUtils;
 import tree.Type;
 import utils.Pair;
+import utils.SequenceAlgorithms;
 
 import java.util.*;
 import java.util.function.Function;
@@ -42,60 +43,108 @@ public class BasicTreeMatcher implements TreeMatcher {
     public void basicMatcher(Tree src, Tree dst, MultiMappingStore mappingStore) {
         step1(src,dst,mappingStore);
         greedyMatcher(src,dst,mappingStore);
-        lastChanceMatch(src,dst,mappingStore);
+//        lastChanceMatch(src,dst,mappingStore);
 
     }
 
     protected void lastChanceMatch(Tree src, Tree dst,MultiMappingStore mappings) {
-//        lcsEqualMatching(mappings, src, dst);
-//        lcsStructureMatching(mappings, src, dst);
+        lcsEqualMatching(mappings, src, dst);
+        lcsStructureMatching(mappings, src, dst);
         histogramMatching(src, dst, mappings);
     }
 
-//    protected void lcsEqualMatching(MultiMappingStore mappings, Tree src, Tree dst) {
-//        List<Tree> unmappedSrcChildren = new ArrayList<>();
-//        for (Tree c : src.getChildren())
-//            if (!mappings.isSrcMapped(c))
-//                unmappedSrcChildren.add(c);
-//
-//        List<Tree> unmappedDstChildren = new ArrayList<>();
-//        for (Tree c : dst.getChildren())
-//            if (!mappings.isDstMapped(c))
-//                unmappedDstChildren.add(c);
-//
-//        List<int[]> lcs = SequenceAlgorithms.longestCommonSubsequenceWithIsomorphism(
-//                unmappedSrcChildren, unmappedDstChildren);
-//        for (int[] x : lcs) {
-//            var t1 = unmappedSrcChildren.get(x[0]);
-//            var t2 = unmappedDstChildren.get(x[1]);
-//
-//            if (mappings.areSrcsUnmapped(TreeUtils.preOrder(t1)) && mappings.areDstsUnmapped(
-//                    TreeUtils.preOrder(t2)))
-//                mappings.addMappingRecursively(t1, t2);
-//        }
-//    }
+    protected void lcsEqualMatching(MultiMappingStore mappings, Tree src, Tree dst) {
+        List<Tree> unmappedSrcChildren = new ArrayList<>();
+        List<Tree> unmappedDstChildren = new ArrayList<>();
+        for (Tree c : src.getChildren()) {
+            if (mappings.isSrcMapped(c)) {
+                boolean _flag = false;
+                Set<Tree> dstForSrc = mappings.getDstForSrc(c);
+                for (Tree dstMapped : dstForSrc) {
+                    if (dst.getDescendantsAndItself().contains(dstMapped)) {
+                        _flag = true;
+                        break;
+                    }
+                }
+                if (_flag)
+                    continue;
+            }
+            unmappedSrcChildren.add(c);
+        }
 
-//    protected void lcsStructureMatching(MultiMappingStore mappings, Tree src, Tree dst) {
-//        List<Tree> unmappedSrcChildren = new ArrayList<>();
-//        for (Tree c : src.getChildren())
-//            if (!mappings.isSrcMapped(c))
-//                unmappedSrcChildren.add(c);
-//
-//        List<Tree> unmappedDstChildren = new ArrayList<>();
-//        for (Tree c : dst.getChildren())
-//            if (!mappings.isDstMapped(c))
-//                unmappedDstChildren.add(c);
-//
-//        List<int[]> lcs = SequenceAlgorithms.longestCommonSubsequenceWithIsostructure(
-//                unmappedSrcChildren, unmappedDstChildren);
-//        for (int[] x : lcs) {
-//            var t1 = unmappedSrcChildren.get(x[0]);
-//            var t2 = unmappedDstChildren.get(x[1]);
-//            if (mappings.areSrcsUnmapped(
-//                    TreeUtils.preOrder(t1)) && mappings.areDstsUnmapped(TreeUtils.preOrder(t2)))
-//                mappings.addMappingRecursively(t1, t2);
-//        }
-//    }
+        for (Tree c : dst.getChildren()) {
+            if (mappings.isDstMapped(c)) {
+                boolean _flag = false;
+                Set<Tree> srcForDst = mappings.getSrcForDst(c);
+                for (Tree srcMapped : srcForDst) {
+                    if (src.getDescendantsAndItself().contains(srcMapped)) {
+                        _flag = true;
+                        break;
+                    }
+                }
+                if (_flag)
+                    continue;
+            }
+            unmappedDstChildren.add(c);
+        }
+
+        List<int[]> lcs = SequenceAlgorithms.longestCommonSubsequenceWithIsomorphism(
+                unmappedSrcChildren, unmappedDstChildren);
+        for (int[] x : lcs) {
+            var t1 = unmappedSrcChildren.get(x[0]);
+            var t2 = unmappedDstChildren.get(x[1]);
+            //TODO:
+            if (mappings.areSrcsUnmapped(TreeUtils.preOrder(t1)) && mappings.areDstsUnmapped(
+                    TreeUtils.preOrder(t2)))
+                mappings.addMappingRecursively(t1, t2);
+        }
+    }
+
+    protected void lcsStructureMatching(MultiMappingStore mappings, Tree src, Tree dst) {
+        List<Tree> unmappedSrcChildren = new ArrayList<>();
+        List<Tree> unmappedDstChildren = new ArrayList<>();
+        for (Tree c : src.getChildren()) {
+            if (mappings.isSrcMapped(c)) {
+                boolean _flag = false;
+                Set<Tree> dstForSrc = mappings.getDstForSrc(c);
+                for (Tree dstMapped : dstForSrc) {
+                    if (dst.getDescendantsAndItself().contains(dstMapped)) {
+                        _flag = true;
+                        break;
+                    }
+                }
+                if (_flag)
+                    continue;
+            }
+            unmappedSrcChildren.add(c);
+        }
+
+        for (Tree c : dst.getChildren()) {
+            if (mappings.isDstMapped(c)) {
+                boolean _flag = false;
+                Set<Tree> srcForDst = mappings.getSrcForDst(c);
+                for (Tree srcMapped : srcForDst) {
+                    if (src.getDescendantsAndItself().contains(srcMapped)) {
+                        _flag = true;
+                        break;
+                    }
+                }
+                if (_flag)
+                    continue;
+            }
+            unmappedDstChildren.add(c);
+        }
+
+        List<int[]> lcs = SequenceAlgorithms.longestCommonSubsequenceWithIsostructure(
+                unmappedSrcChildren, unmappedDstChildren);
+        for (int[] x : lcs) {
+            var t1 = unmappedSrcChildren.get(x[0]);
+            var t2 = unmappedDstChildren.get(x[1]);
+            if (mappings.areSrcsUnmapped(
+                    TreeUtils.preOrder(t1)) && mappings.areDstsUnmapped(TreeUtils.preOrder(t2)))
+                mappings.addMappingRecursively(t1, t2);
+        }
+    }
 
     protected void histogramMatching(Tree src, Tree dst, MultiMappingStore mappings) {
         Map<Type, List<Tree>> srcHistogram = new HashMap<>();
@@ -162,6 +211,7 @@ public class BasicTreeMatcher implements TreeMatcher {
             }
             if (t.isRoot()) {
                 mappings.addMapping(t, dst);
+                lastChanceMatch(t,dst,mappings);
                 break;
             } else if (!(mappings.isSrcMapped(t) || t.isLeaf()) || (!t.isLeaf() && _flag)) {
                 List<Tree> candidates = getDstCandidates(mappings, t, dst);
@@ -176,8 +226,10 @@ public class BasicTreeMatcher implements TreeMatcher {
                 }
 
                 if (best != null) {
-                    if (!mappings.isDstMapped(best))
+                    if (!mappings.isDstMapped(best)) {
                         mappings.addMapping(t, best);
+                        lastChanceMatch(t, best, mappings);
+                    }
                     else
                     {
                         Set<Tree> srcForDst = mappings.getSrcForDst(best);
@@ -188,8 +240,10 @@ public class BasicTreeMatcher implements TreeMatcher {
                                 _check = false;
                                 break;
                             }
-                        if (_check)
+                        if (_check) {
                             mappings.addMapping(t, best);
+                            lastChanceMatch(t, best, mappings);
+                        }
                     }
                     // TODO: 8/2/2022 Might be mapped from other trees but it must be discarded
                 }

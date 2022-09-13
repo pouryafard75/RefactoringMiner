@@ -212,6 +212,24 @@ public class MultiMappingStore implements Iterable<Mapping> {
         return dstToSrcs_all.containsKey(dst);
     }
 
+    public boolean areSrcsUnmapped(Collection<Tree> srcs) {
+        for (Tree src : srcs)
+            if (isSrcMapped(src))
+                return false;
+
+        return true;
+    }
+
+    /**
+     * Return whether or not all the given destination nodes are unmapped.
+     */
+    public boolean areDstsUnmapped(Collection<Tree> dsts) {
+        for (Tree dst : dsts)
+            if (isDstMapped(dst))
+                return false;
+
+        return true;
+    }
 
     @Override
     public String toString() {
