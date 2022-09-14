@@ -3,6 +3,7 @@
 package view.webdiff;
 import actions.ASTDiff;
 import actions.TreeClassifier;
+import actions.model.MultiMove;
 import tree.Tree;
 import org.rendersnake.DocType;
 import org.rendersnake.HtmlCanvas;
@@ -75,7 +76,14 @@ public class MonacoDiffView implements Renderable {
             if (c.getSrcMoveOutTreeMap().containsKey(t))
                 appendRange(b,t,"moveOut", c.getSrcMoveOutTreeMap().get(t).toString());
             if (c.getMultiMapSrc().containsKey(t))
-                appendRange(b,t,"mm",null);
+            {
+                String tag = "mm";
+                boolean _isUpdated = ((MultiMove)(c.getMultiMapSrc().get(t))).isUpdated();
+                if (_isUpdated) {
+                    tag += " updOnTop";
+                }
+                appendRange(b,t,tag,null);
+            }
         }
         b.append("]").append(",");
         b.append("}");
@@ -98,7 +106,16 @@ public class MonacoDiffView implements Renderable {
             if (c.getDstMoveInTreeMap().containsKey(t))
                 appendRange(b,t,"moveIn",c.getDstMoveInTreeMap().get(t).toString());
             if (c.getMultiMapDst().containsKey(t))
-                appendRange(b,t,"mm",null);
+            {
+                String tag = "mm";
+                boolean _isUpdated = ((MultiMove)(c.getMultiMapDst().get(t))).isUpdated();
+                if (_isUpdated)
+                {
+                    tag += " updOnTop";
+                }
+                appendRange(b,t,tag,null);
+            }
+
         }
         b.append("]").append(",");
         b.append("}");
