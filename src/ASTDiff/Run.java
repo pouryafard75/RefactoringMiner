@@ -18,7 +18,7 @@ public class Run {
 //        String pedReqCommit =  "https://github.com/rstudio/rstudio/commit/9a581e07cb6381d70f3fd9bb2055e810e2a682a9";
 //        String pedReqCommit2 =  "https://github.com/jfinal/jfinal/commit/881baed894540031bd55e402933bcad28b74ca88";
         url = reqCommit;
-        projectASTDiff = ProjectASTDiffer.fromURL(url).diff();
+//        projectASTDiff = ProjectASTDiffer.fromURL(url).diff();
 //
         //-----------------------------------------------------------------------------------------------------------------\\
 
@@ -44,8 +44,8 @@ public class Run {
 
         //File-level execution:
 
-        String file1 = "D:\\TestCases\\sout\\parent.java";
-        String file2 = "D:\\TestCases\\sout\\child.java";
+        String file1 = "C:\\Docs\\TestCases\\sout\\parent.java";
+        String file2 = "C:\\Docs\\TestCases\\sout\\child.java";
         projectASTDiff = ProjectASTDiffer.fromLocalFiles(file1,file2).diff();
 
         //-----------------------------------------------------------------------------------------------------------------\\

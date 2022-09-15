@@ -154,6 +154,8 @@ public interface Tree {
      * @return a boolean indicating if the tree has at least one child or not.
      */
     default boolean isLeaf() {
+        if (getChildren() == null)
+            System.out.println();
         return getChildren().isEmpty();
     }
 

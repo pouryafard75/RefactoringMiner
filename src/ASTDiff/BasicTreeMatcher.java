@@ -43,6 +43,7 @@ public class BasicTreeMatcher implements TreeMatcher {
     public void basicMatcher(Tree src, Tree dst, MultiMappingStore mappingStore) {
         step1(src,dst,mappingStore);
         greedyMatcher(src,dst,mappingStore);
+//        nonG(src,dst,mappingStore);
 //        lastChanceMatch(src,dst,mappingStore);
 
     }
@@ -195,6 +196,37 @@ public class BasicTreeMatcher implements TreeMatcher {
         }
     }
 
+    public void nonG(Tree src, Tree dst, MultiMappingStore mappings) {
+        for (Tree t : src.postOrder()) {
+            if (t.isRoot()) {
+                mappings.addMapping(t, dst);
+                lastChanceMatch(t, dst,mappings);
+                break;
+            }
+            else if (!(mappings.isSrcMapped(t) || t.isLeaf())) {
+                List<Tree> candidates = getDstCandidates(mappings, t,dst);
+                Tree best = null;
+                var max = -1D;
+                var tSize = t.getDescendants().size();
+
+                for (var candidate : candidates) {
+                    var threshold = 1D / (1D + Math.log(candidate.getDescendants().size() + tSize));
+                    var sim = SimilarityMetrics.diceSimilarity(t, candidate, mappings);
+                    if (sim > max && sim >= threshold) {
+                        max = sim;
+                        best = candidate;
+                    }
+                }
+                if (best != null) {
+                    lastChanceMatch(t, best, mappings);
+                    mappings.addMapping(t, best);
+                }
+            }
+//            else if (mappings.isSrcMapped(t) && mappings.hasUnmappedSrcChildren(t)
+//                    && mappings.hasUnmappedDstChildren(mappings.getDstForSrc(t)))
+//                lastChanceMatch(mappings, t, mappings.getDstForSrc(t));
+        }
+    }
 
     public void greedyMatcher(Tree src, Tree dst, MultiMappingStore mappings) {
         double simThreshold = 0.5;

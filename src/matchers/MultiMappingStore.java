@@ -23,6 +23,7 @@ package matchers;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import tree.FakeTree;
 import tree.Tree;
 import tree.TreeContext;
 import utils.Pair;
@@ -115,12 +116,12 @@ public class MultiMappingStore implements Iterable<Mapping> {
         Map<Tree,Set<Tree>> multis = new HashMap<>();
         for (Tree _dst : dstToSrcs_all.keySet())
         {
-            if (dstToSrcs_all.get(_dst).size() > 1)
+            if (dstToSrcs_all.get(_dst).size() > 1 && !(_dst instanceof FakeTree))
                 multis.put(_dst,dstToSrcs_all.get(_dst));
             else
             {
                 Tree mappedSrc = dstToSrcs_all.get(_dst).iterator().next();
-                if (srcToDsts_all.get(mappedSrc).size() > 1)
+                if (srcToDsts_all.get(mappedSrc).size() > 1  && !(_dst instanceof FakeTree))
                     multis.put(_dst,dstToSrcs_all.get(_dst));
             }
         }
