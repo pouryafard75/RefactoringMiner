@@ -111,8 +111,14 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
                 w = cpyMappings.getSrcForDst(x);
                 if (w == null)
                 {
-                    origMappings.getSrcForDst(x).getFinalRoot();
-                    actions.add(new MoveIn(origMappings.getSrcForDst(x),x,findNameByTree(parentContextMap,origMappings.getSrcForDst(x)),+1));
+                    if (origMappings.getSrcForDst(x).equals(FakeTree.getInstance()))
+                    {
+
+                    }
+                    else {
+                        origMappings.getSrcForDst(x).getFinalRoot();
+                        actions.add(new MoveIn(origMappings.getSrcForDst(x), x, findNameByTree(parentContextMap, origMappings.getSrcForDst(x)), +1));
+                    }
                 }
                 else if (!x.equals(origDst)) { // TODO => x != origDst // Case of the root
                     Tree v = w.getParent();
@@ -155,7 +161,11 @@ public class ChawatheScriptGenerator implements EditScriptGenerator {
             }
             else if (!multiMappingStore.isSrcMultiMapped(copyToOrig.get(w)))
             {
-                if (!cpyMappings.getDstForSrc(w).getFinalRoot().equals(origDst))
+                if (cpyMappings.getDstForSrc(w).equals(FakeTree.getInstance()))
+                {
+
+                }
+                else if (!cpyMappings.getDstForSrc(w).getFinalRoot().equals(origDst))
                 {
                         Tree a = cpyMappings.getDstForSrc(w);
                         actions.add(new MoveOut(copyToOrig.get(w),cpyMappings.getDstForSrc(w),findNameByTree(childContextMap,a),+1));

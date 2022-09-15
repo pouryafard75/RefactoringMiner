@@ -5,6 +5,20 @@ package tree;
 import java.util.*;
 
 public class FakeTree extends AbstractTree {
+    private int number;
+    private static FakeTree instance;
+    private static int counter = 0;
+    public static FakeTree getInstance()
+    {
+        if (instance == null)
+            instance = new FakeTree();
+        return instance;
+    }
+    private FakeTree()
+    {
+        counter += 1;
+        number = counter;
+    }
     public FakeTree(Tree... trees) {
         children = new ArrayList<>(trees.length);
         children.addAll(Arrays.asList(trees));

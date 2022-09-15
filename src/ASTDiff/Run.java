@@ -9,7 +9,7 @@ import java.io.IOException;
 public class Run {
     public static void main(String[] args) throws RefactoringMinerTimedOutException, IOException {
 
-
+        ProjectASTDiff projectASTDiff;
         //Commit-level execution by url:
 
         String url;
@@ -18,15 +18,15 @@ public class Run {
 //        String pedReqCommit =  "https://github.com/rstudio/rstudio/commit/9a581e07cb6381d70f3fd9bb2055e810e2a682a9";
 //        String pedReqCommit2 =  "https://github.com/jfinal/jfinal/commit/881baed894540031bd55e402933bcad28b74ca88";
         url = reqCommit;
-        ProjectASTDiff projectASTDiff = ProjectASTDiffer.fromURL(url).diff();
-
+        projectASTDiff = ProjectASTDiffer.fromURL(url).diff();
+//
         //-----------------------------------------------------------------------------------------------------------------\\
 
         //Local-repo execution:
 
         /*String localDir = "D:\\TestCases\\";
         String commitID = "e47272d6e1390b6366f577b84c58eae50f8f0a69";
-        ProjectASTDiff projectASTDiff = ProjectASTDiffer.fromLocalRepo(localDir,commitID).diff();*/
+        projectASTDiff = ProjectASTDiffer.fromLocalRepo(localDir,commitID).diff();*/
 
         //-----------------------------------------------------------------------------------------------------------------\\
 
@@ -38,7 +38,7 @@ public class Run {
 
         /*String dir1 = "D:\\TestCases\\v1";
         String dir2 = "D:\\TestCases\\v2";
-        ProjectASTDiff projectASTDiff = ProjectASTDiffer.fromLocalDirectories(dir1, dir2 ).diff();*/
+        projectASTDiff = ProjectASTDiffer.fromLocalDirectories(dir1, dir2 ).diff();*/
 
         //-----------------------------------------------------------------------------------------------------------------\\
 
@@ -46,7 +46,7 @@ public class Run {
 
         String file1 = "D:\\TestCases\\sout\\parent.java";
         String file2 = "D:\\TestCases\\sout\\child.java";
-//        ProjectASTDiff projectASTDiff = ProjectASTDiffer.fromLocalFiles(file1,file2).diff();
+        projectASTDiff = ProjectASTDiffer.fromLocalFiles(file1,file2).diff();
 
         //-----------------------------------------------------------------------------------------------------------------\\
 

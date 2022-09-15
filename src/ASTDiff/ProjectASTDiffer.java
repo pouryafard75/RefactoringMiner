@@ -30,6 +30,7 @@ public class ProjectASTDiffer
 {
     private final boolean _CHECK_COMMENTS = false;
     private ProjectASTDiff projectASTDiff;
+    private List<AbstractCodeFragment> nonMappedLeavesT1;
 
     public ProjectASTDiff getProjectASTDiff() {
         return projectASTDiff;
@@ -236,6 +237,7 @@ public class ProjectASTDiffer
             Tree dstOperationNode = Tree.findByLocationInfo(dstTree, umlOperationBodyMapper.getOperation2().getLocationInfo());
             mappingStore.addMapping(srcOperationNode, dstOperationNode);
             processMethodSignature(srcOperationNode, dstOperationNode, umlOperationBodyMapper, mappingStore);
+            this.nonMappedLeavesT1 = umlOperationBodyMapper.getNonMappedLeavesT1();
             fromRefMiner(srcTree, dstTree, umlOperationBodyMapper.getMappings(), mappingStore);
         }
         else {
@@ -269,6 +271,7 @@ public class ProjectASTDiffer
             else if (abstractCodeMapping instanceof CompositeStatementObjectMapping)
                 processCompositeMapping(srcTree,dstTree,abstractCodeMapping,mappingStore);
         }
+
     }
 
     private void processCompositeMapping(Tree srcTree, Tree dstTree, AbstractCodeMapping abstractCodeMapping, MultiMappingStore mappingStore) {
@@ -300,6 +303,7 @@ public class ProjectASTDiffer
         LeafMapping leafMapping = (LeafMapping) abstractCodeMapping;
         Tree srcStatementNode =Tree.findByLocationInfo(srcTree,leafMapping.getFragment1().getLocationInfo());
         Tree dstStatementNode =Tree.findByLocationInfo(dstTree,leafMapping.getFragment2().getLocationInfo());
+
         if (leafMapping.getFragment2().toString().equals(leafMapping.getFragment1().toString())) {
             mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
         }

@@ -94,8 +94,8 @@ public class BasicTreeMatcher implements TreeMatcher {
             var t1 = unmappedSrcChildren.get(x[0]);
             var t2 = unmappedDstChildren.get(x[1]);
             //TODO:
-            if (mappings.areSrcsUnmapped(TreeUtils.preOrder(t1)) && mappings.areDstsUnmapped(
-                    TreeUtils.preOrder(t2)))
+            if (mappings.areSrcsUnmapped(TreeUtils.preOrder(t1),dst) && mappings.areDstsUnmapped(
+                    TreeUtils.preOrder(t2),src))
                 mappings.addMappingRecursively(t1, t2);
         }
     }
@@ -141,7 +141,7 @@ public class BasicTreeMatcher implements TreeMatcher {
             var t1 = unmappedSrcChildren.get(x[0]);
             var t2 = unmappedDstChildren.get(x[1]);
             if (mappings.areSrcsUnmapped(
-                    TreeUtils.preOrder(t1)) && mappings.areDstsUnmapped(TreeUtils.preOrder(t2)))
+                    TreeUtils.preOrder(t1),dst) && mappings.areDstsUnmapped(TreeUtils.preOrder(t2),src))
                 mappings.addMappingRecursively(t1, t2);
         }
     }
