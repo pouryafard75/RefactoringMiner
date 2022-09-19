@@ -119,6 +119,8 @@ public class MappingStore implements Iterable<Mapping> {
      * Add a mapping between the two provided nodes inside the mapping store.
      */
     public void addMapping(Tree src, Tree dst) {
+//        if (!src.getType().name.equals(dst.getType().name))
+//            System.out.println();
         srcToDst.put(src, dst);
         dstToSrc.put(dst, src);
     }
