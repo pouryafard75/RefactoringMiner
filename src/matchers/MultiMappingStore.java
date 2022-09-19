@@ -267,4 +267,12 @@ public class MultiMappingStore implements Iterable<Mapping> {
             addMapping(mapping.first,mapping.second);
         }
     }
+    public void addWithMaps(MappingStore match,Map<Tree,Tree> srcCopy, Map<Tree,Tree> dstCopy) {
+        for (Mapping mapping : match) {
+            Tree realSrc = srcCopy.get(mapping.first);
+            Tree realDst = dstCopy.get(mapping.second);
+            if (realSrc != null && realDst != null)
+                this.addMapping(realSrc,realDst);
+        }
+    }
 }
