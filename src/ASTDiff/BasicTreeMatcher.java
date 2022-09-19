@@ -48,7 +48,9 @@ public class BasicTreeMatcher implements TreeMatcher {
 
     }
 
-    protected void lastChanceMatch(Tree src, Tree dst,MultiMappingStore mappings) {
+    protected void lastChanceMatch(Tree src, Tree dst,MultiMappingStore mappings)
+    {
+//        if (true ) return;
         lcsEqualMatching(mappings, src, dst);
         lcsStructureMatching(mappings, src, dst);
         histogramMatching(src, dst, mappings);

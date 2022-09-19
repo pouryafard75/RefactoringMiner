@@ -113,6 +113,8 @@ public class ProjectASTDiffer
     private void makeASTDiff(List<? extends UMLClassBaseDiff> umlClassBaseDiffList) throws RefactoringMinerTimedOutException {
         for (UMLClassBaseDiff classDiff : umlClassBaseDiffList) {
             ASTDiff classASTDiff = process(classDiff, findTreeContexts(classDiff));
+//            ASTDiff classASTDiff = processWithGTGreedy(classDiff, findTreeContexts(classDiff));
+//            ASTDiff classASTDiff = processWithGTSimple(classDiff, findTreeContexts(classDiff));
             DiffInfo diffInfo = new DiffInfo(
                     classDiff.getOriginalClass().getLocationInfo().getFilePath(),
                     classDiff.getNextClass().getLocationInfo().getFilePath()
@@ -127,6 +129,22 @@ public class ProjectASTDiffer
                         .get(classDiff.getOriginalClass().getSourceFile()),
                         this.projectASTDiff.getProjectData().getUmlModelDiff().getChildModel().getTreeContextMap().
                                 get(classDiff.getNextClass().getSourceFile()));
+    }
+    private ASTDiff processWithGTSimple(UMLClassBaseDiff classDiff, Pair<TreeContext, TreeContext> treeContextPair) throws RefactoringMinerTimedOutException {
+        TreeContext srcTreeContext = treeContextPair.first;
+        TreeContext dstTreeContext = treeContextPair.second;
+        MultiMappingStore mappingStore = new MultiMappingStore(srcTreeContext,dstTreeContext);
+        MappingStore match = new GTSimple(1).match(srcTreeContext.getRoot(), dstTreeContext.getRoot(), new MappingStore(srcTreeContext.getRoot(), dstTreeContext.getRoot()));
+        mappingStore.add(match);
+        return new ASTDiff(treeContextPair.first, treeContextPair.second, mappingStore);
+    }
+    private ASTDiff processWithGTGreedy(UMLClassBaseDiff classDiff, Pair<TreeContext, TreeContext> treeContextPair) throws RefactoringMinerTimedOutException {
+        TreeContext srcTreeContext = treeContextPair.first;
+        TreeContext dstTreeContext = treeContextPair.second;
+        MultiMappingStore mappingStore = new MultiMappingStore(srcTreeContext,dstTreeContext);
+        MappingStore match = new GTGreedy(1).match(srcTreeContext.getRoot(), dstTreeContext.getRoot(), new MappingStore(srcTreeContext.getRoot(), dstTreeContext.getRoot()));
+        mappingStore.add(match);
+        return new ASTDiff(treeContextPair.first, treeContextPair.second, mappingStore);
     }
     private ASTDiff process(UMLClassBaseDiff classDiff, Pair<TreeContext, TreeContext> treeContextPair) throws RefactoringMinerTimedOutException {
         TreeContext srcTreeContext = treeContextPair.first;
@@ -263,6 +281,7 @@ public class ProjectASTDiffer
     }
 
     private void fromRefMiner(Tree srcTree, Tree dstTree, Set<AbstractCodeMapping> mappingSet, MultiMappingStore mappingStore) {
+//        if (true) return;
         ArrayList<AbstractCodeMapping> mappings = new ArrayList<>(mappingSet);
         for (AbstractCodeMapping abstractCodeMapping : mappings)
         {
@@ -457,6 +476,7 @@ public class ProjectASTDiffer
             }
             else if (refactoring instanceof MergeVariableRefactoring)
             {
+                if (true) return;
                 MergeVariableRefactoring mergeVariableRefactoring = (MergeVariableRefactoring)(refactoring);
                 Set<VariableDeclaration> mergedVariables = mergeVariableRefactoring.getMergedVariables();
                 VariableDeclaration newVariable = mergeVariableRefactoring.getNewVariable();

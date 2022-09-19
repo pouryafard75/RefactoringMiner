@@ -261,4 +261,10 @@ public class MultiMappingStore implements Iterable<Mapping> {
             for (int i = 0; i < src.getChildren().size(); i++)
                 addMappingRecursively(src.getChild(i), dst.getChild(i));
     }
+
+    public void add(MappingStore match) {
+        for (Mapping mapping : match) {
+            addMapping(mapping.first,mapping.second);
+        }
+    }
 }

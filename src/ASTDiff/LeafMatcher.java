@@ -1,8 +1,7 @@
 package ASTDiff;
 
 import gr.uom.java.xmi.decomposition.AbstractCodeMapping;
-import matchers.Mapping;
-import matchers.MultiMappingStore;
+import matchers.*;
 import org.eclipse.jdt.core.dom.ASTNode;
 import tree.FakeTree;
 import tree.Tree;
@@ -14,11 +13,10 @@ import java.util.Iterator;
 public class LeafMatcher extends BasicTreeMatcher implements TreeMatcher{
     @Override
     public void match(Tree src, Tree dst, AbstractCodeMapping abstractCodeMapping, MultiMappingStore mappingStore) {
-//        if (true) return;
-//        if (abstractCodeMapping.getFragment1().getLocationInfo().getStartLine() == 410)
-//            System.out.println("");
-        super.match(src,dst,abstractCodeMapping,mappingStore);
-        specialCases(src,dst,abstractCodeMapping,mappingStore);
+        MappingStore match = new GTSimple(0).match(src, dst, new MappingStore(src, dst));
+//        MappingStore match = new GTGreedy(0).match(src, dst, new MappingStore(src, dst));
+        mappingStore.add(match);
+        System.out.println("hit");
     }
 
     private void specialCases(Tree src, Tree dst, AbstractCodeMapping abstractCodeMapping, MultiMappingStore mappingStore) {

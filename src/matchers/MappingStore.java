@@ -64,6 +64,20 @@ public class MappingStore implements Iterable<Mapping> {
         dstToSrc = new HashMap<>();
     }
 
+    public MappingStore(Tree src, Tree dst)
+    {
+        TreeContext _srcTC = new TreeContext();
+        _srcTC.setRoot(src);
+        srcTC = _srcTC;
+        TreeContext _dstTC = new TreeContext();
+        _dstTC.setRoot(dst);
+        dstTC = _dstTC;
+        this.src = src;
+        this.dst = dst;
+        srcToDst = new HashMap<>();
+        dstToSrc = new HashMap<>();
+    }
+
     /**
      * Return the number of mappings.
      */
