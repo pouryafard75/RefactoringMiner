@@ -9,6 +9,7 @@ import tree.TreeUtils;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 public class LeafMatcher extends BasicTreeMatcher implements TreeMatcher{
     @Override
@@ -18,7 +19,10 @@ public class LeafMatcher extends BasicTreeMatcher implements TreeMatcher{
         mappingStore.add(match);
         System.out.println("hit");
     }
-
+    public void pruneTree(Tree src, Tree dst, Map<Tree,Tree> srcCopy, Map<Tree,Tree> dstCopy)
+    {
+        src.deepCustomCopy();
+    }
     private void specialCases(Tree src, Tree dst, AbstractCodeMapping abstractCodeMapping, MultiMappingStore mappingStore) {
         String EXP_STATEMENT =  "ExpressionStatement";
         String VAR_DEC_STATEMENT = "VariableDeclarationStatement";

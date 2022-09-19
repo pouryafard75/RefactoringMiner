@@ -63,6 +63,20 @@ public class DefaultTree extends AbstractTree implements Tree {
     }
 
     @Override
+    public Tree deepCopyWithMapPruning(Map<Tree,Tree> cpyMap) {
+        if (this.type.name.equals("Block")) return null;
+        Tree copy = new DefaultTree(this);
+        cpyMap.put(copy,this);
+        if (this.type.name.equals("AnonymousClassDeclaration")) return copy;
+        for (Tree child : this.getChildren()) {
+            Tree childCopy = child.deepCopyWithMapPruning(cpyMap);
+            if (childCopy != null)
+                copy.addChild(childCopy);
+        }
+        return copy;
+    }
+
+    @Override
     public Tree deepCustomCopy() {
         Tree copy = new DefaultTree(this);
         for (Tree child : getChildren()) {

@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
 import gen.TreeGenerator;
 
+import static tree.TypeSet.type;
 
 
 /**
@@ -36,6 +37,11 @@ import gen.TreeGenerator;
 public final class TreeIoUtils {
     private TreeIoUtils() {
     }
+
+    public static TreeGenerator fromXml() {
+        return new XmlInternalGenerator();
+    }
+
 
     public static TreeSerializer toXml(TreeContext ctx) {
         return toXml(ctx, ctx.getRoot());
@@ -647,6 +653,76 @@ public final class TreeIoUtils {
         @Override
         public void writeTree(Tree tree) throws IOException {
             writer.write(tree.toString());
+        }
+    }
+    public static class XmlInternalGenerator extends TreeGenerator {
+
+        static MetadataUnserializers defaultUnserializers = new MetadataUnserializers();
+        final MetadataUnserializers unserializers = new MetadataUnserializers(); // FIXME should it be pushed up or not?
+
+        private static final QName TYPE = new QName("type");
+
+        private static final QName LABEL = new QName("label");
+        private static final String POS = "pos";
+        private static final String LENGTH = "length";
+
+        static {
+            defaultUnserializers.add(POS, Integer::parseInt);
+            defaultUnserializers.add(LENGTH, Integer::parseInt);
+        }
+
+        public XmlInternalGenerator() {
+            unserializers.addAll(defaultUnserializers);
+        }
+
+        @Override
+        protected TreeContext generate(Reader source) throws IOException {
+            XMLInputFactory fact = XMLInputFactory.newInstance();
+            TreeContext context = new TreeContext();
+            try {
+                ArrayDeque<Tree> trees = new ArrayDeque<>();
+                XMLEventReader r = fact.createXMLEventReader(source);
+                while (r.hasNext()) {
+                    XMLEvent e = r.nextEvent();
+                    if (e instanceof StartElement) {
+                        StartElement s  = (StartElement) e;
+                        if (!s.getName().getLocalPart().equals("tree")) // FIXME need to deal with options
+                            continue;
+                        Type type = type(s.getAttributeByName(TYPE).getValue());
+
+                        Tree t = context.createTree(type, labelForAttribute(s, LABEL));
+                        // FIXME this iterator has no type, due to the API. We have to cast it later
+                        Iterator<?> it = s.getAttributes();
+                        while (it.hasNext()) {
+                            Attribute a = (Attribute) it.next();
+                            unserializers.load(t, a.getName().getLocalPart(), a.getValue());
+                        }
+
+                        if (trees.isEmpty())
+                            context.setRoot(t);
+                        else
+                            t.setParentAndUpdateChildren(trees.peekFirst());
+                        trees.addFirst(t);
+                    } else if (e instanceof EndElement) {
+                        if (!((EndElement) e).getName().getLocalPart().equals("tree")) // FIXME need to deal with option
+                            continue;
+                        trees.removeFirst();
+                    }
+                }
+                return context;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        private static String labelForAttribute(StartElement s, QName attrName) {
+            Attribute attr = s.getAttributeByName(attrName);
+            return attr == null ? Tree.NO_LABEL : attr.getValue();
+        }
+
+        public MetadataUnserializers getUnserializers() {
+            return unserializers;
         }
     }
 }

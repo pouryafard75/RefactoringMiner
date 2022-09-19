@@ -266,6 +266,11 @@ public interface Tree {
 
     default Tree deepCustomCopy() { return null;}
 
+    default Tree deepCopyWithMapPruning(Map<Tree,Tree> cpyMap)
+    {
+        return null;
+    }
+
     static Tree deepCopyWithMap(Tree tree,Map<Tree,Tree> cpyMap) {
         Tree copy = new DefaultTree(tree);
         cpyMap.put(copy,tree);
@@ -273,6 +278,7 @@ public interface Tree {
             copy.addChild(deepCopyWithMap(child,cpyMap));
         return copy;
     }
+
 
     /**
      * Indicates whether the node has a label or not.
