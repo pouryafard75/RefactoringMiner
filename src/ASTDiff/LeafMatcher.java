@@ -6,6 +6,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import tree.FakeTree;
 import tree.Tree;
 import tree.TreeUtils;
+import utils.Pair;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -14,14 +15,18 @@ import java.util.Map;
 public class LeafMatcher extends BasicTreeMatcher implements TreeMatcher{
     @Override
     public void match(Tree src, Tree dst, AbstractCodeMapping abstractCodeMapping, MultiMappingStore mappingStore) {
-        MappingStore match = new GTSimple(0).match(src, dst, new MappingStore(src, dst));
-//        MappingStore match = new GTGreedy(0).match(src, dst, new MappingStore(src, dst));
-        mappingStore.add(match);
-        System.out.println("hit");
+//        if (true) return;
+        Map<Tree,Tree> srcCopy = new HashMap<>();
+        Map<Tree,Tree> dstCopy = new HashMap<>();
+        Pair<Tree, Tree> prunedPair = pruneTrees(src, dst, srcCopy, dstCopy);
+        MappingStore match = new GTSimple(0).match(prunedPair.first, prunedPair.second, new MappingStore(prunedPair.first, prunedPair.second));
+        mappingStore.addWithMaps(match,srcCopy,dstCopy);
     }
-    public void pruneTree(Tree src, Tree dst, Map<Tree,Tree> srcCopy, Map<Tree,Tree> dstCopy)
+    public Pair<Tree,Tree> pruneTrees(Tree src, Tree dst, Map<Tree,Tree> srcCopy, Map<Tree,Tree> dstCopy)
     {
-        src.deepCustomCopy();
+        Tree prunedSrc = src.deepCopyWithMapPruning(srcCopy);
+        Tree prunedDst = dst.deepCopyWithMapPruning(dstCopy);
+        return new Pair<>(prunedSrc,prunedDst);
     }
     private void specialCases(Tree src, Tree dst, AbstractCodeMapping abstractCodeMapping, MultiMappingStore mappingStore) {
         String EXP_STATEMENT =  "ExpressionStatement";
