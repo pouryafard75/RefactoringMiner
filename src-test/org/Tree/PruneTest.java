@@ -29,7 +29,7 @@ public class PruneTest {
         Tree testTree = methodBlock.getChild(0);
         Map<Tree,Tree> cpyMap = new HashMap<>();
         Tree res = testTree.deepCopyWithMapPruning(cpyMap);
-        assertEquals("Number of objects", 9,cpyMap.size());
+        assertEquals("Anonymous Class statement pruning", 9,cpyMap.size());
     }
 
     @Test
@@ -37,7 +37,7 @@ public class PruneTest {
         Tree testTree = methodBlock.getChild(1);
         Map<Tree,Tree> cpyMap = new HashMap<>();
         Tree res = testTree.deepCopyWithMapPruning(cpyMap);
-        assertEquals("Number of objects", 9,cpyMap.size());
+        assertEquals("Lambda with block pruning", 9,cpyMap.size());
     }
 
     @Test
@@ -45,7 +45,7 @@ public class PruneTest {
         Tree testTree = methodBlock.getChild(2);
         Map<Tree,Tree> cpyMap = new HashMap<>();
         Tree res = testTree.deepCopyWithMapPruning(cpyMap);
-        assertEquals("Number of objects", 15,cpyMap.size());
+        assertEquals("Lambda without block pruning", 15,cpyMap.size());
     }
 
 }
