@@ -20,7 +20,12 @@ public class SimpleBottomUpMatcher implements Matcher {
     public MappingStore match(Tree src, Tree dst, MappingStore mappings) {
         for (Tree t : src.postOrder()) {
             if (t.isRoot()) {
-                mappings.addMapping(t, dst);
+                if (t.getType().name.equals(dst.getType().name))
+                {
+                    if (!mappings.isSrcMapped(t) && mappings.isDstMapped(dst))
+                        mappings.addMapping(t, dst);
+                }
+//
                 lastChanceMatch(mappings, t, dst);
                 break;
             }
