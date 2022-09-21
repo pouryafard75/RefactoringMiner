@@ -381,13 +381,14 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 				System.out.println("Populating File execution: " + (population_ended - population_started)/ 1000 + " seconds");
 				List<MoveSourceFolderRefactoring> moveSourceFolderRefactorings = processIdenticalFiles(fileContentsBefore, fileContentsCurrent, renamedFilesHint);
 				long RM_started =  System.currentTimeMillis();
-				System.out.println("RefactoringMiner Started...");
+				logger.info("RefactoringMiner Started...");
 				UMLModel parentUMLModel = createModel(fileContentsBefore, repositoryDirectoriesBefore);
 				UMLModel currentUMLModel = createModel(fileContentsCurrent, repositoryDirectoriesCurrent);
 				UMLModelDiff modelDiff = parentUMLModel.diff(currentUMLModel);
 				long RM_finished =  System.currentTimeMillis();
 
-				System.out.println("RefactoringMiner ModelDiff execution: " + (RM_finished - RM_started)/ 1000 + " seconds");
+				logger.info("RefactoringMiner ModelDiff execution: " + (RM_finished - RM_started)/ 1000 + " seconds");
+
 				projectData.setUmlModelDiff(modelDiff);
 				projectData.setFileContentsCurrent(fileContentsCurrent);
 				projectData.setFileContentsBefore(fileContentsBefore);
@@ -443,7 +444,7 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		System.out.println("RefactoringMiner Started...");
+		logger.info("RefactoringMiner Started...");
 		long RM_started =  System.currentTimeMillis();
 		UMLModel currentUMLModel = null;
 		try {
@@ -464,7 +465,7 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 			throw new RuntimeException(e);
 		}
 		long RM_finished =  System.currentTimeMillis();
-		System.out.println("RefactoringMiner ModelDiff execution: " + (RM_finished - RM_started)/ 1000 + " seconds");
+		logger.info("RefactoringMiner ModelDiff execution: " + (RM_finished - RM_started)/ 1000 + " seconds");
 		projectData.setFileContentsBefore(fileContentsBefore);
 		projectData.setFileContentsCurrent(fileContentsCurrent);
 		projectData.setUmlModelDiff(modelDiff);

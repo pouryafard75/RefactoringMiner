@@ -13,6 +13,8 @@ import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import org.refactoringminer.api.RefactoringType;
 import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
 import org.refactoringminer.rm1.ProjectData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import tree.Tree;
 import tree.TreeContext;
 import tree.TreeUtils;
@@ -28,6 +30,7 @@ import static tree.TreeUtils.findChildByTypeAndLabel;
 
 public class ProjectASTDiffer
 {
+    private final static Logger logger = LoggerFactory.getLogger(ProjectASTDiffer.class);
     private final boolean _CHECK_COMMENTS = false;
     private ProjectASTDiff projectASTDiff;
     private List<AbstractCodeFragment> nonMappedLeavesT1;
@@ -93,7 +96,7 @@ public class ProjectASTDiffer
         makeASTDiff(this.projectASTDiff.getProjectData().getUmlModelDiff().getClassRenameDiffList());
 //        makeASTDiff(this.projectASTDiff.getProjectData().getUmlModelDiff().getClassMoveDiffList());
         long diff_execution_finished =  System.currentTimeMillis();
-        System.out.println("Diff execution: " + (diff_execution_finished - diff_execution_started)/ 1000 + " seconds");
+        logger.info("Diff execution: " + (diff_execution_finished - diff_execution_started)/ 1000 + " seconds");
         computeAllEditScripts();
         return projectASTDiff;
     }
@@ -108,7 +111,7 @@ public class ProjectASTDiffer
             );
         }
         long editScript_end = System.currentTimeMillis();
-        System.out.println("EditScript execution: " + (editScript_end - editScript_start)/ 1000 + " seconds");
+        logger.info("EditScript execution: " + (editScript_end - editScript_start)/ 1000 + " seconds");
     }
     private void makeASTDiff(List<? extends UMLClassBaseDiff> umlClassBaseDiffList) throws RefactoringMinerTimedOutException {
         for (UMLClassBaseDiff classDiff : umlClassBaseDiffList) {
