@@ -20,12 +20,23 @@
 
 package matchers;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import tree.FakeTree;
 import tree.Tree;
 import tree.TreeContext;
+import tree.Type;
 import utils.Pair;
 
 public class MultiMappingStore implements Iterable<Mapping> {
@@ -273,6 +284,142 @@ public class MultiMappingStore implements Iterable<Mapping> {
             Tree realDst = dstCopy.get(mapping.second);
             if (realSrc != null && realDst != null)
                 this.addMapping(realSrc,realDst);
+        }
+    }
+
+    public List<MappingExportModel> exportModelList() {
+        List<MappingExportModel> exportList = new ArrayList<>();
+        for (Mapping mapping : new ArrayList<>(getMappings())) {
+            MappingExportModel mappingExportModel = new MappingExportModel(
+                    mapping.first.getType().name,
+                    mapping.first.getLabel(),
+                    mapping.first.getPos(),
+                    mapping.first.getEndPos(),
+                    mapping.first.hashCode(),
+                    mapping.second.getType().name,
+                    mapping.first.getLabel(),
+                    mapping.first.getPos(),
+                    mapping.first.getEndPos(),
+                    mapping.second.hashCode()
+            );
+            exportList.add(mappingExportModel);
+        }
+        exportList.sort(
+                (MappingExportModel m1, MappingExportModel m2) ->
+                        Integer.compare(m1.getFirstHash() * m1.getSecondHash(), m2.firstHash * m2.getSecondHash())
+                        );
+        return exportList;
+    }
+
+    public String exportString() throws JsonProcessingException {
+        List<MappingExportModel> mappingExportModels = this.exportModelList();
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(mappingExportModels);
+    }
+    public void exportToFile(File outputFile) throws IOException {
+        List<MappingExportModel> mappingExportModels = this.exportModelList();
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(outputFile, mappingExportModels);
+    }
+
+    public static class MappingExportModel implements Serializable {
+
+        String firstType,secondType,firstLabel,secondLabel;
+        int firstPos,secondPos,firstEndPos,secondEndPos;
+        @JsonIgnore
+        int firstHash,secondHash;
+
+        public MappingExportModel(String firstType, String firstLabel,int firstPos,int firstEndPos, int firstHash,String secondType, String secondLabel, int secondPos, int secondEndPos, int secondHash) {
+            this.firstType = firstType;
+            this.secondType = secondType;
+            this.firstLabel = firstLabel;
+            this.secondLabel = secondLabel;
+            this.firstPos = firstPos;
+            this.secondPos = secondPos;
+            this.firstEndPos = firstEndPos;
+            this.secondEndPos = secondEndPos;
+            this.firstHash = firstHash;
+            this.secondHash = secondHash;
+        }
+
+        public int getFirstHash() {
+            return firstHash;
+        }
+
+        public int getSecondHash() {
+            return secondHash;
+        }
+
+        public void setFirstHash(int firstHash) {
+            this.firstHash = firstHash;
+        }
+
+        public void setSecondHash(int secondHash) {
+            this.secondHash = secondHash;
+        }
+
+        public String getFirstType() {
+            return firstType;
+        }
+
+        public void setFirstType(String firstType) {
+            this.firstType = firstType;
+        }
+
+        public String getSecondType() {
+            return secondType;
+        }
+
+        public void setSecondType(String secondType) {
+            this.secondType = secondType;
+        }
+
+        public String getFirstLabel() {
+            return firstLabel;
+        }
+
+        public void setFirstLabel(String firstLabel) {
+            this.firstLabel = firstLabel;
+        }
+
+        public String getSecondLabel() {
+            return secondLabel;
+        }
+
+        public void setSecondLabel(String secondLabel) {
+            this.secondLabel = secondLabel;
+        }
+
+        public int getFirstPos() {
+            return firstPos;
+        }
+
+        public void setFirstPos(int firstPos) {
+            this.firstPos = firstPos;
+        }
+
+        public int getSecondPos() {
+            return secondPos;
+        }
+
+        public void setSecondPos(int secondPos) {
+            this.secondPos = secondPos;
+        }
+
+        public int getFirstEndPos() {
+            return firstEndPos;
+        }
+
+        public void setFirstEndPos(int firstEndPos) {
+            this.firstEndPos = firstEndPos;
+        }
+
+        public int getSecondEndPos() {
+            return secondEndPos;
+        }
+
+        public void setSecondEndPos(int secondEndPos) {
+            this.secondEndPos = secondEndPos;
         }
     }
 }
