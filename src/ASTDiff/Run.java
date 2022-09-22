@@ -17,8 +17,8 @@ public class Run {
         String reqCommit =  "https://github.com/phishman3579/java-algorithms-implementation/commit/ab98bcacf6e5bf1c3a06f6bcca68f178f880ffc9";
 //        String pedReqCommit =  "https://github.com/rstudio/rstudio/commit/9a581e07cb6381d70f3fd9bb2055e810e2a682a9";
 //        String pedReqCommit2 =  "https://github.com/jfinal/jfinal/commit/881baed894540031bd55e402933bcad28b74ca88";
-        url = myCommit;
-//        projectASTDiff = ProjectASTDiffer.fromURL(url).diff();
+        url = reqCommit;
+        projectASTDiff = ProjectASTDiffer.fromURL(url).diff();
 //
         //-----------------------------------------------------------------------------------------------------------------\\
 
@@ -47,9 +47,9 @@ public class Run {
 //        String file1 = "C:\\Docs\\TestCases\\bug\\v1.java";
 //        String file2 = "C:\\Docs\\TestCases\\bug\\v2.java";
 
-        String file1 = "C:\\Docs\\TestCases\\sout\\parent.java";
-        String file2 = "C:\\Docs\\TestCases\\sout\\child.java";
-        projectASTDiff = ProjectASTDiffer.fromLocalFiles(file1,file2).diff();
+        String file1 = "/Users/pourya/IdeaProjects/TestCases/v1/DistributedCacheStream.java";
+        String file2 = "/Users/pourya/IdeaProjects/TestCases/v2/DistributedCacheStream.java";
+//        projectASTDiff = ProjectASTDiffer.fromLocalFiles(file1,file2).diff();
 
         //-----------------------------------------------------------------------------------------------------------------\\
 

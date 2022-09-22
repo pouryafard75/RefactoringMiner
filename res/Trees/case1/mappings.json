@@ -1,49 +1,4 @@
 [ {
-  "firstType" : "CompilationUnit",
-  "secondType" : "CompilationUnit",
-  "firstLabel" : "",
-  "secondLabel" : "",
-  "firstPos" : 0,
-  "secondPos" : 0,
-  "firstEndPos" : 157,
-  "secondEndPos" : 157
-}, {
-  "firstType" : "AccessModifier",
-  "secondType" : "AccessModifier",
-  "firstLabel" : "public",
-  "secondLabel" : "public",
-  "firstPos" : 24,
-  "secondPos" : 24,
-  "firstEndPos" : 30,
-  "secondEndPos" : 30
-}, {
-  "firstType" : "TypeDeclaration",
-  "secondType" : "TypeDeclaration",
-  "firstLabel" : "",
-  "secondLabel" : "",
-  "firstPos" : 0,
-  "secondPos" : 0,
-  "firstEndPos" : 155,
-  "secondEndPos" : 155
-}, {
-  "firstType" : "ExpressionStatement",
-  "secondType" : "ExpressionStatement",
-  "firstLabel" : "",
-  "secondLabel" : "",
-  "firstPos" : 55,
-  "secondPos" : 55,
-  "firstEndPos" : 64,
-  "secondEndPos" : 64
-}, {
-  "firstType" : "ExpressionStatement",
-  "secondType" : "ExpressionStatement",
-  "firstLabel" : "",
-  "secondLabel" : "",
-  "firstPos" : 74,
-  "secondPos" : 74,
-  "firstEndPos" : 84,
-  "secondEndPos" : 84
-}, {
   "firstType" : "AccessModifier",
   "secondType" : "AccessModifier",
   "firstLabel" : "public",
@@ -53,41 +8,41 @@
   "firstEndPos" : 6,
   "secondEndPos" : 6
 }, {
-  "firstType" : "SimpleName",
-  "secondType" : "SimpleName",
-  "firstLabel" : "clear",
-  "secondLabel" : "clear",
-  "firstPos" : 36,
-  "secondPos" : 36,
-  "firstEndPos" : 41,
-  "secondEndPos" : 41
-}, {
-  "firstType" : "SimpleName",
-  "secondType" : "SimpleName",
-  "firstLabel" : "modify",
-  "secondLabel" : "modify",
-  "firstPos" : 55,
-  "secondPos" : 55,
-  "firstEndPos" : 61,
-  "secondEndPos" : 61
-}, {
-  "firstType" : "PrimitiveType",
-  "secondType" : "PrimitiveType",
-  "firstLabel" : "void",
-  "secondLabel" : "void",
-  "firstPos" : 31,
-  "secondPos" : 31,
-  "firstEndPos" : 35,
-  "secondEndPos" : 35
-}, {
   "firstType" : "MethodInvocation",
   "secondType" : "MethodInvocation",
   "firstLabel" : "",
   "secondLabel" : "",
-  "firstPos" : 55,
-  "secondPos" : 55,
-  "firstEndPos" : 63,
-  "secondEndPos" : 63
+  "firstPos" : 71,
+  "secondPos" : 71,
+  "firstEndPos" : 80,
+  "secondEndPos" : 80
+}, {
+  "firstType" : "Block",
+  "secondType" : "Block",
+  "firstLabel" : "",
+  "secondLabel" : "",
+  "firstPos" : 43,
+  "secondPos" : 43,
+  "firstEndPos" : 87,
+  "secondEndPos" : 87
+}, {
+  "firstType" : "TYPE_DECLARATION_KIND",
+  "secondType" : "TYPE_DECLARATION_KIND",
+  "firstLabel" : "class",
+  "secondLabel" : "class",
+  "firstPos" : 7,
+  "secondPos" : 7,
+  "firstEndPos" : 12,
+  "secondEndPos" : 12
+}, {
+  "firstType" : "MethodDeclaration",
+  "secondType" : "MethodDeclaration",
+  "firstLabel" : "",
+  "secondLabel" : "",
+  "firstPos" : 23,
+  "secondPos" : 23,
+  "firstEndPos" : 87,
+  "secondEndPos" : 87
 }, {
   "firstType" : "SimpleName",
   "secondType" : "SimpleName",
@@ -98,48 +53,93 @@
   "firstEndPos" : 16,
   "secondEndPos" : 16
 }, {
-  "firstType" : "MethodDeclaration",
-  "secondType" : "MethodDeclaration",
+  "firstType" : "ExpressionStatement",
+  "secondType" : "ExpressionStatement",
   "firstLabel" : "",
   "secondLabel" : "",
-  "firstPos" : 24,
-  "secondPos" : 24,
-  "firstEndPos" : 91,
-  "secondEndPos" : 91
-}, {
-  "firstType" : "Block",
-  "secondType" : "Block",
-  "firstLabel" : "",
-  "secondLabel" : "",
-  "firstPos" : 44,
-  "secondPos" : 44,
-  "firstEndPos" : 91,
-  "secondEndPos" : 91
-}, {
-  "firstType" : "MethodInvocation",
-  "secondType" : "MethodInvocation",
-  "firstLabel" : "",
-  "secondLabel" : "",
-  "firstPos" : 74,
-  "secondPos" : 74,
-  "firstEndPos" : 83,
-  "secondEndPos" : 83
+  "firstPos" : 71,
+  "secondPos" : 71,
+  "firstEndPos" : 81,
+  "secondEndPos" : 81
 }, {
   "firstType" : "SimpleName",
   "secondType" : "SimpleName",
   "firstLabel" : "publish",
   "secondLabel" : "publish",
-  "firstPos" : 74,
-  "secondPos" : 74,
-  "firstEndPos" : 81,
-  "secondEndPos" : 81
+  "firstPos" : 71,
+  "secondPos" : 71,
+  "firstEndPos" : 78,
+  "secondEndPos" : 78
 }, {
-  "firstType" : "TYPE_DECLARATION_KIND",
-  "secondType" : "TYPE_DECLARATION_KIND",
-  "firstLabel" : "class",
-  "secondLabel" : "class",
-  "firstPos" : 7,
-  "secondPos" : 7,
-  "firstEndPos" : 12,
-  "secondEndPos" : 12
+  "firstType" : "PrimitiveType",
+  "secondType" : "PrimitiveType",
+  "firstLabel" : "void",
+  "secondLabel" : "void",
+  "firstPos" : 30,
+  "secondPos" : 30,
+  "firstEndPos" : 34,
+  "secondEndPos" : 34
+}, {
+  "firstType" : "MethodInvocation",
+  "secondType" : "MethodInvocation",
+  "firstLabel" : "",
+  "secondLabel" : "",
+  "firstPos" : 53,
+  "secondPos" : 53,
+  "firstEndPos" : 61,
+  "secondEndPos" : 61
+}, {
+  "firstType" : "SimpleName",
+  "secondType" : "SimpleName",
+  "firstLabel" : "modify",
+  "secondLabel" : "modify",
+  "firstPos" : 53,
+  "secondPos" : 53,
+  "firstEndPos" : 59,
+  "secondEndPos" : 59
+}, {
+  "firstType" : "AccessModifier",
+  "secondType" : "AccessModifier",
+  "firstLabel" : "public",
+  "secondLabel" : "public",
+  "firstPos" : 23,
+  "secondPos" : 23,
+  "firstEndPos" : 29,
+  "secondEndPos" : 29
+}, {
+  "firstType" : "CompilationUnit",
+  "secondType" : "CompilationUnit",
+  "firstLabel" : "",
+  "secondLabel" : "",
+  "firstPos" : 0,
+  "secondPos" : 0,
+  "firstEndPos" : 147,
+  "secondEndPos" : 147
+}, {
+  "firstType" : "SimpleName",
+  "secondType" : "SimpleName",
+  "firstLabel" : "clear",
+  "secondLabel" : "clear",
+  "firstPos" : 35,
+  "secondPos" : 35,
+  "firstEndPos" : 40,
+  "secondEndPos" : 40
+}, {
+  "firstType" : "TypeDeclaration",
+  "secondType" : "TypeDeclaration",
+  "firstLabel" : "",
+  "secondLabel" : "",
+  "firstPos" : 0,
+  "secondPos" : 0,
+  "firstEndPos" : 146,
+  "secondEndPos" : 146
+}, {
+  "firstType" : "ExpressionStatement",
+  "secondType" : "ExpressionStatement",
+  "firstLabel" : "",
+  "secondLabel" : "",
+  "firstPos" : 53,
+  "secondPos" : 53,
+  "firstEndPos" : 62,
+  "secondEndPos" : 62
 } ]

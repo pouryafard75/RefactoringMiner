@@ -7,7 +7,6 @@ import gr.uom.java.xmi.diff.*;
 import jdt.CommentVisitor;
 import matchers.*;
 import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.refactoringminer.api.GitHistoryRefactoringMiner;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import org.refactoringminer.api.RefactoringType;
@@ -21,7 +20,6 @@ import tree.TreeUtils;
 import utils.Pair;
 
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -688,14 +686,14 @@ public class ProjectASTDiffer
 
     private void processImports(Tree srcTree, Tree dstTree, UMLImportListDiff importDiffList, MultiMappingStore mappingStore) {
         if (importDiffList == null) return;
-        Set<String> commonImports = importDiffList.getCommonImports();
+        Set<UMLImport> commonImports = importDiffList.getCommonImports();
         if (commonImports.isEmpty())
              return;
         String searchingType = "ImportDeclaration";
         List<Tree> srcChildren = srcTree.getChildren();
         List<Tree> dstChildren = dstTree.getChildren();
-        
-        for(String label : commonImports){
+
+        for(UMLImport label : commonImports){
             Tree srcImportStatement = findImportByTypeAndLabel(srcChildren,searchingType,label);
             Tree dstImportStatement = findImportByTypeAndLabel(dstChildren,searchingType,label);
             if (srcImportStatement != null && dstImportStatement != null)
@@ -703,10 +701,10 @@ public class ProjectASTDiffer
         }
     }
 
-    private Tree findImportByTypeAndLabel(List<Tree> inputTree, String searchingType, String label) {
+    private Tree findImportByTypeAndLabel(List<Tree> inputTree, String searchingType, UMLImport label) {
         for (Tree srcStatement: inputTree) {
             if (srcStatement.getType().name.equals(searchingType)) {
-                if (srcStatement.getChild(0).getLabel().equals(label)) //TODO getChild 0 will cause a lot of problem
+                if (srcStatement.getChild(0).getLabel().equals(label.getName())) //TODO getChild 0 will cause a lot of problem
                     return srcStatement;
             }
         }
