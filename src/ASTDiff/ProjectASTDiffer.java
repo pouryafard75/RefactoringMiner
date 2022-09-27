@@ -268,9 +268,17 @@ public class ProjectASTDiffer
             fromRefMiner(srcTree, dstTree, umlOperationBodyMapper.getMappings(), mappingStore);
         }
         else {
+            //Static Initializers
             Tree srcOperationNode = Tree.findByLocationInfo(srcTree, umlOperationBodyMapper.getContainer1().getLocationInfo());
             Tree dstOperationNode = Tree.findByLocationInfo(dstTree, umlOperationBodyMapper.getContainer2().getLocationInfo());
             mappingStore.addMapping(srcOperationNode, dstOperationNode);
+            if (umlOperationBodyMapper.getContainer1() instanceof UMLInitializer &&  umlOperationBodyMapper.getContainer2() instanceof UMLInitializer)
+                if (((UMLInitializer)umlOperationBodyMapper.getContainer1()).isStatic() && ((UMLInitializer)umlOperationBodyMapper.getContainer2()).isStatic())
+                {
+                    Tree srcInitializer = Tree.findByLocationInfo(srcTree, umlOperationBodyMapper.getContainer1().getLocationInfo());
+                    Tree dstInitializer = Tree.findByLocationInfo(dstTree, umlOperationBodyMapper.getContainer2().getLocationInfo());
+                    mappingStore.addMapping(srcInitializer.getChild(0),dstInitializer.getChild(0));
+                }
             processMethodSignature(srcOperationNode, dstOperationNode,umlOperationBodyMapper,  mappingStore);
             fromRefMiner(srcTree, dstTree, umlOperationBodyMapper.getMappings(), mappingStore);
         }
