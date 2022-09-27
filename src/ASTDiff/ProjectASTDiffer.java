@@ -56,7 +56,15 @@ public class ProjectASTDiffer
     }
     public static ProjectASTDiffer fromURL(String url)
     {
-        return ProjectASTDiffer.fromRepoCommit(getRepo(url),getCommit(url));
+        String cleaned = clean(url);
+        return ProjectASTDiffer.fromRepoCommit(getRepo(cleaned),getCommit(cleaned));
+    }
+    private static String clean(String url)
+    {
+        int index = nthIndexOf(url,'#',1);
+        if (index == -1) return url;
+        return url.substring(0,index);
+
     }
     private ProjectASTDiffer(ProjectData projectData){
         this.projectASTDiff = new ProjectASTDiff(projectData);
