@@ -512,6 +512,13 @@ public class ProjectASTDiffer
                     mappingStore.addMapping(srcVarName,dstVarName);
                 }
             }
+            else if (refactoring instanceof SplitConditionalRefactoring splitConditionalRefactoring)
+            {
+                Set<AbstractCodeFragment> splitConditionals = splitConditionalRefactoring.getSplitConditionals();
+                for (AbstractCodeFragment splitConditional : splitConditionals) {
+                    new CompositeMatcher().match(srcTree,dstTree, (AbstractStatement) splitConditionalRefactoring.getOriginalConditional(), (AbstractStatement) splitConditional,mappingStore);
+                }
+            }
         }
     }
 
