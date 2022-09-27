@@ -739,6 +739,8 @@ public class ProjectASTDiffer
                 matchModifier(srcOperationNode, dstOperationNode, "final", mappingStore);
             if (umlOperationBodyMapper.getOperation1().isAbstract() && umlOperationBodyMapper.getOperation2().isAbstract())
                 matchModifier(srcOperationNode, dstOperationNode, "abstract", mappingStore);
+            if (umlOperationBodyMapper.getOperation1().isSynchronized() && umlOperationBodyMapper.getOperation2().isSynchronized())
+                matchModifier(srcOperationNode, dstOperationNode, "synchronized", mappingStore);
         }
     }
 
