@@ -23,10 +23,12 @@ public class Run {
         String splitConiditonExample4 =  "https://github.com/BuildCraft/BuildCraft/commit/6abc40ed4850d74ee6c155f5a28f8b34881a0284#diff-0850b8a596d522bb87b55e5a3799a56612654c4c2b7d86a8157bf2d6bb8e5e0cL353-L356";
         String splitConiditonExample5 =  "https://github.com/JetBrains/intellij-community/commit/1b70adbfd49e00194c4c1170ef65e8114d7a2e46#diff-618af48f6b6713ae4367692615f2309a93d3ac39eb4453167d89ed33d0f8e35aL160";
 
+
+        String working_commit = "https://github.com/infinispan/infinispan/commit/043030723632627b0908dca6b24dae91d3dfd938";
         String replicationCommit = "https://github.com/apache/cassandra/commit/ec52e77ecde749e7c5a483b26cbd8041f2a5a33c";
 
-        url = replicationCommit;
-        projectASTDiff = ProjectASTDiffer.fromURL(url).diff();
+        url = working_commit;
+//        projectASTDiff = ProjectASTDiffer.fromURL(url).diff();
 //
         //-----------------------------------------------------------------------------------------------------------------\\
 
@@ -52,13 +54,17 @@ public class Run {
 
         //File-level execution:
 
+        String file1,file2;
 //        String file1 = "C:\\Docs\\TestCases\\bug\\v1.java";
 //        String file2 = "C:\\Docs\\TestCases\\bug\\v2.java";
-          String file1 = "D:\\TestCases\\case\\v1.java";
-          String file2 = "D:\\TestCases\\case\\v2.java";
+//          String file1 = "D:\\TestCases\\case\\v1.java";
+//          String file2 = "D:\\TestCases\\case\\v2.java";
 //        String file1 = "/Users/pourya/IdeaProjects/TestCases/v1/DistributedCacheStream.java";
 //        String file2 = "/Users/pourya/IdeaProjects/TestCases/v2/DistributedCacheStream.java";
-//        projectASTDiff = ProjectASTDiffer.fromLocalFiles(file1,file2).diff();
+
+        file1 = "D:\\TestCases\\v1\\DistributedCacheStream.java";
+        file2 = "D:\\TestCases\\v2\\DistributedCacheStream.java";
+        projectASTDiff = ProjectASTDiffer.fromLocalFiles(file1,file2).diff();
 
         //-----------------------------------------------------------------------------------------------------------------\\
 

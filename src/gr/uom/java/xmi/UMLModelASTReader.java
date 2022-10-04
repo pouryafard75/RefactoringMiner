@@ -2,7 +2,10 @@ package gr.uom.java.xmi;
 
 import static gr.uom.java.xmi.decomposition.Visitor.stringify;
 
+import java.io.BufferedReader;
+
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,37 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.ToolFactory;
 import org.eclipse.jdt.core.compiler.IScanner;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
-import org.eclipse.jdt.core.dom.Annotation;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.BodyDeclaration;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.Comment;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.IExtendedModifier;
-import org.eclipse.jdt.core.dom.ImportDeclaration;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.Javadoc;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.Modifier;
-import org.eclipse.jdt.core.dom.PackageDeclaration;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.SuperMethodInvocation;
-import org.eclipse.jdt.core.dom.TagElement;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.TypeParameter;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.*;
 
 import gr.uom.java.xmi.LocationInfo.CodeElementType;
 import gr.uom.java.xmi.decomposition.OperationBody;
@@ -98,6 +71,37 @@ public class UMLModelASTReader {
 			}
 			try {
 				CompilationUnit compilationUnit = (CompilationUnit)parser.createAST(null);
+//				if (this.umlModel.getRepositoryDirectories() == null) {
+//					LinkedHashSet<String> strings = new LinkedHashSet<>();
+//					strings.add("default");
+//					this.umlModel.setRepositoryDirectories(strings);
+//				}
+
+//				if (this.umlModel.getRepositoryDirectories() == null)
+//				{
+//	     			PackageDeclaration aPackage = compilationUnit.getPackage();
+//					Set<String> repDirectories = new LinkedHashSet<>();
+//					String defaultPackage = "default";
+//					if (aPackage == null)
+//						repDirectories.add(defaultPackage);
+//					else {
+//						if (aPackage.getName().getFullyQualifiedName().equals(""))
+//							repDirectories.add(defaultPackage);
+//						else {
+//							String currentString = aPackage.getName().getFullyQualifiedName();
+//							while (true) {
+//								String result = currentString.replace(".", "/");
+//								repDirectories.add(result);
+//								int lastDotIndex = currentString.lastIndexOf(".");
+//								if (lastDotIndex == -1)
+//									break;
+//								currentString = currentString.substring(0, lastDotIndex);
+//							}
+//						}
+//					}
+//					this.umlModel.setRepositoryDirectories(repDirectories);
+//				}
+
 				IScanner scanner = ToolFactory.createScanner(true, false, false, false);
 				scanner.setSource(javaFileContent.toCharArray());
 				JdtVisitor visitor = new JdtVisitor(scanner);
@@ -107,7 +111,7 @@ public class UMLModelASTReader {
 				TreeContext treeContext = visitor.getTreeContext();
 				treeContext.setUmlCommentList(extractInternalComments(compilationUnit, filePath, javaFileContent));
 				treeContext.setFilename(filePath);
-				this.getUmlModel().addTreeContext(filePath,treeContext); //TODO:  Use fullpath to avoid errors while two files have the same name
+				this.getUmlModel().addTreeContext(filePath,treeContext);
 			}
 			catch(Exception e) {
 				//e.printStackTrace();
@@ -132,15 +136,56 @@ public class UMLModelASTReader {
 
 	public static ProjectData makeProjectData_fromFiles(String file1, String file2) throws IOException, RefactoringMinerTimedOutException {
 		//TODO, RefactoringMiner support for this one
-		String fullpath1 = file1.replaceAll("/", systemFileSeparator);
-		String contents1 = FileUtils.readFileToString(new File(fullpath1));
-		Map<String,String> dir1info = new HashMap<>();
-		dir1info.put(fullpath1,contents1);
 
-		String fullpath2 = file2.replaceAll("/", systemFileSeparator);
-		String contents2 = FileUtils.readFileToString(new File(fullpath2));
+		String contents1 = FileUtils.readFileToString(new File(file1));
+		Map<String,String> dir1info = new HashMap<>();
+//
+		String modifiedName1 = "";
+		try (BufferedReader br = new BufferedReader(new FileReader(file2))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				// process the line.
+				String keyword = "package";
+				String semicolon = ";";
+				if (line.contains(keyword) && line.endsWith(";"))
+				{
+					int packageIndex = line.indexOf(keyword);
+					int startingIndex = packageIndex + keyword.length();
+					int semicolonIndex = line.indexOf(semicolon);
+					String substring = line.substring(startingIndex, semicolonIndex - 1);
+					String trimed = substring.trim();
+					modifiedName1 = trimed + "." + Path.of(file1).getFileName().toString();
+					break;
+				}
+			}
+		}
+
+		String contents2 = FileUtils.readFileToString(new File(file2));
 		Map<String,String> dir2info = new HashMap<>();
-		dir2info.put(fullpath2,contents2);
+
+		String modifiedName2 = "";
+		try (BufferedReader br = new BufferedReader(new FileReader(file2))) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				// process the line.
+				String keyword = "package";
+				String semicolon = ";";
+				if (line.contains(keyword) && line.endsWith(";"))
+				{
+					int packageIndex = line.indexOf(keyword);
+					int startingIndex = packageIndex + keyword.length();
+					int semicolonIndex = line.indexOf(semicolon);
+					String substring = line.substring(startingIndex, semicolonIndex - 1);
+					String trimed = substring.trim();
+					modifiedName2 = trimed + "." + Path.of(file2).getFileName().toString();
+					break;
+				}
+			}
+		}
+
+		dir1info.put(modifiedName1.replace(".","/"),contents1);
+		dir2info.put(modifiedName2.replace(".","/"),contents2);
+
 		logger.info("RefactoringMiner Started...");
 		long RM_started =  System.currentTimeMillis();
 

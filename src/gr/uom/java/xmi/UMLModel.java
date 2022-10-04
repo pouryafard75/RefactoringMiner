@@ -22,6 +22,15 @@ public class UMLModel {
 	public Map<String, TreeContext> getTreeContextMap() {
 		return treeContextMap;
 	}
+
+	public Set<String> getRepositoryDirectories() {
+		return repositoryDirectories;
+	}
+
+	public void setRepositoryDirectories(Set<String> repositoryDirectories) {
+		this.repositoryDirectories = repositoryDirectories;
+	}
+
 	public void addTreeContext(String fname, TreeContext treeContext){
 		treeContextMap.put(fname,treeContext);
 	}
