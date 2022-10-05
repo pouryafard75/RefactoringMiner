@@ -4,6 +4,7 @@ package io;
 
 import actions.EditScript;
 import actions.model.*;
+import com.google.gson.stream.JsonWriter;
 import io.TreeIoUtils.AbstractSerializer;
 import matchers.Mapping;
 import matchers.MultiMappingStore;
@@ -39,6 +40,17 @@ public final class ActionsIoUtils {
             @Override
             protected ActionFormatter newFormatter(TreeContext ctx, Writer writer) throws Exception {
                 return new XmlFormatter(ctx, writer);
+            }
+        };
+    }
+
+    public static ActionSerializer toJson(TreeContext sctx, EditScript actions,
+                                          MultiMappingStore mappings) throws IOException {
+        return new ActionSerializer(sctx, mappings, actions) {
+
+            @Override
+            protected ActionFormatter newFormatter(TreeContext ctx, Writer writer) throws Exception {
+                return new JsonFormatter(ctx, writer);
             }
         };
     }
@@ -320,6 +332,112 @@ public final class ActionsIoUtils {
 
         private String toS(Tree node) {
             return String.format("%s", node.toString());
+        }
+    }
+    static class JsonFormatter implements ActionFormatter {
+        private final JsonWriter writer;
+
+        JsonFormatter(TreeContext ctx, Writer writer) {
+
+            this.writer = new JsonWriter(writer);
+            this.writer.setIndent("  ");
+        }
+
+        @Override
+        public void startOutput() throws IOException {
+            writer.beginObject();
+        }
+
+        @Override
+        public void endOutput() throws IOException {
+            writer.endObject();
+        }
+
+        @Override
+        public void startMatches() throws Exception {
+            writer.name("matches").beginArray();
+        }
+
+        @Override
+        public void match(Tree srcNode, Tree destNode) throws Exception {
+            writer.beginObject();
+            writer.name("src").value(srcNode.toString());
+            writer.name("dest").value(destNode.toString());
+            writer.endObject();
+        }
+
+        @Override
+        public void endMatches() throws Exception {
+            writer.endArray();
+        }
+
+        @Override
+        public void startActions() throws IOException {
+            writer.name("actions").beginArray();
+        }
+
+        @Override
+        public void insertRoot(Insert action, Tree node) throws IOException {
+            start(action, node);
+            end(node);
+        }
+
+        @Override
+        public void insertAction(Insert action, Tree node, Tree parent, int index) throws IOException {
+            start(action, node);
+            writer.name("parent").value(parent.toString());
+            writer.name("at").value(index);
+            end(node);
+        }
+
+        @Override
+        public void insertTreeAction(TreeInsert action, Tree node, Tree parent, int index) throws IOException {
+            start(action, node);
+            writer.name("parent").value(parent.toString());
+            writer.name("at").value(index);
+            end(node);
+        }
+
+        @Override
+        public void moveAction(Move action, Tree src, Tree dst, int index) throws IOException {
+            start(action, src);
+            writer.name("parent").value(dst.toString());
+            writer.name("at").value(index);
+            end(src);
+        }
+
+        @Override
+        public void updateAction(Update action, Tree src, Tree dst) throws IOException {
+            start(action, src);
+            writer.name("label").value(dst.getLabel());
+            end(src);
+        }
+
+        @Override
+        public void deleteAction(Delete action, Tree node) throws IOException {
+            start(action, node);
+            end(node);
+        }
+
+        @Override
+        public void deleteTreeAction(TreeDelete action, Tree node) throws IOException {
+            start(action, node);
+            end(node);
+        }
+
+        private void start(Action action, Tree src) throws IOException {
+            writer.beginObject();
+            writer.name("action").value(action.getName());
+            writer.name("tree").value(src.toString());
+        }
+
+        private void end(Tree node) throws IOException {
+            writer.endObject();
+        }
+
+        @Override
+        public void endActions() throws Exception {
+            writer.endArray();
         }
     }
 }
