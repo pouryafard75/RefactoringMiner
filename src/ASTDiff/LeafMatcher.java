@@ -1,6 +1,7 @@
 package ASTDiff;
 
 import gr.uom.java.xmi.decomposition.AbstractCodeMapping;
+import gr.uom.java.xmi.decomposition.AbstractExpression;
 import matchers.*;
 import org.eclipse.jdt.core.dom.ASTNode;
 import tree.FakeTree;
@@ -15,6 +16,9 @@ import java.util.Map;
 public class LeafMatcher extends BasicTreeMatcher implements TreeMatcher{
     @Override
     public void match(Tree src, Tree dst, AbstractCodeMapping abstractCodeMapping, MultiMappingStore mappingStore) {
+        if (abstractCodeMapping != null)
+            if (abstractCodeMapping.getFragment1() instanceof AbstractExpression || abstractCodeMapping.getFragment2() instanceof AbstractExpression)
+                return;
 //        if (true) return;
         Map<Tree,Tree> srcCopy = new HashMap<>();
         Map<Tree,Tree> dstCopy = new HashMap<>();
