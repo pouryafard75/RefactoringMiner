@@ -54,45 +54,48 @@ public class ProjectASTDiffer
 //        return null;
         return new ProjectASTDiffer(UMLModelASTReader.makeProjectData_fromFiles(file1,file2));
     }
-    public static ProjectASTDiffer fromURL(String url)
-    {
-        String cleaned = clean(url);
-        return ProjectASTDiffer.fromRepoCommit(getRepo(cleaned),getCommit(cleaned));
-    }
-    private static String clean(String url)
-    {
-        int index = nthIndexOf(url,'#',1);
-        if (index == -1) return url;
-        return url.substring(0,index);
-
-    }
     private ProjectASTDiffer(ProjectData projectData){
         this.projectASTDiff = new ProjectASTDiff(projectData);
     }
-
-    private static String getRepo(String url) {
-        int index = nthIndexOf(url,'/',5);
-        return url.substring(0,index) + ".git";
-    }
-
-    private static String getCommit(String url) {
-        int index = nthIndexOf(url,'/',6);
-        return url.substring(index+1);
-    }
-    private static int nthIndexOf(String text, char needle, int n)
+    public static ProjectASTDiffer fromURL(String url)
     {
-        for (int i = 0; i < text.length(); i++)
+        String cleaned = URLHelper.clean(url);
+        return ProjectASTDiffer.fromRepoCommit(URLHelper.getRepo(cleaned),URLHelper.getCommit(cleaned));
+    }
+
+
+    public static class URLHelper{
+        public static String clean(String url)
         {
-            if (text.charAt(i) == needle)
+            int index = nthIndexOf(url,'#',1);
+            if (index == -1) return url;
+            return url.substring(0,index);
+
+        }
+        public static String getRepo(String url) {
+            int index = nthIndexOf(url,'/',5);
+            return url.substring(0,index) + ".git";
+        }
+
+        public static String getCommit(String url) {
+            int index = nthIndexOf(url,'/',6);
+            return url.substring(index+1);
+        }
+        public static int nthIndexOf(String text, char needle, int n)
+        {
+            for (int i = 0; i < text.length(); i++)
             {
-                n--;
-                if (n == 0)
+                if (text.charAt(i) == needle)
                 {
-                    return i;
+                    n--;
+                    if (n == 0)
+                    {
+                        return i;
+                    }
                 }
             }
+            return -1;
         }
-        return -1;
     }
 
 
@@ -165,11 +168,25 @@ public class ProjectASTDiffer
         processRefactorings(srcTree,dstTree,classDiff.getRefactorings(),mappingStore);
         processPackageDeclaration(srcTree,dstTree,classDiff,mappingStore);
         processImports(srcTree,dstTree,classDiff.getImportDiffList(),mappingStore);
+        processEnumConstants(srcTree,dstTree,classDiff.getCommonEnumConstants(),mappingStore);
+        for (UMLEnumConstantDiff umlEnumConstantDiff : classDiff.getEnumConstantDiffList()) {
+            UMLAnonymousClassDiff anonymousClassDiff = umlEnumConstantDiff.getAnonymousClassDiff().isPresent() ? umlEnumConstantDiff.getAnonymousClassDiff().get() : null;
+            List<UMLOperationBodyMapper> operationBodyMapperList = anonymousClassDiff.getOperationBodyMapperList();
+        }
         processClassDeclarationMapping(srcTree,dstTree,classDiff,mappingStore);
         processAllMethods(srcTree,dstTree,classDiff.getOperationBodyMapperList(),mappingStore);
         processModelDiffRefactorings(srcTree,dstTree,classDiff,this.projectASTDiff.getProjectData().getUmlModelDiff().getRefactorings(),mappingStore);
         if (_CHECK_COMMENTS) addAndProcessComments(treeContextPair.first, treeContextPair.second,mappingStore);
         return new ASTDiff(treeContextPair.first, treeContextPair.second, mappingStore);
+    }
+
+    private void processEnumConstants(Tree srcTree, Tree dstTree, Set<org.apache.commons.lang3.tuple.Pair<UMLEnumConstant, UMLEnumConstant>> commonEnumConstants, MultiMappingStore mappingStore) {
+        for (org.apache.commons.lang3.tuple.Pair<UMLEnumConstant, UMLEnumConstant> commonEnumConstant : commonEnumConstants) {
+            LocationInfo locationInfo1 = commonEnumConstant.getLeft().getLocationInfo();
+            LocationInfo locationInfo2 = commonEnumConstant.getRight().getLocationInfo();
+            Tree srcEnumConstant = Tree.findByLocationInfo(srcTree,locationInfo1);
+            Tree dstEnumConstant = Tree.findByLocationInfo(dstTree,locationInfo2);
+        }
     }
 
     private void processModelDiffRefactorings(Tree srcTree, Tree dstTree, UMLClassBaseDiff classDiff, List<Refactoring> refactorings, MultiMappingStore mappingStore) {
@@ -340,20 +357,21 @@ public class ProjectASTDiffer
         Tree srcStatementNode =Tree.findByLocationInfo(srcTree,leafMapping.getFragment1().getLocationInfo());
         Tree dstStatementNode =Tree.findByLocationInfo(dstTree,leafMapping.getFragment2().getLocationInfo());
 
-        if (leafMapping.getFragment2().toString().equals(leafMapping.getFragment1().toString())) {
-            mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
-        }
-        else {
-            if (srcStatementNode.isIsoStructuralTo(dstStatementNode))
+//        if (leafMapping.getFragment2().toString().equals(leafMapping.getFragment1().toString())) {
+//            mappingStore.addMappingRecursively(srcStatementNode, dstStatementNode);
+//        }
+//        else {
+//            if (srcStatementNode.isIsoStructuralTo(dstStatementNode))
+//            {
+//                mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
+//            }
+//            else
             {
-                mappingStore.addMappingRecursively(srcStatementNode,dstStatementNode);
-            }
-            else {
                 if (srcStatementNode.getType().name.equals(dstStatementNode.getType().name))
                     mappingStore.addMapping(srcStatementNode, dstStatementNode);
                 new LeafMatcher().match(srcStatementNode,dstStatementNode,abstractCodeMapping,mappingStore);
             }
-        }
+//        }
     }
 
     private void processClassAnnotations(Tree srcTree, Tree dstTree, UMLAnnotationListDiff annotationListDiff, MultiMappingStore mappingStore) {
