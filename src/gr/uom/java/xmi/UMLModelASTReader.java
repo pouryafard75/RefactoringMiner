@@ -71,36 +71,30 @@ public class UMLModelASTReader {
 			}
 			try {
 				CompilationUnit compilationUnit = (CompilationUnit)parser.createAST(null);
-//				if (this.umlModel.getRepositoryDirectories() == null) {
-//					LinkedHashSet<String> strings = new LinkedHashSet<>();
-//					strings.add("default");
-//					this.umlModel.setRepositoryDirectories(strings);
-//				}
-
-//				if (this.umlModel.getRepositoryDirectories() == null)
-//				{
-//	     			PackageDeclaration aPackage = compilationUnit.getPackage();
-//					Set<String> repDirectories = new LinkedHashSet<>();
-//					String defaultPackage = "default";
-//					if (aPackage == null)
-//						repDirectories.add(defaultPackage);
-//					else {
-//						if (aPackage.getName().getFullyQualifiedName().equals(""))
-//							repDirectories.add(defaultPackage);
-//						else {
-//							String currentString = aPackage.getName().getFullyQualifiedName();
-//							while (true) {
-//								String result = currentString.replace(".", "/");
-//								repDirectories.add(result);
-//								int lastDotIndex = currentString.lastIndexOf(".");
-//								if (lastDotIndex == -1)
-//									break;
-//								currentString = currentString.substring(0, lastDotIndex);
-//							}
-//						}
-//					}
-//					this.umlModel.setRepositoryDirectories(repDirectories);
-//				}
+				if (this.umlModel.getRepositoryDirectories() == null)
+				{
+	     			PackageDeclaration aPackage = compilationUnit.getPackage();
+					Set<String> repDirectories = new LinkedHashSet<>();
+					String defaultPackage = "default";
+					if (aPackage == null)
+						repDirectories.add(defaultPackage);
+					else {
+						if (aPackage.getName().getFullyQualifiedName().equals(""))
+							repDirectories.add(defaultPackage);
+						else {
+							String currentString = aPackage.getName().getFullyQualifiedName();
+							while (true) {
+								String result = currentString.replace(".", "/");
+								repDirectories.add(result);
+								int lastDotIndex = currentString.lastIndexOf(".");
+								if (lastDotIndex == -1)
+									break;
+								currentString = currentString.substring(0, lastDotIndex);
+							}
+						}
+					}
+					this.umlModel.setRepositoryDirectories(repDirectories);
+				}
 
 				IScanner scanner = ToolFactory.createScanner(true, false, false, false);
 				scanner.setSource(javaFileContent.toCharArray());
@@ -182,9 +176,25 @@ public class UMLModelASTReader {
 				}
 			}
 		}
+		boolean tempFlag1 = false;
+		boolean tempFlag2 = false;
+		if (modifiedName1.endsWith(".java")) {
+			modifiedName1 = modifiedName1.substring(0, modifiedName1.indexOf(".java"));
+			tempFlag1 = true;
+		}
+		modifiedName1 = modifiedName1.replace(".","/");
+		if (tempFlag1)
+			modifiedName1 += ".java";
 
-		dir1info.put(modifiedName1.replace(".","/"),contents1);
-		dir2info.put(modifiedName2.replace(".","/"),contents2);
+		if (modifiedName2.endsWith(".java")) {
+			modifiedName2 = modifiedName2.substring(0, modifiedName2.indexOf(".java"));
+			tempFlag2 = true;
+		}
+		modifiedName2 = modifiedName2.replace(".","/");
+		if (tempFlag2)
+			modifiedName2 += ".java";
+		dir1info.put(modifiedName1,contents1);
+		dir2info.put(modifiedName2,contents2);
 
 		logger.info("RefactoringMiner Started...");
 		long RM_started =  System.currentTimeMillis();
