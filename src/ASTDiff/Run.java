@@ -29,7 +29,7 @@ public class Run {
         String tempCommit = "https://github.com/pouryafard75/TestCases/commit/2a7cd0e864723e699070951b079ac33e47f01b8f";
         String pedReqCommit = "https://github.com/thundernest/k-9/commit/23c49d834d3859fc76a604da32d1789d2e863303";
         String pedReqCommit2 = "https://github.com/Netflix/eureka/commit/5103ace802b2819438318dd53b5b07512aae0d25";
-        url = pedReqCommit2;
+        url = splitConiditonExample2;
         projectASTDiff = ProjectASTDiffer.fromURL(url).diff();
 //
         //-----------------------------------------------------------------------------------------------------------------\\
@@ -60,11 +60,11 @@ public class Run {
 //          String file2 = "D:\\TestCases\\case\\v2.java";
 //        String file1 = "/Users/pourya/IdeaProjects/TestCases/v1/DistributedCacheStream.java";
 //        String file2 = "/Users/pourya/IdeaProjects/TestCases/v2/DistributedCacheStream.java";
-        file1 = "D:\\TestCases\\v1\\AbstractCacheStream.java";
-        file2 = "D:\\TestCases\\v2\\AbstractCacheStream.java";
-
-//        file1 = "D:\\TestCases\\sout\\parent.java";
-//        file2 = "D:\\TestCases\\sout\\child.java";
+//        file1 = "D:\\TestCases\\v1\\AbstractCacheStream.java";
+//        file2 = "D:\\TestCases\\v2\\AbstractCacheStream.java";
+//
+        file1 = "D:\\TestCases\\sout\\parent.java";
+        file2 = "D:\\TestCases\\sout\\child.java";
 //        projectASTDiff = ProjectASTDiffer.fromLocalFiles(file1,file2).diff();
 
         //-----------------------------------------------------------------------------------------------------------------\\

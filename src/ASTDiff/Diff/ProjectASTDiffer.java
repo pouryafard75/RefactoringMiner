@@ -172,9 +172,14 @@ public class ProjectASTDiffer
         processPackageDeclaration(srcTree,dstTree,classDiff,mappingStore);
         processImports(srcTree,dstTree,classDiff.getImportDiffList(),mappingStore);
         processEnumConstants(srcTree,dstTree,classDiff.getCommonEnumConstants(),mappingStore);
+
         for (UMLEnumConstantDiff umlEnumConstantDiff : classDiff.getEnumConstantDiffList()) {
             UMLAnonymousClassDiff anonymousClassDiff = umlEnumConstantDiff.getAnonymousClassDiff().isPresent() ? umlEnumConstantDiff.getAnonymousClassDiff().get() : null;
+            assert anonymousClassDiff != null;
             List<UMLOperationBodyMapper> operationBodyMapperList = anonymousClassDiff.getOperationBodyMapperList();
+            for (UMLOperationBodyMapper umlOperationBodyMapper : operationBodyMapperList) {
+                processMethod(srcTree,dstTree,umlOperationBodyMapper,mappingStore);
+            }
         }
         processClassDeclarationMapping(srcTree,dstTree,classDiff,mappingStore);
         processAllMethods(srcTree,dstTree,classDiff.getOperationBodyMapperList(),mappingStore);
@@ -189,6 +194,7 @@ public class ProjectASTDiffer
             LocationInfo locationInfo2 = commonEnumConstant.getRight().getLocationInfo();
             Tree srcEnumConstant = Tree.findByLocationInfo(srcTree,locationInfo1);
             Tree dstEnumConstant = Tree.findByLocationInfo(dstTree,locationInfo2);
+            new LeafMatcher().match(srcEnumConstant,dstEnumConstant,null,mappingStore);
         }
     }
 
