@@ -1,21 +1,16 @@
 package org.Tree;
 
-import ASTDiff.ProjectASTDiff;
-import ASTDiff.ProjectASTDiffer;
-import com.google.common.io.CharStreams;
-import matchers.Mapping;
-import matchers.MultiMappingStore;
+import ASTDiff.Diff.ProjectASTDiff;
+import ASTDiff.Diff.ProjectASTDiffer;
+import ASTDiff.matchers.MultiMappingStore;
 import org.junit.Test;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
-import org.refactoringminer.rm1.GitHistoryRefactoringMinerImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
