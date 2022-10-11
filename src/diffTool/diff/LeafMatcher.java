@@ -13,17 +13,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class LeafMatcher extends BasicTreeMatcher implements TreeMatcher {
+    private final boolean overwrite;
+
     @Override
     public void match(Tree src, Tree dst, AbstractCodeMapping abstractCodeMapping, MultiMappingStore mappingStore) {
-        if (abstractCodeMapping != null)
-            if (abstractCodeMapping.getFragment1() instanceof AbstractExpression || abstractCodeMapping.getFragment2() instanceof AbstractExpression)
-                return;
+//        if (abstractCodeMapping != null)
+//            if (abstractCodeMapping.getFragment1() instanceof AbstractExpression || abstractCodeMapping.getFragment2() instanceof AbstractExpression)
+//                return;
 //        if (true) return;
         Map<Tree,Tree> srcCopy = new HashMap<>();
         Map<Tree,Tree> dstCopy = new HashMap<>();
         Pair<Tree, Tree> prunedPair = pruneTrees(src, dst, srcCopy, dstCopy);
         MappingStore match = new GTSimple(0).match(prunedPair.first, prunedPair.second, new MappingStore(prunedPair.first, prunedPair.second));
-        mappingStore.addWithMaps(match,srcCopy,dstCopy);
+        if (!overwrite)
+            mappingStore.addWithMaps(match,srcCopy,dstCopy);
+        else
+            mappingStore.replaceWithMaps(match,srcCopy,dstCopy);
     }
     public Pair<Tree,Tree> pruneTrees(Tree src, Tree dst, Map<Tree,Tree> srcCopy, Map<Tree,Tree> dstCopy)
     {
@@ -110,6 +115,11 @@ public class LeafMatcher extends BasicTreeMatcher implements TreeMatcher {
 
     private void leafMatcher(Tree src, Tree dst,MultiMappingStore mappingStore) {
 //        super.match(src,dst,mappingStore);
+    }
+
+    LeafMatcher(boolean overwrite)
+    {
+        this.overwrite = overwrite;
     }
 }
 

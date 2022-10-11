@@ -34,7 +34,8 @@ public class ProjectASTDiffer
     private final static Logger logger = LoggerFactory.getLogger(ProjectASTDiffer.class);
     private final boolean _CHECK_COMMENTS = false;
     private ProjectASTDiff projectASTDiff;
-    private List<AbstractCodeFragment> nonMappedLeavesT1;
+    private List<AbstractCodeMapping> lastStepMappings;
+
 
     public ProjectASTDiff getProjectASTDiff() {
         return projectASTDiff;
@@ -168,6 +169,7 @@ public class ProjectASTDiffer
         Tree dstTree = dstTreeContext.getRoot();
         MultiMappingStore mappingStore = new MultiMappingStore(srcTreeContext,dstTreeContext);
         mappingStore.addMapping(srcTree,dstTree);
+        this.lastStepMappings = new ArrayList<>();
         processRefactorings(srcTree,dstTree,classDiff.getRefactorings(),mappingStore);
         processPackageDeclaration(srcTree,dstTree,classDiff,mappingStore);
         processImports(srcTree,dstTree,classDiff.getImportDiffList(),mappingStore);
@@ -184,8 +186,18 @@ public class ProjectASTDiffer
         processClassDeclarationMapping(srcTree,dstTree,classDiff,mappingStore);
         processAllMethods(srcTree,dstTree,classDiff.getOperationBodyMapperList(),mappingStore);
         processModelDiffRefactorings(srcTree,dstTree,classDiff,this.projectASTDiff.getProjectData().getUmlModelDiff().getRefactorings(),mappingStore);
+        processLastStepMappings(srcTree,dstTree,mappingStore);
         if (_CHECK_COMMENTS) addAndProcessComments(treeContextPair.first, treeContextPair.second,mappingStore);
         return new ASTDiff(treeContextPair.first, treeContextPair.second, mappingStore);
+    }
+
+    private void processLastStepMappings(Tree srcTree, Tree dstTree, MultiMappingStore mappingStore) {
+        for (AbstractCodeMapping lastStepMapping : lastStepMappings) {
+            System.out.println();
+            Tree srcExp = Tree.findByLocationInfo(srcTree,lastStepMapping.getFragment1().getLocationInfo());
+            Tree dstExp = Tree.findByLocationInfo(dstTree,lastStepMapping.getFragment2().getLocationInfo());
+            new LeafMatcher(true).match(srcExp,dstExp,lastStepMapping,mappingStore);
+        }
     }
 
     private void processEnumConstants(Tree srcTree, Tree dstTree, Set<org.apache.commons.lang3.tuple.Pair<UMLEnumConstant, UMLEnumConstant>> commonEnumConstants, MultiMappingStore mappingStore) {
@@ -194,7 +206,7 @@ public class ProjectASTDiffer
             LocationInfo locationInfo2 = commonEnumConstant.getRight().getLocationInfo();
             Tree srcEnumConstant = Tree.findByLocationInfo(srcTree,locationInfo1);
             Tree dstEnumConstant = Tree.findByLocationInfo(dstTree,locationInfo2);
-            new LeafMatcher().match(srcEnumConstant,dstEnumConstant,null,mappingStore);
+            new LeafMatcher(false).match(srcEnumConstant,dstEnumConstant,null,mappingStore);
         }
     }
 
@@ -290,7 +302,6 @@ public class ProjectASTDiffer
             Tree dstOperationNode = Tree.findByLocationInfo(dstTree, umlOperationBodyMapper.getOperation2().getLocationInfo());
             mappingStore.addMapping(srcOperationNode, dstOperationNode);
             processMethodSignature(srcOperationNode, dstOperationNode, umlOperationBodyMapper, mappingStore);
-            this.nonMappedLeavesT1 = umlOperationBodyMapper.getNonMappedLeavesT1();
             fromRefMiner(srcTree, dstTree, umlOperationBodyMapper, mappingStore);
         }
         else {
@@ -386,7 +397,11 @@ public class ProjectASTDiffer
             {
                 if (srcStatementNode.getType().name.equals(dstStatementNode.getType().name))
                     mappingStore.addMapping(srcStatementNode, dstStatementNode);
-                new LeafMatcher().match(srcStatementNode,dstStatementNode,abstractCodeMapping,mappingStore);
+
+                if (abstractCodeMapping.getFragment1() instanceof AbstractExpression || abstractCodeMapping.getFragment2() instanceof AbstractExpression)
+                    lastStepMappings.add(abstractCodeMapping);
+                else
+                    new LeafMatcher(false).match(srcStatementNode,dstStatementNode,abstractCodeMapping,mappingStore);
             }
 //        }
     }
@@ -624,7 +639,7 @@ public class ProjectASTDiffer
         Tree srcVarDeclaration = Tree.findByLocationInfo(srcTree,srcUMLAttribute.getVariableDeclaration().getLocationInfo());
         Tree dstVarDeclaration = Tree.findByLocationInfo(dstTree,dstUMLAttribute.getVariableDeclaration().getLocationInfo());
         mappingStore.addMapping(srcVarDeclaration,dstVarDeclaration);
-        new LeafMatcher().match(srcVarDeclaration,dstVarDeclaration,null,mappingStore);
+        new LeafMatcher(false).match(srcVarDeclaration,dstVarDeclaration,null,mappingStore);
         processAttributeJavaDoc(srcTree,dstTree,srcUMLAttribute.getJavadoc(),dstUMLAttribute.getJavadoc(),mappingStore);
         mappingStore.addMapping(srcVarDeclaration.getChild(0),dstVarDeclaration.getChild(0));
 

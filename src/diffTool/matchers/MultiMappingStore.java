@@ -148,7 +148,27 @@ public class MultiMappingStore implements Iterable<Mapping> {
         }
         return multis;
     }
-
+    public void replaceMapping(Tree src, Tree dst)
+    {
+        if (this.getDstForSrc(src) != null)
+        {
+        Set<Tree> dstForSrcList = new LinkedHashSet<>(this.getDstForSrc(src));
+            for (Tree dstForSrc : dstForSrcList)
+                removeMapping(src,dstForSrc);
+        }
+        if (this.getSrcForDst(dst) != null)
+        {
+        Set<Tree> srcForDstList = new LinkedHashSet<>(this.getSrcForDst(dst));
+            for (Tree srcForDst : srcForDstList)
+                removeMapping(srcForDst,dst);
+        }
+        if (!srcToDsts_all.containsKey(src))
+            srcToDsts_all.put(src, new HashSet<>());
+        srcToDsts_all.get(src).add(dst);
+        if (!dstToSrcs_all.containsKey(dst))
+            dstToSrcs_all.put(dst, new HashSet<>());
+        dstToSrcs_all.get(dst).add(src);
+    }
     public void addMapping(Tree src, Tree dst) {
         if (!srcToDsts_all.containsKey(src))
             srcToDsts_all.put(src, new HashSet<>());
@@ -167,8 +187,10 @@ public class MultiMappingStore implements Iterable<Mapping> {
     }
 
     public void removeMapping(Tree src, Tree dst) {
-        srcToDsts_all.get(src).remove(dst);
-        srcToDsts_all.get(dst).remove(src);
+        if (srcToDsts_all.get(src) != null)
+            srcToDsts_all.get(src).remove(dst);
+        if (dstToSrcs_all.get(dst) != null)
+            dstToSrcs_all.get(dst).remove(src);
     }
 
     public int size() {
@@ -279,6 +301,14 @@ public class MultiMappingStore implements Iterable<Mapping> {
             Tree realDst = dstCopy.get(mapping.second);
             if (realSrc != null && realDst != null)
                 this.addMapping(realSrc,realDst);
+        }
+    }
+    public void replaceWithMaps(MappingStore match,Map<Tree,Tree> srcCopy, Map<Tree,Tree> dstCopy) {
+        for (Mapping mapping : match) {
+            Tree realSrc = srcCopy.get(mapping.first);
+            Tree realDst = dstCopy.get(mapping.second);
+            if (realSrc != null && realDst != null)
+                this.replaceMapping(realSrc,realDst);
         }
     }
 
