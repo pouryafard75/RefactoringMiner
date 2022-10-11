@@ -1,12 +1,12 @@
 
 
 
-package ASTDiff.jdt;
+package diffTool.jdt;
 
-import ASTDiff.gen.SyntaxException;
-import ASTDiff.tree.Type;
-import ASTDiff.tree.TypeSet;
-import ASTDiff.tree.Tree;
+import diffTool.gen.SyntaxException;
+import diffTool.tree.Type;
+import diffTool.tree.TypeSet;
+import diffTool.tree.Tree;
 import org.eclipse.jdt.core.compiler.IScanner;
 import org.eclipse.jdt.core.compiler.ITerminalSymbols;
 import org.eclipse.jdt.core.compiler.InvalidInputException;
@@ -14,15 +14,15 @@ import org.eclipse.jdt.core.dom.*;
 
 public class JdtVisitor  extends AbstractJdtVisitor {
 
-    private static final ASTDiff.tree.Type INFIX_EXPRESSION_OPERATOR = TypeSet.type("INFIX_EXPRESSION_OPERATOR");
-    private static final ASTDiff.tree.Type METHOD_INVOCATION_RECEIVER = TypeSet.type("METHOD_INVOCATION_RECEIVER");
-    private static final ASTDiff.tree.Type METHOD_INVOCATION_ARGUMENTS = TypeSet.type("METHOD_INVOCATION_ARGUMENTS");
-    private static final ASTDiff.tree.Type TYPE_DECLARATION_KIND = TypeSet.type("TYPE_DECLARATION_KIND");
-    private static final ASTDiff.tree.Type ASSIGNMENT_OPERATOR = TypeSet.type("ASSIGNMENT_OPERATOR");
-    private static final ASTDiff.tree.Type PREFIX_EXPRESSION_OPERATOR = TypeSet.type("PREFIX_EXPRESSION_OPERATOR");
-    private static final ASTDiff.tree.Type POSTFIX_EXPRESSION_OPERATOR = TypeSet.type("POSTFIX_EXPRESSION_OPERATOR");
+    private static final diffTool.tree.Type INFIX_EXPRESSION_OPERATOR = TypeSet.type("INFIX_EXPRESSION_OPERATOR");
+    private static final diffTool.tree.Type METHOD_INVOCATION_RECEIVER = TypeSet.type("METHOD_INVOCATION_RECEIVER");
+    private static final diffTool.tree.Type METHOD_INVOCATION_ARGUMENTS = TypeSet.type("METHOD_INVOCATION_ARGUMENTS");
+    private static final diffTool.tree.Type TYPE_DECLARATION_KIND = TypeSet.type("TYPE_DECLARATION_KIND");
+    private static final diffTool.tree.Type ASSIGNMENT_OPERATOR = TypeSet.type("ASSIGNMENT_OPERATOR");
+    private static final diffTool.tree.Type PREFIX_EXPRESSION_OPERATOR = TypeSet.type("PREFIX_EXPRESSION_OPERATOR");
+    private static final diffTool.tree.Type POSTFIX_EXPRESSION_OPERATOR = TypeSet.type("POSTFIX_EXPRESSION_OPERATOR");
 
-    private static final ASTDiff.tree.Type ARRAY_INITIALIZER = nodeAsSymbol(ASTNode.ARRAY_INITIALIZER);
+    private static final diffTool.tree.Type ARRAY_INITIALIZER = nodeAsSymbol(ASTNode.ARRAY_INITIALIZER);
     private static final Type SIMPLE_NAME = nodeAsSymbol(ASTNode.SIMPLE_NAME);
 
     private IScanner scanner;

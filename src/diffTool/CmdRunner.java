@@ -1,13 +1,13 @@
-package ASTDiff;
+package diffTool;
 
 
-import ASTDiff.Diff.ProjectASTDiff;
-import ASTDiff.Diff.ProjectASTDiffer;
+import diffTool.diff.ProjectASTDiff;
+import diffTool.diff.ProjectASTDiffer;
 import org.apache.commons.cli.*;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
-import ASTDiff.webdiff.WebDiff;
+import diffTool.webdiff.WebDiff;
 
 import java.io.IOException;
 

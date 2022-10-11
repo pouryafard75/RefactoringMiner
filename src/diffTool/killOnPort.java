@@ -1,4 +1,4 @@
-package ASTDiff;
+package diffTool;
 
 import java.io.BufferedReader;
 import java.io.IOException;

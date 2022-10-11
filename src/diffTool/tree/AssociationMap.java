@@ -1,6 +1,6 @@
 
 
-package ASTDiff.tree;
+package diffTool.tree;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;

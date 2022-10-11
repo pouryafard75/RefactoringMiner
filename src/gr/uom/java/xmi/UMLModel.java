@@ -7,7 +7,7 @@ import java.io.File;
 import java.util.*;
 
 import org.refactoringminer.api.RefactoringMinerTimedOutException;
-import ASTDiff.tree.TreeContext;
+import diffTool.tree.TreeContext;
 
 public class UMLModel {
 	public File rootFolder;

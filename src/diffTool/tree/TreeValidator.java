@@ -1,5 +1,5 @@
 
-package ASTDiff.tree;
+package diffTool.tree;
 
 /**
  * Class dedicated to check the constraints on the ASTs.

@@ -1,5 +1,5 @@
-package ASTDiff.Diff;
-import ASTDiff.utils.Pair;
+package diffTool.diff;
+import diffTool.utils.Pair;
 
 import java.util.*;
 

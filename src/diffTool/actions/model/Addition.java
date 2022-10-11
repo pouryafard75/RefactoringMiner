@@ -1,7 +1,7 @@
 
 
-package ASTDiff.actions.model;
-import ASTDiff.tree.Tree;
+package diffTool.actions.model;
+import diffTool.tree.Tree;
 
 public abstract class Addition extends Action {
     protected Tree parent;

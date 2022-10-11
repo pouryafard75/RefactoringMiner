@@ -1,7 +1,7 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
 
-import ASTDiff.tree.Tree;
+import diffTool.tree.Tree;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectSortedMap;
 

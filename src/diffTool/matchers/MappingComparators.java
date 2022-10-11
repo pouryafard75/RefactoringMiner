@@ -1,8 +1,8 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
 
-import ASTDiff.utils.SequenceAlgorithms;
-import ASTDiff.tree.Tree;
+import diffTool.utils.SequenceAlgorithms;
+import diffTool.tree.Tree;
 import it.unimi.dsi.fastutil.doubles.DoubleArrayList;
 import it.unimi.dsi.fastutil.doubles.DoubleList;
 

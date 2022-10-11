@@ -1,7 +1,7 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
-import ASTDiff.tree.Tree;
-import ASTDiff.utils.Pair;
+import diffTool.tree.Tree;
+import diffTool.utils.Pair;
 
 public class Mapping extends Pair<Tree, Tree> {
     public Mapping(Tree a, Tree b) {

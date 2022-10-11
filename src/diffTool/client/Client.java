@@ -1,4 +1,4 @@
-package ASTDiff.client;
+package diffTool.client;
 
 
 public abstract class Client {

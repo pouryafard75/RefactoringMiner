@@ -1,8 +1,8 @@
 
-package ASTDiff.actions;
+package diffTool.actions;
 
-import ASTDiff.actions.model.Action;
-import ASTDiff.tree.Tree;
+import diffTool.actions.model.Action;
+import diffTool.tree.Tree;
 
 import java.util.Map;
 import java.util.Set;

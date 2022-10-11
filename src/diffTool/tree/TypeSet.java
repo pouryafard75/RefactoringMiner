@@ -1,5 +1,5 @@
 
-package ASTDiff.tree;
+package diffTool.tree;
 
 import java.util.HashMap;
 import java.util.Map;

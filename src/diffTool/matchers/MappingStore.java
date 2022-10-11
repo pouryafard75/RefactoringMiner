@@ -1,10 +1,10 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
 import java.util.*;
 
-import ASTDiff.tree.TreeContext;
-import ASTDiff.tree.Tree;
-import ASTDiff.utils.Pair;
+import diffTool.tree.TreeContext;
+import diffTool.tree.Tree;
+import diffTool.utils.Pair;
 
 public class MappingStore implements Iterable<Mapping> {
     /**

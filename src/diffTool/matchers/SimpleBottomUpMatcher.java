@@ -1,4 +1,4 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ASTDiff.tree.Type;
-import ASTDiff.utils.SequenceAlgorithms;
-import ASTDiff.tree.Tree;
-import ASTDiff.tree.TreeUtils;
+import diffTool.tree.Type;
+import diffTool.utils.SequenceAlgorithms;
+import diffTool.tree.Tree;
+import diffTool.tree.TreeUtils;
 
 public class SimpleBottomUpMatcher implements Matcher {
     public SimpleBottomUpMatcher() {

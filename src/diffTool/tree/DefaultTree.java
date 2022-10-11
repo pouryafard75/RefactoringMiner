@@ -1,6 +1,6 @@
 
 
-package ASTDiff.tree;
+package diffTool.tree;
 
 import java.util.ArrayList;
 import java.util.Iterator;

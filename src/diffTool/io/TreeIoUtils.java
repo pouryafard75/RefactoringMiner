@@ -1,11 +1,11 @@
 
 
-package ASTDiff.io;
-import ASTDiff.gen.TreeGenerator;
-import ASTDiff.tree.*;
-import ASTDiff.matchers.MappingStore;
-import ASTDiff.tree.TreeContext.MetadataSerializers;
-import ASTDiff.tree.TreeContext.MetadataUnserializers;
+package diffTool.io;
+import diffTool.gen.TreeGenerator;
+import diffTool.tree.*;
+import diffTool.matchers.MappingStore;
+import diffTool.tree.TreeContext.MetadataSerializers;
+import diffTool.tree.TreeContext.MetadataUnserializers;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.*;
@@ -389,7 +389,7 @@ public final class TreeIoUtils {
 
         @Override
         public void startTree(Tree tree) throws XMLStreamException {
-            writer.writeStartElement("ASTDiff/tree");
+            writer.writeStartElement("diffTool/tree");
             writer.writeAttribute("type", tree.getType().toString());
             if (tree.hasLabel()) writer.writeAttribute("label", tree.getLabel());
             if (Tree.NO_POS != tree.getPos()) {
@@ -683,7 +683,7 @@ public final class TreeIoUtils {
                     XMLEvent e = r.nextEvent();
                     if (e instanceof StartElement) {
                         StartElement s  = (StartElement) e;
-                        if (!s.getName().getLocalPart().equals("ASTDiff/tree")) // FIXME need to deal with options
+                        if (!s.getName().getLocalPart().equals("diffTool/tree")) // FIXME need to deal with options
                             continue;
                         Type type = TypeSet.type(s.getAttributeByName(TYPE).getValue());
 
@@ -701,7 +701,7 @@ public final class TreeIoUtils {
                             t.setParentAndUpdateChildren(trees.peekFirst());
                         trees.addFirst(t);
                     } else if (e instanceof EndElement) {
-                        if (!((EndElement) e).getName().getLocalPart().equals("ASTDiff/tree")) // FIXME need to deal with option
+                        if (!((EndElement) e).getName().getLocalPart().equals("diffTool/tree")) // FIXME need to deal with option
                             continue;
                         trees.removeFirst();
                     }

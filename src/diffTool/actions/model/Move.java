@@ -1,8 +1,8 @@
 
 
-package ASTDiff.actions.model;
+package diffTool.actions.model;
 
-import ASTDiff.tree.Tree;
+import diffTool.tree.Tree;
 
 public class Move extends TreeAddition {
     public Move(Tree node, Tree parent, int pos) {

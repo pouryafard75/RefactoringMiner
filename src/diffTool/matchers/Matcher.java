@@ -1,6 +1,6 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
-import ASTDiff.tree.Tree;
+import diffTool.tree.Tree;
 public interface Matcher {
     /**
      * Compute and return the mappings between a provided src and dst AST.

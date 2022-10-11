@@ -1,13 +1,13 @@
-package ASTDiff.actions;
+package diffTool.actions;
 
-import ASTDiff.actions.model.*;
-import ASTDiff.matchers.Mapping;
-import ASTDiff.matchers.MappingStore;
-import ASTDiff.matchers.MultiMappingStore;
-import ASTDiff.tree.FakeTree;
-import ASTDiff.tree.Tree;
-import ASTDiff.tree.TreeContext;
-import ASTDiff.tree.TreeUtils;
+import diffTool.actions.model.*;
+import diffTool.matchers.Mapping;
+import diffTool.matchers.MappingStore;
+import diffTool.matchers.MultiMappingStore;
+import diffTool.tree.FakeTree;
+import diffTool.tree.Tree;
+import diffTool.tree.TreeContext;
+import diffTool.tree.TreeUtils;
 
 import java.util.*;
 

@@ -1,9 +1,9 @@
 
-package ASTDiff.actions;
-import ASTDiff.actions.model.MultiMoveActionGenerator;
-import ASTDiff.matchers.MultiMappingStore;
-import ASTDiff.tree.Tree;
-import ASTDiff.tree.TreeContext;
+package diffTool.actions;
+import diffTool.actions.model.MultiMoveActionGenerator;
+import diffTool.matchers.MultiMappingStore;
+import diffTool.tree.Tree;
+import diffTool.tree.TreeContext;
 
 import java.util.Map;
 import java.util.Set;

@@ -1,7 +1,7 @@
-package ASTDiff.webdiff;
+package diffTool.webdiff;
 
-import ASTDiff.actions.ASTDiff;
-import ASTDiff.utils.Pair;
+import diffTool.actions.ASTDiff;
+import diffTool.utils.Pair;
 import org.rendersnake.HtmlCanvas;
 import org.rendersnake.Renderable;
 import spark.Spark;
@@ -11,10 +11,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
-import ASTDiff.Diff.DiffInfo;
-import ASTDiff.Diff.DirComperator;
+import diffTool.diff.DiffInfo;
+import diffTool.diff.DirComperator;
 
-import ASTDiff.Diff.ProjectASTDiff;
+import diffTool.diff.ProjectASTDiff;
 
 import static spark.Spark.*;
 

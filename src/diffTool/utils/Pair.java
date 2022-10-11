@@ -1,4 +1,4 @@
-package ASTDiff.utils;
+package diffTool.utils;
 
 /**
  * A class to store immutable pairs of objects.

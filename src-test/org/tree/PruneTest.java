@@ -1,9 +1,9 @@
-package org.Tree;
+package org.tree;
 
-import ASTDiff.jdt.JdtTreeGenerator;
+import diffTool.jdt.JdtTreeGenerator;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import ASTDiff.tree.Tree;
+import diffTool.tree.Tree;
 
 import java.io.IOException;
 import java.util.HashMap;

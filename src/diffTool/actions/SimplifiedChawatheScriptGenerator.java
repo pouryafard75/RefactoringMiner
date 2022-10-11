@@ -1,10 +1,10 @@
 
-package ASTDiff.actions;
+package diffTool.actions;
 
-import ASTDiff.actions.model.*;
-import ASTDiff.matchers.MultiMappingStore;
-import ASTDiff.tree.Tree;
-import ASTDiff.tree.TreeContext;
+import diffTool.actions.model.*;
+import diffTool.matchers.MultiMappingStore;
+import diffTool.tree.Tree;
+import diffTool.tree.TreeContext;
 
 import java.util.HashMap;
 import java.util.Map;

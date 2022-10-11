@@ -1,6 +1,6 @@
 
 
-package ASTDiff.client;
+package diffTool.client;
 
 import java.io.PrintStream;
 import java.util.ArrayList;

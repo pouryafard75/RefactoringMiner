@@ -1,7 +1,7 @@
-package ASTDiff.Diff;
+package diffTool.diff;
 
 
-import ASTDiff.actions.ASTDiff;
+import diffTool.actions.ASTDiff;
 import org.refactoringminer.rm1.ProjectData;
 
 import java.util.HashMap;

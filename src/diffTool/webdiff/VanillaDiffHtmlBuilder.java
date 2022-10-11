@@ -1,13 +1,13 @@
 
 
-package ASTDiff.webdiff;
+package diffTool.webdiff;
 
-import ASTDiff.actions.ASTDiff;
-import ASTDiff.actions.TreeClassifier;
-import ASTDiff.actions.model.MultiMove;
-import ASTDiff.utils.SequenceAlgorithms;
-import ASTDiff.tree.Tree;
-import ASTDiff.tree.TreeContext;
+import diffTool.actions.ASTDiff;
+import diffTool.actions.TreeClassifier;
+import diffTool.actions.model.MultiMove;
+import diffTool.utils.SequenceAlgorithms;
+import diffTool.tree.Tree;
+import diffTool.tree.TreeContext;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 

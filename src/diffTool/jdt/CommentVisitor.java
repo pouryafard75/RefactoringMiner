@@ -1,11 +1,11 @@
-package ASTDiff.jdt;
+package diffTool.jdt;
 
-import ASTDiff.tree.Type;
-import ASTDiff.tree.TypeSet;
+import diffTool.tree.Type;
+import diffTool.tree.TypeSet;
 import gr.uom.java.xmi.LocationInfo;
 import gr.uom.java.xmi.UMLComment;
-import ASTDiff.tree.Tree;
-import ASTDiff.tree.TreeContext;
+import diffTool.tree.Tree;
+import diffTool.tree.TreeContext;
 
 import java.util.ArrayList;
 import java.util.List;

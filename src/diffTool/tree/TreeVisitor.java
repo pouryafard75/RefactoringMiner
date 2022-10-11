@@ -1,7 +1,7 @@
 
-package ASTDiff.tree;
+package diffTool.tree;
 
-import ASTDiff.utils.Pair;
+import diffTool.utils.Pair;
 
 import java.util.ArrayDeque;
 import java.util.Deque;

@@ -1,14 +1,14 @@
 
 
-package ASTDiff.io;
+package diffTool.io;
 
-import ASTDiff.actions.EditScript;
-import ASTDiff.actions.model.*;
-import ASTDiff.matchers.MultiMappingStore;
+import diffTool.actions.EditScript;
+import diffTool.actions.model.*;
+import diffTool.matchers.MultiMappingStore;
 import com.google.gson.stream.JsonWriter;
-import ASTDiff.matchers.Mapping;
-import ASTDiff.tree.Tree;
-import ASTDiff.tree.TreeContext;
+import diffTool.matchers.Mapping;
+import diffTool.tree.Tree;
+import diffTool.tree.TreeContext;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
@@ -184,7 +184,7 @@ public final class ActionsIoUtils {
 
         @Override
         public void startActions() throws XMLStreamException {
-            writer.writeStartElement("ASTDiff/actions");
+            writer.writeStartElement("diffTool/actions");
         }
 
         @Override
@@ -243,7 +243,7 @@ public final class ActionsIoUtils {
 
         private void start(Action action, Tree src) throws XMLStreamException {
             writer.writeEmptyElement(action.getName());
-            writer.writeAttribute("ASTDiff/tree", src.toString());
+            writer.writeAttribute("diffTool/tree", src.toString());
         }
 
         private void end(Tree node) throws XMLStreamException {
@@ -372,7 +372,7 @@ public final class ActionsIoUtils {
 
         @Override
         public void startActions() throws IOException {
-            writer.name("ASTDiff/actions").beginArray();
+            writer.name("diffTool/actions").beginArray();
         }
 
         @Override
@@ -427,7 +427,7 @@ public final class ActionsIoUtils {
         private void start(Action action, Tree src) throws IOException {
             writer.beginObject();
             writer.name("action").value(action.getName());
-            writer.name("ASTDiff/tree").value(src.toString());
+            writer.name("diffTool/tree").value(src.toString());
         }
 
         private void end(Tree node) throws IOException {

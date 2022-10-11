@@ -1,4 +1,4 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.simmetrics.StringMetrics;
 
-import ASTDiff.tree.Tree;
+import diffTool.tree.Tree;
 
 public class ZsMatcher implements Matcher {
 

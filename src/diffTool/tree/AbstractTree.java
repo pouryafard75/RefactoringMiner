@@ -1,9 +1,9 @@
 
 
-package ASTDiff.tree;
+package diffTool.tree;
 
 
-import ASTDiff.io.TreeIoUtils;
+import diffTool.io.TreeIoUtils;
 import java.util.*;
 
 public abstract class AbstractTree implements Tree {

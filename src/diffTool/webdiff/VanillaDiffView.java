@@ -1,8 +1,8 @@
 
 
-package ASTDiff.webdiff;
+package diffTool.webdiff;
 
-import ASTDiff.actions.ASTDiff;
+import diffTool.actions.ASTDiff;
 import org.rendersnake.DocType;
 import org.rendersnake.HtmlCanvas;
 import org.rendersnake.Renderable;

@@ -1,6 +1,6 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
-import ASTDiff.tree.Tree;
+import diffTool.tree.Tree;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,9 +1,9 @@
 
-package ASTDiff.actions;
+package diffTool.actions;
 
-import ASTDiff.matchers.MappingStore;
-import ASTDiff.matchers.MultiMappingStore;
-import ASTDiff.tree.TreeContext;
+import diffTool.matchers.MappingStore;
+import diffTool.matchers.MultiMappingStore;
+import diffTool.tree.TreeContext;
 
 import java.util.Map;
 

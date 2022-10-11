@@ -1,5 +1,5 @@
 
-package ASTDiff.io;
+package diffTool.io;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamException;

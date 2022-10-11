@@ -19,7 +19,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import gr.uom.java.xmi.diff.UMLModelDiff;
-import ASTDiff.jdt.JdtVisitor;
+import diffTool.jdt.JdtVisitor;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.ToolFactory;
@@ -33,7 +33,7 @@ import org.refactoringminer.api.RefactoringMinerTimedOutException;
 import org.refactoringminer.rm1.ProjectData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ASTDiff.tree.TreeContext;
+import diffTool.tree.TreeContext;
 
 public class UMLModelASTReader {
 

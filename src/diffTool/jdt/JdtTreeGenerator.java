@@ -1,6 +1,6 @@
 
 
-package ASTDiff.jdt;
+package diffTool.jdt;
 
 import org.eclipse.jdt.core.compiler.IScanner;
 

@@ -1,10 +1,10 @@
 
 
-package ASTDiff.actions;
+package diffTool.actions;
 
-import ASTDiff.actions.model.*;
-import ASTDiff.actions.model.Delete;
-import ASTDiff.tree.Tree;
+import diffTool.actions.model.*;
+import diffTool.actions.model.Delete;
+import diffTool.tree.Tree;
 
 import java.util.HashSet;
 import java.util.Set;

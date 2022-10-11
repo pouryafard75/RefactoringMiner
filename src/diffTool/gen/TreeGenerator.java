@@ -1,10 +1,10 @@
-package ASTDiff.gen;
+package diffTool.gen;
 
 
 
 
 
-import ASTDiff.tree.TreeContext;
+import diffTool.tree.TreeContext;
 
 
 import java.io.*;

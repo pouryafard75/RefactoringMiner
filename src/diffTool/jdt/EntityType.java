@@ -1,4 +1,4 @@
-package ASTDiff.jdt;
+package diffTool.jdt;
 
 
 public enum EntityType {

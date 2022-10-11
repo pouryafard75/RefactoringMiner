@@ -1,4 +1,4 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 
-import ASTDiff.tree.Tree;
+import diffTool.tree.Tree;
 //import com.google.common.collect.Sets;
 
 public abstract class AbstractBottomUpMatcher implements Matcher {

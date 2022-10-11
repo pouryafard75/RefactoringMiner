@@ -1,6 +1,6 @@
 
 
-package ASTDiff.tree;
+package diffTool.tree;
 
 /**
  * Class containing several metrics information regarding a node of an AST.

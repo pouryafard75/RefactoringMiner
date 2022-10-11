@@ -1,9 +1,9 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
 import java.util.*;
 import java.util.function.Function;
-import ASTDiff.tree.Tree;
-import ASTDiff.utils.Pair;
+import diffTool.tree.Tree;
+import diffTool.utils.Pair;
 
 public abstract class AbstractSubtreeMatcher {
     private static final int DEFAULT_MIN_PRIORITY = 1;

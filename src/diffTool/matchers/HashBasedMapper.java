@@ -1,7 +1,7 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
-import ASTDiff.tree.Tree;
-import ASTDiff.utils.Pair;
+import diffTool.tree.Tree;
+import diffTool.utils.Pair;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 

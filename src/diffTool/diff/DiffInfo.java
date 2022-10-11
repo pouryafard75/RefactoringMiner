@@ -1,6 +1,6 @@
-package ASTDiff.Diff;
+package diffTool.diff;
 
-import ASTDiff.utils.Pair;
+import diffTool.utils.Pair;
 
 public class DiffInfo extends Pair<String,String> {
 

@@ -1,6 +1,6 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
-import ASTDiff.tree.Tree;
+import diffTool.tree.Tree;
 
 public class GTGreedy extends GTM {
     public GTGreedy(int minP) {

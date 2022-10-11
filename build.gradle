@@ -69,6 +69,18 @@ artifacts {
     archives javadocJar, sourcesJar
 }
 
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Main-Class': 'org.refactoringminer.RefactoringMiner'
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it)}
+    }
+    exclude 'META-INF', 'META-INF/**'
+
+    with jar
+}
 ext.isReleaseVersion = !version.endsWith("SNAPSHOT")
 
 publishing {

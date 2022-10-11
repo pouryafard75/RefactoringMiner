@@ -18,10 +18,10 @@
  * Copyright 2011-2015 Floréal Morandat <florealm@gmail.com>
  */
 
-package ASTDiff.webdiff;
+package diffTool.webdiff;
 
-import ASTDiff.actions.ASTDiff;
-import ASTDiff.io.ActionsIoUtils;
+import diffTool.actions.ASTDiff;
+import diffTool.io.ActionsIoUtils;
 import org.rendersnake.DocType;
 import org.rendersnake.HtmlCanvas;
 import org.rendersnake.Renderable;

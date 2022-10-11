@@ -1,9 +1,9 @@
 
 
-package ASTDiff.webdiff;
+package diffTool.webdiff;
 
 
-import ASTDiff.Diff.DiffInfo;
+import diffTool.diff.DiffInfo;
 import org.rendersnake.DocType;
 import org.rendersnake.HtmlCanvas;
 import org.rendersnake.Renderable;
@@ -11,7 +11,7 @@ import org.rendersnake.Renderable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
-import ASTDiff.Diff.DirComperator;
+import diffTool.diff.DirComperator;
 
 import static org.rendersnake.HtmlAttributesFactory.*;
 

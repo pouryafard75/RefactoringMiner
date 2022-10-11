@@ -1,8 +1,8 @@
 
 
-package ASTDiff.io;
+package diffTool.io;
 
-import ASTDiff.utils.Pair;
+import diffTool.utils.Pair;
 
 import java.io.*;
 import java.nio.file.*;

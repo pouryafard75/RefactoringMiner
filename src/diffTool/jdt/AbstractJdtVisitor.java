@@ -1,16 +1,16 @@
 
 
-package ASTDiff.jdt;
+package diffTool.jdt;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 
-import ASTDiff.tree.Type;
-import ASTDiff.tree.TypeSet;
+import diffTool.tree.Type;
+import diffTool.tree.TypeSet;
 import org.eclipse.jdt.core.dom.*;
-import ASTDiff.tree.Tree;
-import ASTDiff.tree.TreeContext;
+import diffTool.tree.Tree;
+import diffTool.tree.TreeContext;
 
 public abstract class AbstractJdtVisitor extends ASTVisitor {
 
@@ -30,21 +30,21 @@ public abstract class AbstractJdtVisitor extends ASTVisitor {
         push(n, nodeAsSymbol(n), label, n.getStartPosition(), n.getLength());
     }
 
-    protected void pushNode(ASTNode n, ASTDiff.tree.Type type, int pos, int length) {
+    protected void pushNode(ASTNode n, diffTool.tree.Type type, int pos, int length) {
         push(n, type, "", pos, length);
     }
 
     protected void pushFakeNode(EntityType n, int startPosition, int length) {
-        ASTDiff.tree.Type type = TypeSet.type(n.name()); // FIXME is that consistent with AbstractJDTVisitor.type
+        diffTool.tree.Type type = TypeSet.type(n.name()); // FIXME is that consistent with AbstractJDTVisitor.type
         push(null, type,"", startPosition, length);
     }
 
-    protected void push(ASTNode n, ASTDiff.tree.Type type, String label, int startPosition, int length) {
-        if (type.name.equals("Modifier"))
-        {
-            if (label.equals("public") || label.equals("private") || label.equals("protected") || label.equals("default"))
-                type = TypeSet.type("AccessModifier");
-        }
+    protected void push(ASTNode n, diffTool.tree.Type type, String label, int startPosition, int length) {
+//        if (type.name.equals("Modifier"))
+//        {
+//            if (label.equals("public") || label.equals("private") || label.equals("protected") || label.equals("default"))
+//                type = TypeSet.type("AccessModifier");
+//        }
         Tree t = context.createTree(type, label);
         t.setPos(startPosition);
         t.setLength(length);
@@ -98,7 +98,7 @@ public abstract class AbstractJdtVisitor extends ASTVisitor {
         trees.pop();
     }
 
-    protected static ASTDiff.tree.Type nodeAsSymbol(ASTNode node) {
+    protected static diffTool.tree.Type nodeAsSymbol(ASTNode node) {
         return nodeAsSymbol(node.getNodeType());
     }
 

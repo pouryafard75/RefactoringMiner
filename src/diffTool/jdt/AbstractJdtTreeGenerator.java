@@ -1,10 +1,10 @@
 
 
-package ASTDiff.jdt;
+package diffTool.jdt;
 
-import ASTDiff.gen.SyntaxException;
-import ASTDiff.gen.TreeGenerator;
-import ASTDiff.tree.TreeContext;
+import diffTool.gen.SyntaxException;
+import diffTool.gen.TreeGenerator;
+import diffTool.tree.TreeContext;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.ToolFactory;
 import org.eclipse.jdt.core.compiler.IScanner;

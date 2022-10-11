@@ -1,8 +1,8 @@
-package ASTDiff;
-import ASTDiff.Diff.ProjectASTDiff;
-import ASTDiff.Diff.ProjectASTDiffer;
+package diffTool;
+import diffTool.diff.ProjectASTDiff;
+import diffTool.diff.ProjectASTDiffer;
 import org.refactoringminer.api.*;
-import ASTDiff.webdiff.WebDiff;
+import diffTool.webdiff.WebDiff;
 import java.io.IOException;
 
 
@@ -18,11 +18,11 @@ public class Run {
         String reqCommit =  "https://github.com/phishman3579/java-algorithms-implementation/commit/ab98bcacf6e5bf1c3a06f6bcca68f178f880ffc9";
 //        String pedramReqCommit =  "https://github.com/rstudio/rstudio/commit/9a581e07cb6381d70f3fd9bb2055e810e2a682a9";
 //        String pedramReqCommit2 =  "https://github.com/jfinal/jfinal/commit/881baed894540031bd55e402933bcad28b74ca88";
-        String splitConiditonExample1 =  "https://github.com/kiegroup/drools/commit/1bf2875e9d73e2d1cd3b58200d5300485f890ff5#diff-1e1bf3853477703f78c734cfb42a7cb2a2a0e55e5ac89265a9a9e73982d5438bL231-L233";
-        String splitConiditonExample2 =  "https://github.com/nutzam/nutz/commit/6599c748ef35d38085703cf3bd41b9b5b6af5f32#diff-d47d95ef90d7f70d88b06a02d8505b58a81c7c1174c2494e56c9b09d090bc6edL307";
-        String splitConiditonExample3 =  "https://github.com/graphhopper/graphhopper/commit/7f80425b6a0af9bdfef12c8a873676e39e0a04a6#diff-619f379c7f10d178fba87944b27d543e3f36a9d34803fbdd5ab964a8c9f60a86L943";
-        String splitConiditonExample4 =  "https://github.com/BuildCraft/BuildCraft/commit/6abc40ed4850d74ee6c155f5a28f8b34881a0284#diff-0850b8a596d522bb87b55e5a3799a56612654c4c2b7d86a8157bf2d6bb8e5e0cL353-L356";
-        String splitConiditonExample5 =  "https://github.com/JetBrains/intellij-community/commit/1b70adbfd49e00194c4c1170ef65e8114d7a2e46#diff-618af48f6b6713ae4367692615f2309a93d3ac39eb4453167d89ed33d0f8e35aL160";
+        String splitConditionExample1 =  "https://github.com/kiegroup/drools/commit/1bf2875e9d73e2d1cd3b58200d5300485f890ff5#diff-1e1bf3853477703f78c734cfb42a7cb2a2a0e55e5ac89265a9a9e73982d5438bL231-L233";
+        String splitConditionExample2 =  "https://github.com/nutzam/nutz/commit/6599c748ef35d38085703cf3bd41b9b5b6af5f32#diff-d47d95ef90d7f70d88b06a02d8505b58a81c7c1174c2494e56c9b09d090bc6edL307";
+        String splitConditionExample3 =  "https://github.com/graphhopper/graphhopper/commit/7f80425b6a0af9bdfef12c8a873676e39e0a04a6#diff-619f379c7f10d178fba87944b27d543e3f36a9d34803fbdd5ab964a8c9f60a86L943";
+        String splitConditionExample4 =  "https://github.com/BuildCraft/BuildCraft/commit/6abc40ed4850d74ee6c155f5a28f8b34881a0284#diff-0850b8a596d522bb87b55e5a3799a56612654c4c2b7d86a8157bf2d6bb8e5e0cL353-L356";
+        String splitConditionExample5 =  "https://github.com/JetBrains/intellij-community/commit/1b70adbfd49e00194c4c1170ef65e8114d7a2e46#diff-618af48f6b6713ae4367692615f2309a93d3ac39eb4453167d89ed33d0f8e35aL160";
 
         String working_commit = "https://github.com/infinispan/infinispan/commit/043030723632627b0908dca6b24dae91d3dfd938";
         String replicationCommit = "https://github.com/apache/cassandra/commit/ec52e77ecde749e7c5a483b26cbd8041f2a5a33c";
@@ -63,11 +63,11 @@ public class Run {
 //          String file2 = "D:\\TestCases\\case\\v2.java";
 //        String file1 = "/Users/pourya/IdeaProjects/TestCases/v1/DistributedCacheStream.java";
 //        String file2 = "/Users/pourya/IdeaProjects/TestCases/v2/DistributedCacheStream.java";
-//        file1 = "D:\\TestCases\\v1\\AbstractCacheStream.java";
-//        file2 = "D:\\TestCases\\v2\\AbstractCacheStream.java";
+        file1 = "D:\\TestCases\\v1\\DistributedCacheStream.java";
+        file2 = "D:\\TestCases\\v2\\DistributedCacheStream.java";
 //
-        file1 = "D:\\TestCases\\test\\test1.java";
-        file2 = "D:\\TestCases\\test\\test2.java";
+//        file1 = "D:\\TestCases\\test\\test1.java";
+//        file2 = "D:\\TestCases\\test\\test2.java";
         projectASTDiff = ProjectASTDiffer.fromLocalFiles(file1,file2).diff();
 
         //-----------------------------------------------------------------------------------------------------------------\\

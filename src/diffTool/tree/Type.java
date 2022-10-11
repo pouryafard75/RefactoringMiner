@@ -1,6 +1,6 @@
 
 
-package ASTDiff.tree;
+package diffTool.tree;
 
 /**
  * Class representing the types of AST nodes. The types should be unmutable and having

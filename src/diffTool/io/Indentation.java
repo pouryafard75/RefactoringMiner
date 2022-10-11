@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  */
-package ASTDiff.io;
+package diffTool.io;
 
 /**
  * Characters that represent line breaks and indentation. These are represented

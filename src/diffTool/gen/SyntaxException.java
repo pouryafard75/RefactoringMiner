@@ -1,4 +1,4 @@
-package ASTDiff.gen;
+package diffTool.gen;
 
 import java.io.Reader;
 

@@ -1,8 +1,8 @@
 
 
-package ASTDiff.utils;
+package diffTool.utils;
 
-import ASTDiff.tree.Tree;
+import diffTool.tree.Tree;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -18,9 +18,9 @@
  * Copyright 2011-2015 Floréal Morandat <florealm@gmail.com>
  */
 
-package ASTDiff.tree;
+package diffTool.tree;
 
-import ASTDiff.io.TreeIoUtils;
+import diffTool.io.TreeIoUtils;
 
 import java.io.File;
 import java.io.FileInputStream;

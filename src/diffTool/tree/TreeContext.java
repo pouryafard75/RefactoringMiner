@@ -1,8 +1,8 @@
 
 
-package ASTDiff.tree;
+package diffTool.tree;
 
-import ASTDiff.io.TreeIoUtils;
+import diffTool.io.TreeIoUtils;
 import gr.uom.java.xmi.UMLComment;
 
 import java.util.*;

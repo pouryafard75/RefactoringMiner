@@ -1,10 +1,10 @@
-package ASTDiff.Diff;
+package diffTool.diff;
 
 import gr.uom.java.xmi.decomposition.*;
-import ASTDiff.matchers.Mapping;
-import ASTDiff.matchers.MultiMappingStore;
-import ASTDiff.tree.DefaultTree;
-import ASTDiff.tree.Tree;
+import diffTool.matchers.Mapping;
+import diffTool.matchers.MultiMappingStore;
+import diffTool.tree.DefaultTree;
+import diffTool.tree.Tree;
 
 import java.util.HashMap;
 import java.util.Map;

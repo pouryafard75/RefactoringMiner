@@ -1,12 +1,12 @@
-package ASTDiff.Diff;
+package diffTool.diff;
 
-import ASTDiff.matchers.*;
+import diffTool.matchers.*;
 import gr.uom.java.xmi.decomposition.AbstractCodeMapping;
-import ASTDiff.tree.Tree;
-import ASTDiff.tree.TreeUtils;
-import ASTDiff.tree.Type;
-import ASTDiff.utils.Pair;
-import ASTDiff.utils.SequenceAlgorithms;
+import diffTool.tree.Tree;
+import diffTool.tree.TreeUtils;
+import diffTool.tree.Type;
+import diffTool.utils.Pair;
+import diffTool.utils.SequenceAlgorithms;
 
 import java.util.*;
 import java.util.function.Function;

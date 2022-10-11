@@ -1,6 +1,6 @@
 
 
-package ASTDiff.tree;
+package diffTool.tree;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -9,7 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import ASTDiff.utils.Pair;
+import diffTool.utils.Pair;
 
 /**
  * Class providing static utility tree methods.

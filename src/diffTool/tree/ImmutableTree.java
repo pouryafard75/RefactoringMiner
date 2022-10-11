@@ -1,5 +1,5 @@
 
-package ASTDiff.tree;
+package diffTool.tree;
 
 import java.util.Collections;
 import java.util.Iterator;

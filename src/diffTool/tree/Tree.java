@@ -1,6 +1,6 @@
 
 
-package ASTDiff.tree;
+package diffTool.tree;
 
 import gr.uom.java.xmi.LocationInfo;
 

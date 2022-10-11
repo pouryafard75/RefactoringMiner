@@ -18,7 +18,7 @@
  * Copyright 2011-2015 Floréal Morandat <florealm@gmail.com>
  */
 
-package ASTDiff.matchers;
+package diffTool.matchers;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,10 +29,10 @@ import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import ASTDiff.tree.FakeTree;
-import ASTDiff.tree.Tree;
-import ASTDiff.tree.TreeContext;
-import ASTDiff.utils.Pair;
+import diffTool.tree.FakeTree;
+import diffTool.tree.Tree;
+import diffTool.tree.TreeContext;
+import diffTool.utils.Pair;
 
 public class MultiMappingStore implements Iterable<Mapping> {
     private Map<Tree, Set<Tree>> srcToDsts_all;

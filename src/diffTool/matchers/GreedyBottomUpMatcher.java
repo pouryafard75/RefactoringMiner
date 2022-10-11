@@ -1,8 +1,8 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
 import java.util.List;
 
-import ASTDiff.tree.Tree;
+import diffTool.tree.Tree;
 
 /**
  * Match the nodes using a bottom-up approach. It browses the nodes of the source

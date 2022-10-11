@@ -1,10 +1,10 @@
 
 
-package ASTDiff.webdiff;
-import ASTDiff.actions.ASTDiff;
-import ASTDiff.actions.TreeClassifier;
-import ASTDiff.actions.model.MultiMove;
-import ASTDiff.tree.Tree;
+package diffTool.webdiff;
+import diffTool.actions.ASTDiff;
+import diffTool.actions.TreeClassifier;
+import diffTool.actions.model.MultiMove;
+import diffTool.tree.Tree;
 import org.rendersnake.DocType;
 import org.rendersnake.HtmlCanvas;
 import org.rendersnake.Renderable;

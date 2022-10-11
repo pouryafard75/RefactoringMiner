@@ -1,9 +1,9 @@
-package ASTDiff.matchers;
+package diffTool.matchers;
 
 import java.util.*;
 
-import ASTDiff.tree.Tree;
-import ASTDiff.utils.Pair;
+import diffTool.tree.Tree;
+import diffTool.utils.Pair;
 
 public class GreedySubtreeMatcher extends AbstractSubtreeMatcher {
     public GreedySubtreeMatcher(int minP) {

@@ -1,7 +1,7 @@
 
-package ASTDiff.actions;
+package diffTool.actions;
 
-import ASTDiff.actions.model.Action;
+import diffTool.actions.model.Action;
 
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -1,13 +1,13 @@
-package ASTDiff.Diff;
+package diffTool.diff;
 
-import ASTDiff.matchers.GTSimple;
-import ASTDiff.matchers.MappingStore;
-import ASTDiff.matchers.MultiMappingStore;
+import diffTool.matchers.GTSimple;
+import diffTool.matchers.MappingStore;
+import diffTool.matchers.MultiMappingStore;
 import gr.uom.java.xmi.decomposition.AbstractCodeMapping;
 import gr.uom.java.xmi.decomposition.AbstractExpression;
-import ASTDiff.tree.FakeTree;
-import ASTDiff.tree.Tree;
-import ASTDiff.utils.Pair;
+import diffTool.tree.FakeTree;
+import diffTool.tree.Tree;
+import diffTool.utils.Pair;
 
 import java.util.HashMap;
 import java.util.Map;

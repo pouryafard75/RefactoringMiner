@@ -1,8 +1,8 @@
 
 
-package ASTDiff.actions.model;
+package diffTool.actions.model;
 
-import ASTDiff.tree.Tree;
+import diffTool.tree.Tree;
 
 public class Update extends Action {
     private String value;
