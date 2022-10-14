@@ -7,6 +7,8 @@ import diffTool.matchers.MappingStore;
 import diffTool.matchers.MultiMappingStore;
 import gr.uom.java.xmi.*;
 import gr.uom.java.xmi.decomposition.*;
+import gr.uom.java.xmi.decomposition.replacement.Replacement;
+import gr.uom.java.xmi.decomposition.replacement.VariableReplacementWithMethodInvocation;
 import gr.uom.java.xmi.diff.*;
 import diffTool.jdt.CommentVisitor;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -216,6 +218,15 @@ public class ProjectASTDiffer
             {
                 List<String> beforeRefactoringClasses = refactoring.getInvolvedClassesBeforeRefactoring().stream().map(ImmutablePair::getRight).collect(Collectors.toList());
                 List<String> afterRefactoringClasses = refactoring.getInvolvedClassesAfterRefactoring().stream().map(ImmutablePair::getRight).collect(Collectors.toList());
+                if (refactoring instanceof MoveOperationRefactoring) {
+                    MoveOperationRefactoring moveOperationRefactoring = (MoveOperationRefactoring) refactoring;
+                    String srcPath = moveOperationRefactoring.getOriginalOperation().getLocationInfo().getFilePath();
+                    String dstPath = moveOperationRefactoring.getMovedOperation().getLocationInfo().getFilePath();
+                    Tree srcTotalTree = umlModelDiff.getParentModel().getTreeContextMap().get(srcPath).getRoot();
+                    Tree dstTotalTree = umlModelDiff.getChildModel().getTreeContextMap().get(dstPath).getRoot();
+                    processMethod(srcTotalTree, dstTotalTree, moveOperationRefactoring.getBodyMapper(), mappingStore);
+                }
+
                 if (afterRefactoringClasses.contains(classDiff.getNextClass().getName()))
                 {
                     if (refactoring.getRefactoringType().equals(RefactoringType.PUSH_DOWN_OPERATION))
@@ -538,7 +549,11 @@ public class ProjectASTDiffer
                 processFieldDeclaration(srcAttrTree,dstAttrTree,renameAttributeRefactoring.getOriginalAttribute(),renameAttributeRefactoring.getRenamedAttribute(),mappingStore);
             }
             else if (refactoring instanceof ExtractVariableRefactoring) {
-                ExtractVariableRefactoring extractVariableRefactoring = (ExtractVariableRefactoring)refactoring;
+//                ExtractVariableRefactoring extractVariableRefactoring = (ExtractVariableRefactoring)refactoring;
+//                AbstractExpression initializer = extractVariableRefactoring.getVariableDeclaration().getInitializer();
+//                for (AbstractCodeMapping reference : extractVariableRefactoring.getReferences()) {
+//
+//                }
             }
             else if (refactoring instanceof MergeVariableRefactoring)
             {

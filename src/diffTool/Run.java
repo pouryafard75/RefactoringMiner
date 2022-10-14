@@ -32,8 +32,12 @@ public class Run {
         String pedReqCommit2 = "https://github.com/Netflix/eureka/commit/5103ace802b2819438318dd53b5b07512aae0d25";
 
         String newCommit = "https://github.com/tsantalis/RefactoringMiner/commit/77ba11175b7d3a3297be5352a512e48e2526569d";
-        url = newCommit;
-//        projectASTDiff = ProjectASTDiffer.fromURL(url).diff();
+
+
+        String sprintBootCommit = "https://github.com/spring-projects/spring-boot/commit/becced5f0b7bac8200df7a5706b568687b517b90";
+
+        url = sprintBootCommit;
+        projectASTDiff = ProjectASTDiffer.fromURL(url).diff();
 //
         //-----------------------------------------------------------------------------------------------------------------\\
 
@@ -68,7 +72,7 @@ public class Run {
 //
 //        file1 = "D:\\TestCases\\test\\test1.java";
 //        file2 = "D:\\TestCases\\test\\test2.java";
-        projectASTDiff = ProjectASTDiffer.fromLocalFiles(file1,file2).diff();
+//        projectASTDiff = ProjectASTDiffer.fromLocalFiles(file1,file2).diff();
 
         //-----------------------------------------------------------------------------------------------------------------\\
 
