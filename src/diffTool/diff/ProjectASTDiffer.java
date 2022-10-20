@@ -37,6 +37,7 @@ public class ProjectASTDiffer
     private final boolean _CHECK_COMMENTS = false;
     private ProjectASTDiff projectASTDiff;
     private List<AbstractCodeMapping> lastStepMappings;
+    private List<Refactoring> modelDiffRefactorings;
 
 
     public ProjectASTDiff getProjectASTDiff() {
@@ -106,6 +107,10 @@ public class ProjectASTDiffer
 
 
     public ProjectASTDiff diff() throws RefactoringMinerTimedOutException {
+        long start = System.currentTimeMillis();
+        modelDiffRefactorings = this.projectASTDiff.getProjectData().getUmlModelDiff().getRefactorings();
+        long finish = System.currentTimeMillis();
+        logger.info("ModelDiff.getRefactorings() execution time: " + (finish - start)/ 1000 + " seconds");
         long diff_execution_started = System.currentTimeMillis();
         makeASTDiff(this.projectASTDiff.getProjectData().getUmlModelDiff().getCommonClassDiffList());
         makeASTDiff(this.projectASTDiff.getProjectData().getUmlModelDiff().getClassRenameDiffList());
@@ -176,7 +181,6 @@ public class ProjectASTDiffer
         processPackageDeclaration(srcTree,dstTree,classDiff,mappingStore);
         processImports(srcTree,dstTree,classDiff.getImportDiffList(),mappingStore);
         processEnumConstants(srcTree,dstTree,classDiff.getCommonEnumConstants(),mappingStore);
-
         for (UMLEnumConstantDiff umlEnumConstantDiff : classDiff.getEnumConstantDiffList()) {
             UMLAnonymousClassDiff anonymousClassDiff = umlEnumConstantDiff.getAnonymousClassDiff().isPresent() ? umlEnumConstantDiff.getAnonymousClassDiff().get() : null;
             assert anonymousClassDiff != null;
@@ -187,15 +191,14 @@ public class ProjectASTDiffer
         }
         processClassDeclarationMapping(srcTree,dstTree,classDiff,mappingStore);
         processAllMethods(srcTree,dstTree,classDiff.getOperationBodyMapperList(),mappingStore);
-        processModelDiffRefactorings(srcTree,dstTree,classDiff,this.projectASTDiff.getProjectData().getUmlModelDiff().getRefactorings(),mappingStore);
+        processModelDiffRefactorings(srcTree,dstTree,classDiff,modelDiffRefactorings,mappingStore);
         processLastStepMappings(srcTree,dstTree,mappingStore);
-        if (_CHECK_COMMENTS) addAndProcessComments(treeContextPair.first, treeContextPair.second,mappingStore);
+//        if (_CHECK_COMMENTS) addAndProcessComments(treeContextPair.first, treeContextPair.second,mappingStore);
         return new ASTDiff(treeContextPair.first, treeContextPair.second, mappingStore);
     }
 
     private void processLastStepMappings(Tree srcTree, Tree dstTree, MultiMappingStore mappingStore) {
         for (AbstractCodeMapping lastStepMapping : lastStepMappings) {
-            System.out.println();
             Tree srcExp = Tree.findByLocationInfo(srcTree,lastStepMapping.getFragment1().getLocationInfo());
             Tree dstExp = Tree.findByLocationInfo(dstTree,lastStepMapping.getFragment2().getLocationInfo());
             new LeafMatcher(true).match(srcExp,dstExp,lastStepMapping,mappingStore);

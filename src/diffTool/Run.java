@@ -36,7 +36,12 @@ public class Run {
 
         String sprintBootCommit = "https://github.com/spring-projects/spring-boot/commit/becced5f0b7bac8200df7a5706b568687b517b90";
 
-        url = sprintBootCommit;
+        String newCase=  "https://github.com/checkstyle/checkstyle/commit/c2d3932843e70e4bb5df7161800aca248f9af778";
+        String blackSq = "https://github.com/checkstyle/checkstyle/commit/1bd30555eac039d0486dffb3fc43b7a34117909b#diff-53107268c5f517054756dc73dca09db673c59ff812b31e0267a770407a723139R166";
+        String pedTempReq = "https://github.com/phishman3579/java-algorithms-implementation/commit/f2385a56e6aa040ea4ff18a23ce5b63a4eeacf29";
+        String timeConsuming = "https://github.com/tsantalis/RefactoringMiner/commit/40cf1c8b96cadaa561587696932fa9c43e515252";
+
+        url = timeConsuming;
         projectASTDiff = ProjectASTDiffer.fromURL(url).diff();
 //
         //-----------------------------------------------------------------------------------------------------------------\\
@@ -67,8 +72,8 @@ public class Run {
 //          String file2 = "D:\\TestCases\\case\\v2.java";
 //        String file1 = "/Users/pourya/IdeaProjects/TestCases/v1/DistributedCacheStream.java";
 //        String file2 = "/Users/pourya/IdeaProjects/TestCases/v2/DistributedCacheStream.java";
-        file1 = "D:\\TestCases\\v1\\DistributedCacheStream.java";
-        file2 = "D:\\TestCases\\v2\\DistributedCacheStream.java";
+        file1 = "D:\\TestCases\\BS\\v1.java";
+        file2 = "D:\\TestCases\\BS\\v2.java";
 //
 //        file1 = "D:\\TestCases\\test\\test1.java";
 //        file2 = "D:\\TestCases\\test\\test2.java";
