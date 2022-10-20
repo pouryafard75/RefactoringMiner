@@ -229,6 +229,16 @@ public class ProjectASTDiffer
                     Tree dstTotalTree = umlModelDiff.getChildModel().getTreeContextMap().get(dstPath).getRoot();
                     processMethod(srcTotalTree, dstTotalTree, moveOperationRefactoring.getBodyMapper(), mappingStore);
                 }
+                if (refactoring instanceof MoveAttributeRefactoring)
+                {
+                    MoveAttributeRefactoring moveAttributeRefactoring = (MoveAttributeRefactoring) refactoring;
+
+                    String srcPath = moveAttributeRefactoring.getOriginalAttribute().getLocationInfo().getFilePath();
+                    String dstPath = moveAttributeRefactoring.getMovedAttribute().getLocationInfo().getFilePath();
+                    Tree srcTotalTree = umlModelDiff.getParentModel().getTreeContextMap().get(srcPath).getRoot();
+                    Tree dstTotalTree = umlModelDiff.getChildModel().getTreeContextMap().get(dstPath).getRoot();
+                    processFieldDeclaration(srcTotalTree,dstTotalTree,moveAttributeRefactoring.getOriginalAttribute(),moveAttributeRefactoring.getMovedAttribute(),mappingStore);
+                }
 
                 if (afterRefactoringClasses.contains(classDiff.getNextClass().getName()))
                 {
