@@ -187,10 +187,16 @@ public class MultiMappingStore implements Iterable<Mapping> {
     }
 
     public void removeMapping(Tree src, Tree dst) {
-        if (srcToDsts_all.get(src) != null)
+        if (srcToDsts_all.get(src) != null) {
             srcToDsts_all.get(src).remove(dst);
-        if (dstToSrcs_all.get(dst) != null)
+            if (srcToDsts_all.get(src).size() == 0)
+                srcToDsts_all.remove(src);
+        }
+        if (dstToSrcs_all.get(dst) != null) {
             dstToSrcs_all.get(dst).remove(src);
+            if (dstToSrcs_all.get(dst).size() == 0)
+                dstToSrcs_all.remove(dst);
+        }
     }
 
     public int size() {
