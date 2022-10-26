@@ -122,6 +122,7 @@ public class ProjectASTDiffer
         logger.info("ModelDiff.getRefactorings() execution time: " + (finish - start)/ 1000 + " seconds");
         long diff_execution_started = System.currentTimeMillis();
         makeASTDiff(this.projectASTDiff.getProjectData().getUmlModelDiff().getCommonClassDiffList());
+//
         makeASTDiff(this.projectASTDiff.getProjectData().getUmlModelDiff().getClassRenameDiffList());
 //        makeASTDiff(this.projectASTDiff.getProjectData().getUmlModelDiff().getClassMoveDiffList());
         long diff_execution_finished =  System.currentTimeMillis();
@@ -208,9 +209,11 @@ public class ProjectASTDiffer
 
     private void processLastStepMappings(Tree srcTree, Tree dstTree, MultiMappingStore mappingStore) {
         for (AbstractCodeMapping lastStepMapping : lastStepMappings) {
-            Tree srcExp = Tree.findByLocationInfo(srcTree,lastStepMapping.getFragment1().getLocationInfo());
-            Tree dstExp = Tree.findByLocationInfo(dstTree,lastStepMapping.getFragment2().getLocationInfo());
-            new LeafMatcher(true).match(srcExp,dstExp,lastStepMapping,mappingStore);
+            if (lastStepMapping.getFragment1().getLocationInfo().getFilePath().equals(lastStepMapping.getFragment2().getLocationInfo().getFilePath())) {
+                Tree srcExp = Tree.findByLocationInfo(srcTree, lastStepMapping.getFragment1().getLocationInfo());
+                Tree dstExp = Tree.findByLocationInfo(dstTree, lastStepMapping.getFragment2().getLocationInfo());
+                new LeafMatcher(true).match(srcExp, dstExp, lastStepMapping, mappingStore);
+            }
         }
     }
 
