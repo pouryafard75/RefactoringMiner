@@ -1,5 +1,6 @@
 package diffTool.diff;
 
+import gr.uom.java.xmi.LocationInfo;
 import gr.uom.java.xmi.decomposition.*;
 import diffTool.matchers.Mapping;
 import diffTool.matchers.MultiMappingStore;
@@ -15,7 +16,11 @@ public class CompositeMatcher extends BasicTreeMatcher implements TreeMatcher {
     @Override
     public void match(Tree src, Tree dst, AbstractCodeMapping abstractCodeMapping, MultiMappingStore mappingStore) {
 //        if (true) return;
-        compositeMatcher(src,dst,abstractCodeMapping,mappingStore);
+        String labeled = "LabeledStatement";
+        if (src.getType().name.equals(labeled) && dst.getType().name.equals(labeled))
+            mappingStore.addMapping(src.getChild(0),dst.getChild(0));
+        else
+            compositeMatcher(src,dst,abstractCodeMapping,mappingStore);
     }
 
     @Override
@@ -36,6 +41,7 @@ public class CompositeMatcher extends BasicTreeMatcher implements TreeMatcher {
         CompositeStatementObjectMapping compositeStatementObjectMapping = (CompositeStatementObjectMapping) abstractCodeMapping;
         CompositeStatementObject fragment1 = (CompositeStatementObject) compositeStatementObjectMapping.getFragment1();
         CompositeStatementObject fragment2 = (CompositeStatementObject) compositeStatementObjectMapping.getFragment2();
+
         cpyToSrc = new HashMap<>();
         cpyToDst = new HashMap<>();
         Tree srcFakeTree = makeFakeTree(src,fragment1,cpyToSrc);
