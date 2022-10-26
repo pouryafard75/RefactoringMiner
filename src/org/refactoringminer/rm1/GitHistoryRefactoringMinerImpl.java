@@ -438,7 +438,7 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 			throw new RuntimeException(e);
 		}
 		long populating_finished =  System.currentTimeMillis();
-		System.out.println("Population From GitHub execution: " + (populating_finished - populating_started)/ 1000 + " seconds");
+		logger.info("Population From GitHub execution: " + (populating_finished - populating_started)/ 1000 + " seconds");
 		try {
 			List<MoveSourceFolderRefactoring> moveSourceFolderRefactorings = processIdenticalFiles(fileContentsBefore, fileContentsCurrent, renamedFilesHint);
 		} catch (IOException e) {
