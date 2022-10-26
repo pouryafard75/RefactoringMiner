@@ -74,10 +74,19 @@ public class ProjectASTDiffer
     public static class URLHelper{
         public static String clean(String url)
         {
-            int index = nthIndexOf(url,'#',1);
-            if (index == -1) return url;
-            return url.substring(0,index);
-
+            String result;
+            int index;
+            index = nthIndexOf(url,'#',1);
+            if (index == -1)
+                result = url;
+            else
+                result =  url.substring(0,index);
+            index = nthIndexOf(result,'?',1);
+            if (index == -1)
+                result = url;
+            else
+                result =  url.substring(0,index);
+            return result;
         }
         public static String getRepo(String url) {
             int index = nthIndexOf(url,'/',5);
