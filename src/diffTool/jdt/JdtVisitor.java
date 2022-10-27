@@ -93,6 +93,20 @@ public class JdtVisitor  extends AbstractJdtVisitor {
 
     @Override
     public boolean visit(QualifiedName name) {
+        Tree t = this.trees.peek();
+        assert t != null;
+
+        Tree s1 = context.createTree(SIMPLE_NAME,name.getQualifier().toString());
+        s1.setPos(name.getQualifier().getStartPosition());
+        s1.setLength(name.getQualifier().getLength());
+        t.addChild(s1);
+        s1.setParent(t);
+        name.getName().accept(this);
+//        Tree s2 = context.createTree(SIMPLE_NAME,name.getName().toString());
+//        s2.setPos(name.getName().getStartPosition());
+//        s2.setLength(name.getName().getLength());
+//        t.addChild(s2);
+//        s2.setParent(t);
         return false;
     }
 
