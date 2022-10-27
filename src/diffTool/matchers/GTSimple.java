@@ -11,7 +11,7 @@ public class GTSimple extends GTM{
     }
     @Override
     public MappingStore match(Tree src, Tree dst, MappingStore mappings) {
-        MappingStore m1 = new GreedySubtreeMatcher(minP).match(src,dst,mappings);
+        MappingStore m1 = new GreedySubtreeMatcher(minP,false).match(src,dst,mappings);
         MappingStore m2 = new SimpleBottomUpMatcher().match(src,dst,m1);
         return m2;
     }

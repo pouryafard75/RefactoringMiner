@@ -187,7 +187,7 @@ public class ProjectASTDiffer
         MultiMappingStore mappingStore = new MultiMappingStore(srcTreeContext,dstTreeContext);
         mappingStore.addMapping(srcTree,dstTree);
         this.lastStepMappings = new ArrayList<>();
-        processRefactorings(srcTree,dstTree,classDiff.getRefactorings(),mappingStore);
+
         processPackageDeclaration(srcTree,dstTree,classDiff,mappingStore);
         processImports(srcTree,dstTree,classDiff.getImportDiffList(),mappingStore);
         processEnumConstants(srcTree,dstTree,classDiff.getCommonEnumConstants(),mappingStore);
@@ -201,6 +201,7 @@ public class ProjectASTDiffer
         }
         processClassDeclarationMapping(srcTree,dstTree,classDiff,mappingStore);
         processAllMethods(srcTree,dstTree,classDiff.getOperationBodyMapperList(),mappingStore);
+        processRefactorings(srcTree,dstTree,classDiff.getRefactorings(),mappingStore);
         processModelDiffRefactorings(srcTree,dstTree,classDiff,modelDiffRefactorings,mappingStore);
         processLastStepMappings(srcTree,dstTree,mappingStore);
 //        if (_CHECK_COMMENTS) addAndProcessComments(treeContextPair.first, treeContextPair.second,mappingStore);
@@ -554,6 +555,59 @@ public class ProjectASTDiffer
 //        if (true) return;
         for (Refactoring refactoring : refactoringList)
         {
+            if (refactoring instanceof ReplaceLoopWithPipelineRefactoring)
+            {
+                //TODO: Kinda completed but assertations must be removed
+                ReplaceLoopWithPipelineRefactoring replaceLoopWithPipelineRefactoring = (ReplaceLoopWithPipelineRefactoring) (refactoring);
+                assert replaceLoopWithPipelineRefactoring.getCodeFragmentsAfter().size() == 1;
+                AbstractCodeFragment next = replaceLoopWithPipelineRefactoring.getCodeFragmentsAfter().iterator().next();
+                List<LambdaExpressionObject> lambdas = next.getLambdas();
+                AbstractCodeFragment enhancedFor = null;
+                for (AbstractCodeFragment abstractCodeFragment : replaceLoopWithPipelineRefactoring.getCodeFragmentsBefore()) {
+                    if (abstractCodeFragment.getLocationInfo().getCodeElementType().toString().equals("ENHANCED_FOR_STATEMENT")) {
+                        enhancedFor = abstractCodeFragment;
+                        break;
+                    }
+                }
+                for (LambdaExpressionObject lambda : lambdas) {
+                    for (VariableDeclaration parameter : lambda.getParameters()) {
+                        String variableName = parameter.getVariableName();
+                        VariableDeclaration variableDeclaration = enhancedFor.getVariableDeclaration(variableName);
+                        Tree srcNode = Tree.findByLocationInfo(srcTree,variableDeclaration.getLocationInfo());
+                        Tree dstNode = Tree.findByLocationInfo(dstTree,parameter.getLocationInfo());
+                        new LeafMatcher(false).match(srcNode,dstNode,null,mappingStore);
+                    }
+                }
+            }
+
+            if (refactoring instanceof ReplacePipelineWithLoopRefactoring)
+            {
+                //TODO : ongoing problem
+                ReplacePipelineWithLoopRefactoring replaceLoopWithPipelineRefactoring = (ReplacePipelineWithLoopRefactoring) (refactoring);
+                assert replaceLoopWithPipelineRefactoring.getCodeFragmentsBefore().size() == 1;
+                AbstractCodeFragment next = replaceLoopWithPipelineRefactoring.getCodeFragmentsBefore().iterator().next();
+                List<LambdaExpressionObject> lambdas = next.getLambdas();
+                AbstractCodeFragment enhancedFor = null;
+                for (AbstractCodeFragment abstractCodeFragment : replaceLoopWithPipelineRefactoring.getCodeFragmentsAfter()) {
+                    System.out.println(abstractCodeFragment);
+                    System.out.println(abstractCodeFragment.getLocationInfo().getCodeElementType());
+                    if (abstractCodeFragment.getLocationInfo().getCodeElementType().toString().equals("ENHANCED_FOR_STATEMENT")) {
+                        enhancedFor = abstractCodeFragment;
+                        break;
+                    }
+                }
+                System.out.println(enhancedFor);
+                for (LambdaExpressionObject lambda : lambdas) {
+                    for (VariableDeclaration parameter : lambda.getParameters()) {
+                        String variableName = parameter.getVariableName();
+                        VariableDeclaration variableDeclaration = enhancedFor.getVariableDeclaration(variableName);
+                        Tree srcNode = Tree.findByLocationInfo(srcTree,parameter.getLocationInfo());
+                        Tree dstNode = Tree.findByLocationInfo(dstTree,variableDeclaration.getLocationInfo());
+                        new LeafMatcher(false).match(srcNode,dstNode,null,mappingStore);
+                    }
+                }
+                System.out.println("");
+            }
             if (refactoring instanceof ExtractOperationRefactoring) {
                 ExtractOperationRefactoring extractOperationRefactoring = (ExtractOperationRefactoring) (refactoring);
                 UMLOperationBodyMapper bodyMapper = extractOperationRefactoring.getBodyMapper();

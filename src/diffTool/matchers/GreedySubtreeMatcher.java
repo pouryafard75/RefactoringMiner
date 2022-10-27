@@ -6,8 +6,10 @@ import diffTool.tree.Tree;
 import diffTool.utils.Pair;
 
 public class GreedySubtreeMatcher extends AbstractSubtreeMatcher {
-    public GreedySubtreeMatcher(int minP) {
+    private final boolean original;
+    public GreedySubtreeMatcher(int minP, boolean original) {
         super(minP);
+        this.original = original;
     }
 
     @Override
@@ -18,8 +20,34 @@ public class GreedySubtreeMatcher extends AbstractSubtreeMatcher {
             List<Mapping> candidates = convertToMappings(pair);
             candidates.sort(comparator);
             candidates.forEach(mapping -> {
-                if (mappings.areBothUnmapped(mapping.first, mapping.second))
-                    mappings.addMappingRecursively(mapping.first, mapping.second);
+                if (mappings.areBothUnmapped(mapping.first, mapping.second)) {
+                    if (original)
+                        mappings.addMappingRecursively(mapping.first, mapping.second);
+                    else
+                    {
+                        String SimpleNameType = "SimpleName";
+                        if (mapping.first.getType().name.equals(SimpleNameType) &&
+                                mapping.second.getType().name.equals(SimpleNameType))
+                            {
+                                if (
+                                        !mapping.first.getParent().getType().name.equals(mapping.second.getParent().getType().name)
+                                        &&
+                                                (
+                                                        ((mapping.first.getParent().getType().name.equals("MethodInvocation"))  && !mapping.second.getParent().getType().name.equals("MethodInvocation"))
+                                                        ||
+                                                        ((mapping.second.getParent().getType().name.equals("MethodInvocation"))  && !mapping.first.getParent().getType().name.equals("MethodInvocation"))
+                                                )
+                                )
+                                {
+                                    //pass
+                                }
+                                else{
+                                    mappings.addMappingRecursively(mapping.first, mapping.second);
+                                }
+
+                            }
+                    }
+                }
             });
         });
     }
