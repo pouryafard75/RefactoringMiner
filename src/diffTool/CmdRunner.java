@@ -35,7 +35,7 @@ public class CmdRunner {
                 } else if (line.hasOption("u")) {
                     String inputUrl = line.getOptionValue("u");
                     try {
-                        ProjectASTDiff projectASTDiff = ProjectASTDiffer.fromURL(inputUrl).diff();
+                        ProjectASTDiff projectASTDiff = ProjectASTDiffer.fromURL(inputUrl,false).diff();
                         WebDiff webDiff = new WebDiff(projectASTDiff);
                         webDiff.run();
                     } catch (RefactoringMinerTimedOutException e) {

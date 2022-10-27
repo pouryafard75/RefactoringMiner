@@ -44,9 +44,9 @@ public class ProjectASTDiffer
         return projectASTDiff;
     }
 
-    private static ProjectASTDiffer fromRepoCommit(String repo, String commitId)
+    private static ProjectASTDiffer fromRepoCommit(String repo, String commitId, boolean reversed)
     {
-        return new ProjectASTDiffer(new GitHistoryRefactoringMinerImpl().getProjectData(repo,commitId));
+        return new ProjectASTDiffer(new GitHistoryRefactoringMinerImpl().getProjectData(repo,commitId,reversed));
     }
     public static ProjectASTDiffer fromLocalRepo(String dirPath, String commitId)
     {
@@ -64,10 +64,10 @@ public class ProjectASTDiffer
     private ProjectASTDiffer(ProjectData projectData){
         this.projectASTDiff = new ProjectASTDiff(projectData);
     }
-    public static ProjectASTDiffer fromURL(String url)
+    public static ProjectASTDiffer fromURL(String url, boolean reversed)
     {
         String cleaned = URLHelper.clean(url);
-        return ProjectASTDiffer.fromRepoCommit(URLHelper.getRepo(cleaned),URLHelper.getCommit(cleaned));
+        return ProjectASTDiffer.fromRepoCommit(URLHelper.getRepo(cleaned),URLHelper.getCommit(cleaned),reversed);
     }
 
 
@@ -569,6 +569,7 @@ public class ProjectASTDiffer
                         break;
                     }
                 }
+                assert enhancedFor != null;
                 for (LambdaExpressionObject lambda : lambdas) {
                     for (VariableDeclaration parameter : lambda.getParameters()) {
                         String variableName = parameter.getVariableName();
@@ -578,6 +579,9 @@ public class ProjectASTDiffer
                         new LeafMatcher(false).match(srcNode,dstNode,null,mappingStore);
                     }
                 }
+                Tree srcSt = Tree.findByLocationInfo(srcTree,enhancedFor.getLocationInfo());
+                Tree dstSt = Tree.findByLocationInfo(dstTree,next.getLocationInfo());
+                mappingStore.addMapping(srcSt,dstSt);
             }
 
             if (refactoring instanceof ReplacePipelineWithLoopRefactoring)
@@ -596,17 +600,21 @@ public class ProjectASTDiffer
                         break;
                     }
                 }
-                System.out.println(enhancedFor);
+                assert enhancedFor != null;
                 for (LambdaExpressionObject lambda : lambdas) {
                     for (VariableDeclaration parameter : lambda.getParameters()) {
                         String variableName = parameter.getVariableName();
                         VariableDeclaration variableDeclaration = enhancedFor.getVariableDeclaration(variableName);
+                        if (variableDeclaration == null)
+                            continue;
                         Tree srcNode = Tree.findByLocationInfo(srcTree,parameter.getLocationInfo());
                         Tree dstNode = Tree.findByLocationInfo(dstTree,variableDeclaration.getLocationInfo());
                         new LeafMatcher(false).match(srcNode,dstNode,null,mappingStore);
                     }
                 }
-                System.out.println("");
+                Tree srcSt = Tree.findByLocationInfo(srcTree,next.getLocationInfo());
+                Tree dstSt = Tree.findByLocationInfo(dstTree,enhancedFor.getLocationInfo());
+                mappingStore.addMapping(srcSt,dstSt);
             }
             if (refactoring instanceof ExtractOperationRefactoring) {
                 ExtractOperationRefactoring extractOperationRefactoring = (ExtractOperationRefactoring) (refactoring);

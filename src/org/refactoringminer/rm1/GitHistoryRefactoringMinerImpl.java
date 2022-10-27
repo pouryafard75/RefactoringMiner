@@ -420,7 +420,7 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 		}
 		return projectData;
 	}
-	public ProjectData getProjectData(String gitURL, String commitId)
+	public ProjectData getProjectData(String gitURL, String commitId, boolean reversed)
 	{
 		ProjectData projectData = new ProjectData();
 		Set<String> repositoryDirectoriesBefore = ConcurrentHashMap.newKeySet();
@@ -460,14 +460,23 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 		}
 		UMLModelDiff modelDiff = null;
 		try {
-			modelDiff = parentUMLModel.diff(currentUMLModel);
+			if (!reversed)
+				modelDiff = parentUMLModel.diff(currentUMLModel);
+			else
+				modelDiff = currentUMLModel.diff(parentUMLModel);
 		} catch (RefactoringMinerTimedOutException e) {
 			throw new RuntimeException(e);
 		}
 		long RM_finished =  System.currentTimeMillis();
 		logger.info("RefactoringMiner ModelDiff execution: " + (RM_finished - RM_started)/ 1000 + " seconds");
-		projectData.setFileContentsBefore(fileContentsBefore);
-		projectData.setFileContentsCurrent(fileContentsCurrent);
+		if (!reversed) {
+			projectData.setFileContentsBefore(fileContentsBefore);
+			projectData.setFileContentsCurrent(fileContentsCurrent);
+		}
+		else {
+			projectData.setFileContentsCurrent(fileContentsBefore);
+			projectData.setFileContentsBefore(fileContentsCurrent);
+		}
 		projectData.setUmlModelDiff(modelDiff);
 //		projectData.setRepositoryDirectoriesBefore(repositoryDirectoriesBefore);
 //		projectData.setRepositoryDirectoriesCurrent(repositoryDirectoriesCurrent);

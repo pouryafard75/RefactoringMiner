@@ -116,6 +116,6 @@ public interface GitHistoryRefactoringMiner {
 	 */
 	String getConfigId();
 
-	ProjectData getProjectData(String gitURL, String commitId);
+	ProjectData getProjectData(String gitURL, String commitId, boolean reversed);
 
 }
