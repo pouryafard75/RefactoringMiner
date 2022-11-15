@@ -21,6 +21,7 @@ public class LeafMatcher extends BasicTreeMatcher implements TreeMatcher {
 //            if (abstractCodeMapping.getFragment1() instanceof AbstractExpression || abstractCodeMapping.getFragment2() instanceof AbstractExpression)
 //                return;
 //        if (true) return;
+        if (src == null || dst == null) return;
         Map<Tree,Tree> srcCopy = new HashMap<>();
         Map<Tree,Tree> dstCopy = new HashMap<>();
         Pair<Tree, Tree> prunedPair = pruneTrees(src, dst, srcCopy, dstCopy);
