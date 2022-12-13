@@ -293,7 +293,10 @@ public class MultiMappingStore implements Iterable<Mapping> {
         addMapping(src, dst);
         if (src.getChildren() != null)
             for (int i = 0; i < src.getChildren().size(); i++)
-                addMappingRecursively(src.getChild(i), dst.getChild(i));
+                if (dst.getChildren().size() == src.getChildren().size())
+                    //TODO: Must investigate why the problem happens related to java docs:
+                    //https://github.com/Graylog2/graylog2-server/commit/2ef067fc70055fc4d55c75937303414ddcf07e0e
+                    addMappingRecursively(src.getChild(i), dst.getChild(i));
     }
 
     public void add(MappingStore match) {
