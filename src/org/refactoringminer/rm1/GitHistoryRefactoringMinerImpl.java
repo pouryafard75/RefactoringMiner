@@ -17,6 +17,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -904,7 +906,11 @@ public class GitHistoryRefactoringMinerImpl implements GitHistoryRefactoringMine
 							URL currentRawURL = commitFile.getRawUrl();
 							InputStream currentRawFileInputStream = currentRawURL.openStream();
 							String currentRawFile = IOUtils.toString(currentRawFileInputStream);
-							String rawURLInParentCommit = currentRawURL.toString().replace(currentCommitId, parentCommitId).replace(fileName, previousFilename);
+							String encodeFileName = URLEncoder.encode(fileName, StandardCharsets.UTF_8);
+							String encodePreviousFilename = URLEncoder.encode(previousFilename, StandardCharsets.UTF_8);
+							String rawURLInParentCommit = currentRawURL.toString()
+									.replace(currentCommitId, parentCommitId)
+									.replace(encodeFileName, encodePreviousFilename);
 							InputStream parentRawFileInputStream = new URL(rawURLInParentCommit).openStream();
 							String parentRawFile = IOUtils.toString(parentRawFileInputStream);
 							filesBefore.put(previousFilename, parentRawFile);
