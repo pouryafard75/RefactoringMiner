@@ -8,6 +8,7 @@ plugins {
     id 'checkstyle'
 }
 
+
 group = "com.github.tsantalis"
 def version = project.hasProperty('version') ?
         project.version
