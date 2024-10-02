@@ -38,6 +38,7 @@ public class ClassDiffMatcher extends OptimizationAwareMatcher{
         if (!mergeFlag) {
             mappingStore.addMapping(srcTree, dstTree);
             new PackageDeclarationMatcher().match(srcTree, dstTree, mappingStore);
+            new CommentMatcher(classDiff.getPackageDeclarationCommentListDiff()).match(srcTree, dstTree, mappingStore);
         }
         boolean isBaseDiff = classDiff instanceof UMLClassBaseDiff;
         if (isBaseDiff) {
